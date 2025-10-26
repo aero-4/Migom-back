@@ -19,8 +19,6 @@ from src.users.presentation.api import UserCRUDRouter, user_api_router
 from src.users.presentation.admin import UserAdmin
 from src.db.engine import engine
 from src.integrations.infrastructure.http.aiohttp_client import AiohttpClient
-from src.vacancies.presentation.admin import VacancyAdmin
-from src.vacancies.presentation.api import vacancy_api_router, VacancyCRUDRouter
 
 
 logger = logging.getLogger(__name__)
