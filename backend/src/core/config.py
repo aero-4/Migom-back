@@ -28,9 +28,10 @@ class Settings(BaseSettings):
     DB_PASSWORD: str | None = os.environ.get("DB_PASSWORD")
     DB_HOST: str | None = os.environ.get("DB_HOST")
     DB_PORT: str | None = os.environ.get("DB_PORT")
-
     DATABASE_URI: AnyUrl | None = None
     ALEMBIC_DATABASE_URI: AnyUrl | None = None
+
+    REDIS_URI: AnyUrl | None = os.environ.get("REDIS_URL")
 
 
     @staticmethod

@@ -13,8 +13,8 @@ class AuthSettings(BaseSettings):
     JWT_PRIVATE_KEY_PATH: str = "./secrets/ec_private.pem"
     JWT_PUBLIC_KEY_PATH: str = "./secrets/ec_public.pem"
 
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 15
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 60 * 24 * 30
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = 60 * 15
+    REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 30
     SECURE_COOKIES: bool = True
     JWT_METHOD: Literal["cookies", "headers", "all"] = "all"
     JWT_ISSUER: str = "auth-service"
@@ -33,3 +33,4 @@ class AuthSettings(BaseSettings):
             return SecretStr(f.read())
 
 
+auth_settings = AuthSettings()
