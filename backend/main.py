@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_db_and_tables()  # Only needed if Alembic is not used
+    # await create_db_and_tables()  # Only needed if Alembic is not used
     yield
 
 
@@ -43,9 +43,9 @@ async def app_exception_handler(request: Request, exc: AppException):
     )
 
 
-app.add_middleware(SecurityMiddleware)
-app.add_middleware(AuthenticationMiddleware)
-app.add_middleware(JWTRefreshMiddleware)
+# app.add_middleware(SecurityMiddleware)
+# app.add_middleware(AuthenticationMiddleware)
+# app.add_middleware(JWTRefreshMiddleware)
 
 Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 

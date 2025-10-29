@@ -3,11 +3,15 @@ from datetime import timedelta
 
 from jose import jwt, JWTError
 from pydantic import SecretStr
+from starlette.responses import Response
+from starlette.requests import Request
 
 from backend.src.auth.config import auth_settings
 from backend.src.auth.domain.entities import TokenData, TokenType
 from backend.src.auth.domain.interfaces.token_auth import ITokenAuth
 from backend.src.auth.domain.interfaces.token_provider import ITokenProvider
+from backend.src.auth.domain.interfaces.token_storage import ITokenStorage
+from backend.src.auth.infrastructure.transports.base import IAuthTransport
 from backend.src.users.domain.entities import User
 from backend.src.utils.datetimes import get_timezone_now
 
@@ -53,9 +57,88 @@ class JWTProvider(ITokenProvider):
 
 
 class JWTAuth(ITokenAuth):
+    """
+    Implementation of ITokenAuth for handling JWT-based authentication.
 
-    def set_tokens(self, user: User):
-        ...
+    Provides methods to issue, revoke, refresh, and retrieve access/refresh tokens
+    from the request/response cycle.
+    Integrates with a token storage backend for additional validation like token revocation.
+    """
 
-    def set_token(self, token: str, type: TokenType):
-        ...
+    def __init__(
+        self,
+        token_provider: ITokenProvider,
+        transports: dict[TokenType, list[IAuthTransport]],
+        token_storage: ITokenStorage | None = None,
+        request: Request | None = None,
+        response: Response | None = None
+    ):
+        super().__init__(token_provider, token_storage)
+        self.transports = transports
+        self.request = request
+        self.response = response
+
+    async def set_tokens(self, user: User) -> None:
+        data = {
+            "user_id": str(user.id),
+            "is_superuser": user.is_superuser,
+        }
+        access_token = self.token_provider.create_access_token(data)
+        refresh_token = self.token_provider.create_refresh_token(data)
+        await self.set_token(access_token, TokenType.ACCESS)
+        await self.set_token(refresh_token, TokenType.REFRESH)
+
+    async def set_token(self, token: str, token_type: TokenType) -> None:
+        for transport in self._get_transports(token_type):
+            transport.set_token(self.response, token)
+
+        if self.token_storage:
+            await self.token_storage.store_token(self.token_provider.read_token(token))
+
+
+    async def read_token(self, token_type: TokenType) -> TokenData | None:
+        token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
+        token_data = self.token_provider.read_token(token)
+        return await self._validate_token_or_none(token_data)
+
+
+    async def _validate_token_or_none(self, token_data: TokenData) -> TokenData | None:
+        if not token_data:
+            return None
+
+        if token_data.jti and self.token_storage:
+            is_active = await self.token_storage.is_token_active(token_data.jti)
+            if not is_active:
+                return None
+        return token_data
+
+    def _get_transports(self, transport_type: TokenType) -> list[IAuthTransport]:
+        for token_type, transports in self.transports.items():
+            if token_type == transport_type:
+                return transports
+        return []
+
+    def _get_access_token(self) -> str | None:
+        """
+        Retrieve access token from the request.
+
+        :return: Access token string or None.
+        """
+        if hasattr(self.request.state, "access_token"):
+            return self.request.state.access_token
+
+        for transport in self._get_transports(TokenType.ACCESS):
+            token = transport.get_token(self.request)
+            if token is not None:
+                return token
+
+    def _get_refresh_token(self) -> str | None:
+        """
+        Retrieve refresh token from the request.
+
+        :return: Refresh token string or None.
+        """
+        for transport in self._get_transports(TokenType.REFRESH):
+            token = transport.get_token(self.request)
+            if token is not None:
+                return token
