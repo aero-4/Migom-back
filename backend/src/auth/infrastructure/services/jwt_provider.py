@@ -5,9 +5,10 @@ from jose import jwt, JWTError
 from pydantic import SecretStr
 
 from backend.src.auth.config import auth_settings
-from backend.src.auth.domain.entities import TokenData
+from backend.src.auth.domain.entities import TokenData, TokenType
 from backend.src.auth.domain.interfaces.token_auth import ITokenAuth
 from backend.src.auth.domain.interfaces.token_provider import ITokenProvider
+from backend.src.users.domain.entities import User
 from backend.src.utils.datetimes import get_timezone_now
 
 
@@ -52,4 +53,9 @@ class JWTProvider(ITokenProvider):
 
 
 class JWTAuth(ITokenAuth):
-    ...
+
+    def set_tokens(self, user: User):
+        ...
+
+    def set_token(self, token: str, type: TokenType):
+        ...

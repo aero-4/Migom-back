@@ -1,4 +1,4 @@
-from backend.src.core.domain.exceptions import NotAuthenticated
+from backend.src.core.domain.exceptions import NotAuthenticated, AlreadyExists, NotFound
 
 
 class ErrorCode:
@@ -9,7 +9,16 @@ class ErrorCode:
     EMAIL_TAKEN = "Email is already taken"
     REFRESH_TOKEN_NOT_VALID = "Refresh token is not valid"
     REFRESH_TOKEN_REQUIRED = "Refresh token is required either in the body or cookie"
+    NOT_FOUND = "User not found"
 
 
 class InvalidCredentials(NotAuthenticated):
     detail = ErrorCode.INVALID_CREDENTIALS
+
+
+class UserAlreadyExists(AlreadyExists):
+    detail = ErrorCode.EMAIL_TAKEN
+
+
+class UserNotFound(NotFound):
+    detail = ErrorCode.NOT_FOUND

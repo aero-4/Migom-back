@@ -1,16 +1,17 @@
 import os
+import secrets
 from typing import Literal
 
 from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, field_validator, ValidationInfo, AnyUrl, ConfigDict
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = os.environ.get("PROJECT_NAME", "MigomProject")
+    PROJECT_NAME: str = os.environ.get("PROJECT_NAME", "Migom")
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = os.environ.get("SECRET_KEY")
-    DOMAIN: str = os.environ.get("DOMAIN")
-    SSL_ENABLED: bool = os.environ.get("SSL_ENABLED")
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+    DOMAIN: str = os.environ.get("DOMAIN", "")
+    SSL_ENABLED: bool = os.environ.get("SSL_ENABLED", False)
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
 
     @field_validator("BACKEND_CORS_ORIGINS")
@@ -21,18 +22,15 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    DB_TYPE: Literal['POSTGRESQL', 'ASYNC_POSTGRESQL', 'SQLITE', 'ASYNC_SQLITE'] = os.environ.get("DB_TYPE")
+    DB_TYPE: Literal['POSTGRESQL', 'ASYNC_POSTGRESQL', 'SQLITE', 'ASYNC_SQLITE'] = os.environ.get("DB_TYPE", "ASYNC_POSTGRESQL")
 
-    DB_NAME: str = os.environ.get("DB_NAME")
-    DB_USER: str | None = os.environ.get("DB_USER")
-    DB_PASSWORD: str | None = os.environ.get("DB_PASSWORD")
-    DB_HOST: str | None = os.environ.get("DB_HOST")
-    DB_PORT: str | None = os.environ.get("DB_PORT")
+    DB_NAME: str = os.environ.get("DB_NAME", "migom")
+    DB_USER: str | None = os.environ.get("DB_USER", "postgres")
+    DB_PASSWORD: str | None = os.environ.get("DB_PASSWORD", "hookklo")
+    DB_HOST: str | None = os.environ.get("DB_HOST", "localhost")
+    DB_PORT: str | None = os.environ.get("DB_PORT", "5432")
     DATABASE_URI: AnyUrl | None = None
-    ALEMBIC_DATABASE_URI: AnyUrl | None = None
-
     REDIS_URI: AnyUrl | None = os.environ.get("REDIS_URL")
-
 
     @staticmethod
     def _build_dsn(scheme: str, values: dict) -> str:
@@ -47,7 +45,7 @@ class Settings(BaseSettings):
             )
         )
 
-    @field_validator("DATABASE_URI")
+    @field_validator("DATABASE_URI", mode="after")
     def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> str:
         if os.environ.get("ENVIRONMENT") == "testing":
             db_name = os.getenv("DB_NAME")
@@ -67,19 +65,6 @@ class Settings(BaseSettings):
         elif db_type == "ASYNC_POSTGRESQL":
             return cls._build_dsn("postgresql+asyncpg", info.data)
         raise ValueError("Unsupported database type")
-
-    @field_validator("ALEMBIC_DATABASE_URI", mode="before")
-    def assemble_alembic_connection(cls, v: str | None, info: ValidationInfo) -> str:
-        if isinstance(v, str):
-            return v
-        db_type = info.data.get("DB_TYPE")
-        if db_type in ["SQLITE", "POSTGRESQL"]:
-            return info.data.get("DATABASE_URI")
-        elif db_type == "ASYNC_SQLITE":
-            return f"sqlite:///{info.data.get('DB_NAME')}.db"
-        elif db_type == "ASYNC_POSTGRESQL":
-            return cls._build_dsn("postgresql+psycopg", info.data)
-        raise ValueError("Unsupported DB_TYPE for alembic")
 
     SMTP_TLS: bool = True
     SMTP_PORT: int | None = None

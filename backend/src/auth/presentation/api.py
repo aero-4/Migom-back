@@ -10,7 +10,7 @@ auth_api_router = APIRouter()
 
 
 @auth_api_router.post("/login")
-async def login(credentials: AuthUserDTO, pwd_hasher: Depends(get_password_hasher), uow: IUserUnitOfWork):
+async def login(credentials: AuthUserDTO, pwd_hasher=Depends(get_password_hasher), uow=IUserUnitOfWork):
     await authenticate(credentials.email, credentials.password, pwd_hasher, uow)
     return {"message": "Login successful"}
 

@@ -1,5 +1,4 @@
-from src.core.domain.exceptions import statuses
-
+from fastapi import status
 
 class AppException(Exception):
     """
@@ -22,7 +21,7 @@ class AppException(Exception):
         Defining a separate internal status system would introduce unnecessary complexity
         for developers accustomed to web applications, so HTTP codes are a pragmatic choice.
     """
-    status_code = statuses.HTTP_500_INTERNAL_SERVER_ERROR
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     detail = "Server error"
     extra: dict | None = None
 
@@ -39,25 +38,25 @@ class AppException(Exception):
 
 
 class PermissionDenied(AppException):
-    status_code = statuses.HTTP_403_FORBIDDEN
+    status_code = status.HTTP_403_FORBIDDEN
     detail = "Permission denied"
 
 
 class NotFound(AppException):
-    status_code = statuses.HTTP_404_NOT_FOUND
+    status_code = status.HTTP_404_NOT_FOUND
     detail = "Not found"
 
 
 class AlreadyExists(AppException):
-    status_code = statuses.HTTP_409_CONFLICT
+    status_code = status.HTTP_409_CONFLICT
     detail = "Already exists"
 
 
 class BadRequest(AppException):
-    status_code = statuses.HTTP_400_BAD_REQUEST
+    status_code = status.HTTP_400_BAD_REQUEST
     detail = "Bad Request"
 
 
 class NotAuthenticated(AppException):
-    status_code = statuses.HTTP_401_UNAUTHORIZED
+    status_code = status.HTTP_401_UNAUTHORIZED
     detail = "User not authenticated"

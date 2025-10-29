@@ -2,23 +2,19 @@ import logging
 
 from contextlib import asynccontextmanager
 
+import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
-from sqladmin import Admin
-from starlette.staticfiles import StaticFiles
 
+from backend.src.db.utils import create_db_and_tables
 from src.core.config import settings
-from src.core.domain.exceptions.exceptions import AppException
-import src.core.infrastructure.logging_setup
+from src.core.domain.exceptions import AppException
 
-from src.auth.presentation.middlewares import SecurityMiddleware, AuthenticationMiddleware, JWTRefreshMiddleware
+from src.auth.presentation.middlewares.security import SecurityMiddleware
+from src.auth.presentation.middlewares.authentication import AuthenticationMiddleware
+from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware
 from src.auth.presentation.api import auth_api_router
-from src.auth.presentation.views import auth_view_router
-from src.users.presentation.api import UserCRUDRouter, user_api_router
-from src.users.presentation.admin import UserAdmin
-from src.db.engine import engine
-from src.integrations.infrastructure.http.aiohttp_client import AiohttpClient
 
 
 logger = logging.getLogger(__name__)
@@ -26,10 +22,8 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    AiohttpClient.get_aiohttp_client()
-    # await create_db_and_tables()  # Only needed if Alembic is not used
+    await create_db_and_tables()  # Only needed if Alembic is not used
     yield
-    await AiohttpClient.close_aiohttp_client()
 
 
 app = FastAPI(
@@ -56,3 +50,5 @@ app.add_middleware(JWTRefreshMiddleware)
 Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
 app.include_router(auth_api_router, prefix='/api/auth', tags=["auth"])
+
+uvicorn.run(app)

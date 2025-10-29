@@ -38,5 +38,4 @@ class CRUDBaseMeta(type):
 
 
 class CRUDBase(metaclass=CRUDBaseMeta):
-
     session_maker: ClassVar[sessionmaker | async_session_maker]
