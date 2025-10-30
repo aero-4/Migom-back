@@ -4,16 +4,16 @@ from fastapi import Depends
 from starlette.requests import Request
 from starlette.responses import Response
 
-from backend.src.auth.config import auth_settings
-from backend.src.auth.domain.entities import TokenType
-from backend.src.auth.domain.interfaces.token_auth import ITokenAuth
-from backend.src.auth.domain.interfaces.token_storage import ITokenStorage
-from backend.src.auth.infrastructure.services.jwt_provider import JWTAuth, JWTProvider
-from backend.src.users.domain.interfaces.password_hasher import IPasswordHasher
-from backend.src.users.infrastructure.services.password_hasher import BcryptPasswordHasher
-from backend.src.auth.infrastructure.services.redis_storage import RedisTokenStorage
-from backend.src.auth.infrastructure.transports.cookie import CookieTransport
-from backend.src.auth.infrastructure.transports.header import HeaderTransport
+from src.auth.config import auth_settings
+from src.auth.domain.entities import TokenType
+from src.auth.domain.interfaces.token_auth import ITokenAuth
+from src.auth.domain.interfaces.token_storage import ITokenStorage
+from src.auth.infrastructure.services.jwt_provider import JWTAuth, JWTProvider
+from src.users.domain.interfaces.password_hasher import IPasswordHasher
+from src.users.infrastructure.services.password_hasher import BcryptPasswordHasher
+from src.auth.infrastructure.services.redis_storage import RedisTokenStorage
+from src.auth.infrastructure.transports.cookie import CookieTransport
+from src.auth.infrastructure.transports.header import HeaderTransport
 
 
 def get_password_hasher() -> IPasswordHasher:

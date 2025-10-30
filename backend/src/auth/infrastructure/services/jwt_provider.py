@@ -6,14 +6,14 @@ from pydantic import SecretStr
 from starlette.responses import Response
 from starlette.requests import Request
 
-from backend.src.auth.config import auth_settings
-from backend.src.auth.domain.entities import TokenData, TokenType
-from backend.src.auth.domain.interfaces.token_auth import ITokenAuth
-from backend.src.auth.domain.interfaces.token_provider import ITokenProvider
-from backend.src.auth.domain.interfaces.token_storage import ITokenStorage
-from backend.src.auth.infrastructure.transports.base import IAuthTransport
-from backend.src.users.domain.entities import User
-from backend.src.utils.datetimes import get_timezone_now
+from src.auth.config import auth_settings
+from src.auth.domain.entities import TokenData, TokenType
+from src.auth.domain.interfaces.token_auth import ITokenAuth
+from src.auth.domain.interfaces.token_provider import ITokenProvider
+from src.auth.domain.interfaces.token_storage import ITokenStorage
+from src.auth.infrastructure.transports.base import IAuthTransport
+from src.users.domain.entities import User
+from src.utils.datetimes import get_timezone_now
 
 
 class JWTProvider(ITokenProvider):
@@ -81,7 +81,6 @@ class JWTAuth(ITokenAuth):
     async def set_tokens(self, user: User) -> None:
         data = {
             "user_id": str(user.id),
-            "is_superuser": user.is_superuser,
         }
         access_token = self.token_provider.create_access_token(data)
         refresh_token = self.token_provider.create_refresh_token(data)

@@ -7,7 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from backend.src.db.utils import create_db_and_tables
+from src.db.utils import create_db_and_tables
 from src.core.config import settings
 from src.core.domain.exceptions import AppException
 
@@ -51,4 +51,3 @@ Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
 app.include_router(auth_api_router, prefix='/api/auth', tags=["auth"])
 
-uvicorn.run(app)

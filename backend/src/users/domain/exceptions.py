@@ -1,4 +1,4 @@
-from backend.src.core.domain.exceptions import NotAuthenticated, AlreadyExists, NotFound
+from src.core.domain.exceptions import NotAuthenticated, AlreadyExists, NotFound
 
 
 class ErrorCode:

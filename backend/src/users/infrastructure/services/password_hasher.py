@@ -1,5 +1,6 @@
-from backend.src.users.domain.interfaces.password_hasher import IPasswordHasher
 import bcrypt
+
+from src.users.domain.interfaces.password_hasher import IPasswordHasher
 
 
 class BcryptPasswordHasher(IPasswordHasher):

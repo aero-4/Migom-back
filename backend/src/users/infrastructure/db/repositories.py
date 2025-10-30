@@ -1,14 +1,16 @@
+from abc import ABC
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.users.domain.entities import User, UserCreate, UserUpdate
-from backend.src.users.domain.exceptions import UserAlreadyExists, UserNotFound
-from backend.src.users.domain.interfaces.user_repo import IUserRepository
-from backend.src.users.infrastructure.db.orm import UserOrm
+from src.users.domain.entities import User, UserCreate, UserUpdate
+from src.users.domain.exceptions import UserAlreadyExists, UserNotFound
+from src.users.domain.interfaces.user_repo import IUserRepository
+from src.users.infrastructure.db.orm import UserOrm
 
 
-class PGUserRepository(IUserRepository):
+class PGUserRepository(IUserRepository, ABC):
     """
     PostgreSQL implementation of the user repository interface.
 
@@ -38,7 +40,7 @@ class PGUserRepository(IUserRepository):
         :return: The created user as a domain model.
         :raises UserAlreadyExists: If a user with the same unique fields already exists.
         """
-        obj = UserDB(**user.model_dump(mode='json'))
+        obj = UserOrm(**user.model_dump(mode='json'))
         self.session.add(obj)
 
         try:
@@ -60,9 +62,9 @@ class PGUserRepository(IUserRepository):
         :return: The retrieved user as a domain model.
         :raises UserNotFound: If no user with the given email exists.
         """
-        stmt = select(UserDB).where(UserDB.email == email)
+        stmt = select(UserOrm).where(UserOrm.email == email)
         result = await self.session.execute(stmt)
-        obj: UserDB = result.scalar_one_or_none()
+        obj: UserOrm = result.scalar_one_or_none()
 
         if not obj:
             raise UserNotFound(detail=f"User with email {email} not found")
@@ -70,12 +72,11 @@ class PGUserRepository(IUserRepository):
         return self._to_domain(obj)
 
     @staticmethod
-    def _to_domain(obj: UserDB) -> User:
+    def _to_domain(obj: UserOrm) -> User:
         return User(
             id=obj.id,
             email=obj.email,
             hashed_password=obj.hashed_password,
-            is_active=obj.is_active,
-            is_superuser=obj.is_superuser,
-            is_verified=obj.is_verified
+            first_name=obj.first_name,
+            last_name=obj.last_name
         )

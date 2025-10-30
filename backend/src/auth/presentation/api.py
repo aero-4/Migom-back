@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from backend.src.auth.application.use_cases.authenication import authenticate
-from backend.src.auth.presentation.dependencies import PasswordHasherDep, TokenAuthDep
-from backend.src.auth.presentation.dtos import AuthUserDTO
-from backend.src.users.presentation.dependencies import UserUoWDep
+from src.auth.application.use_cases.authenication import authenticate
+from src.auth.presentation.dependencies import PasswordHasherDep, TokenAuthDep
+from src.auth.presentation.dtos import AuthUserDTO
+from src.users.presentation.dependencies import UserUoWDep
 
 auth_api_router = APIRouter()
 

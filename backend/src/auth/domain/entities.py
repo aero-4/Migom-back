@@ -1,15 +1,17 @@
 import datetime
+import enum
 
-from backend.src.core.domain.entities import CustomModel
+from src.core.domain.entities import CustomModel
 
 
-class TokenType(CustomModel):
-    access: str | None = None
-    refresh: str | None = None
+class TokenType(str, enum.Enum):
+    ACCESS = "access"
+    REFRESH = "refresh"
 
 
 class TokenData(CustomModel):
     user_id: int
-    iss: str
-    jti: str
+    aud: str | None = None
+    iss: str | None = None
+    jti: str | None = None
     exp: datetime.datetime

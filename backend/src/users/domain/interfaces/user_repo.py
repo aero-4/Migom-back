@@ -1,6 +1,6 @@
 import abc
 
-from backend.src.users.domain.entities import UserCreate, User, UserUpdate
+from src.users.domain.entities import UserCreate, User, UserUpdate
 
 
 class IUserRepository(abc.ABC):

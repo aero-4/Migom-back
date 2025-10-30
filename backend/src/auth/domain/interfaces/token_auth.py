@@ -1,9 +1,9 @@
 import abc
 
-from backend.src.auth.domain.entities import TokenType
-from backend.src.auth.domain.interfaces.token_provider import ITokenProvider
-from backend.src.auth.domain.interfaces.token_storage import ITokenStorage
-from backend.src.users.domain.entities import User
+from src.auth.domain.entities import TokenType
+from src.auth.domain.interfaces.token_provider import ITokenProvider
+from src.auth.domain.interfaces.token_storage import ITokenStorage
+from src.users.domain.entities import User
 
 
 class ITokenAuth(abc.ABC):

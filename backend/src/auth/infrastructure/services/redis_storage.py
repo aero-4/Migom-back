@@ -1,7 +1,7 @@
-from backend.src.auth.domain.entities import TokenData
-from backend.src.auth.domain.interfaces.token_storage import ITokenStorage
-from backend.src.core.infrastructure.redis import get_redis_client
-from backend.src.utils.datetimes import get_timezone_now
+from src.auth.domain.entities import TokenData
+from src.auth.domain.interfaces.token_storage import ITokenStorage
+from src.core.infrastructure.redis import get_redis_client
+from src.utils.datetimes import get_timezone_now
 
 
 class RedisTokenStorage(ITokenStorage):

@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.db.engine import async_session_maker
-from backend.src.users.domain.interfaces.user_uow import IUserUnitOfWork
-from backend.src.users.infrastructure.db.repositories import PGUserRepository
+from src.db.engine import async_session_maker
+from src.users.domain.interfaces.user_uow import IUserUnitOfWork
+from src.users.infrastructure.db.repositories import PGUserRepository
 
 
 class PGUserUnitOfWork(IUserUnitOfWork):

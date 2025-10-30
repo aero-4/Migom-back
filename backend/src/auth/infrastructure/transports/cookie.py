@@ -1,9 +1,8 @@
 from typing import Literal
-
 from starlette.requests import Request
 from starlette.responses import Response
 
-from backend.src.auth.infrastructure.transports.base import IAuthTransport
+from src.auth.infrastructure.transports.base import IAuthTransport
 
 
 class CookieTransport(IAuthTransport):

@@ -1,6 +1,6 @@
 from pydantic import EmailStr, Field
 
-from backend.src.core.domain.entities import CustomModel
+from src.core.domain.entities import CustomModel
 
 
 class AuthUserDTO(CustomModel):

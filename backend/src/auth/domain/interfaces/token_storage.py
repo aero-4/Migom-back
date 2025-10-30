@@ -1,6 +1,6 @@
 import abc
 
-from backend.src.auth.domain.entities import TokenData
+from src.auth.domain.entities import TokenData
 
 
 class ITokenStorage(abc.ABC):

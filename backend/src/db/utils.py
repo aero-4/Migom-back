@@ -1,5 +1,5 @@
-from backend.src.db.base import Base
-from backend.src.db.engine import engine
+from src.db.base import Base
+from src.db.engine import engine
 
 
 async def create_db_and_tables():

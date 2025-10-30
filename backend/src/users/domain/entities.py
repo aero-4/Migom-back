@@ -1,6 +1,6 @@
 import datetime
 
-from backend.src.core.domain.entities import CustomModel
+from src.core.domain.entities import CustomModel
 
 
 class User(CustomModel):

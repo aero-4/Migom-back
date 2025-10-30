@@ -1,7 +1,7 @@
-from backend.src.auth.domain.interfaces.token_auth import ITokenAuth
-from backend.src.users.domain.exceptions import InvalidCredentials
-from backend.src.users.domain.interfaces.password_hasher import IPasswordHasher
-from backend.src.users.domain.interfaces.user_uow import IUserUnitOfWork
+from src.auth.domain.interfaces.token_auth import ITokenAuth
+from src.users.domain.exceptions import InvalidCredentials
+from src.users.domain.interfaces.password_hasher import IPasswordHasher
+from src.users.domain.interfaces.user_uow import IUserUnitOfWork
 
 
 async def authenticate(email: str, password: str, pwd_hasher: IPasswordHasher, uow: IUserUnitOfWork, auth: ITokenAuth):

@@ -4,9 +4,8 @@ from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import String, UUID
 
-from backend.src.db.base import Base
-from backend.src.utils.datetimes import get_timezone_now
-
+from src.db.base import Base
+from src.utils.datetimes import get_timezone_now
 
 class UserOrm(Base):
     __tablename__ = "users"
