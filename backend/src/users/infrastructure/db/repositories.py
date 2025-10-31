@@ -11,36 +11,12 @@ from src.users.infrastructure.db.orm import UserOrm
 
 
 class PGUserRepository(IUserRepository, ABC):
-    """
-    PostgreSQL implementation of the user repository interface.
-
-    This class handles CRUD operations for users using SQLAlchemy and a PostgreSQL database.
-
-    Attributes:
-        session (AsyncSession): The database session used for all operations.
-    """
-
     def __init__(self, session: AsyncSession) -> None:
-        """
-        Initialize the repository with an active database session.
-
-        :param session: Async SQLAlchemy session.
-        """
         super().__init__()
         self.session = session
 
     async def add(self, user: UserCreate) -> User:
-        """
-        Create a new user in the database.
-
-        Attempts to persist a new user entity and flushes the session.
-        Raises a custom exception if a uniqueness constraint is violated.
-
-        :param user: Domain model representing the user to be created.
-        :return: The created user as a domain model.
-        :raises UserAlreadyExists: If a user with the same unique fields already exists.
-        """
-        obj = UserOrm(**user.model_dump(mode='json'))
+        obj = UserOrm(**user.model_dump(mode='python'))
         self.session.add(obj)
 
         try:
@@ -55,15 +31,9 @@ class PGUserRepository(IUserRepository, ABC):
         return self._to_domain(obj)
 
     async def get_by_email(self, email: str) -> User:
-        """
-        Retrieve a user by email address.
-
-        :param email: Email address of the user.
-        :return: The retrieved user as a domain model.
-        :raises UserNotFound: If no user with the given email exists.
-        """
         stmt = select(UserOrm).where(UserOrm.email == email)
         result = await self.session.execute(stmt)
+
         obj: UserOrm = result.scalar_one_or_none()
 
         if not obj:
@@ -71,10 +41,28 @@ class PGUserRepository(IUserRepository, ABC):
 
         return self._to_domain(obj)
 
+    async def update(self, user: UserUpdate) -> User:
+        obj = UserOrm(**user.model_dump(mode='python'))
+        self.session.add(obj)
+        await self.session.flush()
+        return self._to_domain(obj)
+
+    async def delete(self, user: User):
+        stmt = select(UserOrm).where(UserOrm.id == user.id)
+        result = await self.session.execute(stmt)
+        obj: UserOrm = result.scalar_one_or_none()
+
+        if not obj:
+            raise UserNotFound(detail=f"User with id {user.id} not found")
+
+        await self.session.delete(obj)
+        await self.session.flush()
+
     @staticmethod
     def _to_domain(obj: UserOrm) -> User:
         return User(
             id=obj.id,
+            birthday=obj.birthday,
             email=obj.email,
             hashed_password=obj.hashed_password,
             first_name=obj.first_name,

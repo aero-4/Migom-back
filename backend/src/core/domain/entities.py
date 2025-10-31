@@ -8,9 +8,6 @@ class CustomModel(BaseModel):
 
     @model_validator(mode="after")
     def normalize_datetimes(self) -> "CustomModel":
-        """
-        Normalize all datetime fields in the model.
-        """
         tz_moscow = ZoneInfo("Europe/Moscow")
 
         for field_name, value in self.__dict__.items():

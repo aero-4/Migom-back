@@ -1,9 +1,11 @@
-import redis.asyncio as redis
-
 from functools import lru_cache
+
+from redis.asyncio import Redis
+
 from src.core.config import settings
 
 
 @lru_cache
-def get_redis_client() -> redis.Redis:
-    return redis.from_url(url=settings.REDIS_URL)
+def get_redis_client() -> Redis:
+    print(settings.REDIS_URL)
+    return Redis.from_url(settings.REDIS_URL, decode_responses=True)

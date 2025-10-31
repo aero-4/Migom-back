@@ -39,13 +39,14 @@ class JWTProvider(ITokenProvider):
 
     def _encode_jwt(self, data: dict, secret: SecretStr | str, algorithm: str = auth_settings.JWT_ALGORITHM, expire_seconds: int | None = None) -> str:
         payload = data.copy()
+
         if expire_seconds:
             payload["exp"] = get_timezone_now() + timedelta(seconds=expire_seconds)
 
-        payload["jti"] = uuid.uuid4()
+        payload["jti"] = str(uuid.uuid4())
         payload["iss"] = auth_settings.JWT_ISSUER
 
-        return jwt.encode(payload, key=self._get_secret_value(secret), algorithm=[algorithm])
+        return jwt.encode(payload, key=self._get_secret_value(secret), algorithm=algorithm)
 
     def _decode_jwt(self, payload: str, secret: SecretStr | str, algorithm: str = auth_settings.JWT_ALGORITHM, issuer: str = auth_settings.JWT_ISSUER):
         return jwt.decode(payload, key=self._get_secret_value(secret), algorithms=[algorithm], issuer=issuer)
@@ -66,12 +67,12 @@ class JWTAuth(ITokenAuth):
     """
 
     def __init__(
-        self,
-        token_provider: ITokenProvider,
-        transports: dict[TokenType, list[IAuthTransport]],
-        token_storage: ITokenStorage | None = None,
-        request: Request | None = None,
-        response: Response | None = None
+            self,
+            token_provider: ITokenProvider,
+            transports: dict[TokenType, list[IAuthTransport]],
+            token_storage: ITokenStorage | None = None,
+            request: Request | None = None,
+            response: Response | None = None
     ):
         super().__init__(token_provider, token_storage)
         self.transports = transports
@@ -87,6 +88,7 @@ class JWTAuth(ITokenAuth):
         await self.set_token(access_token, TokenType.ACCESS)
         await self.set_token(refresh_token, TokenType.REFRESH)
 
+
     async def set_token(self, token: str, token_type: TokenType) -> None:
         for transport in self._get_transports(token_type):
             transport.set_token(self.response, token)
@@ -94,12 +96,10 @@ class JWTAuth(ITokenAuth):
         if self.token_storage:
             await self.token_storage.store_token(self.token_provider.read_token(token))
 
-
     async def read_token(self, token_type: TokenType) -> TokenData | None:
         token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
         token_data = self.token_provider.read_token(token)
         return await self._validate_token_or_none(token_data)
-
 
     async def _validate_token_or_none(self, token_data: TokenData) -> TokenData | None:
         if not token_data:
@@ -118,11 +118,6 @@ class JWTAuth(ITokenAuth):
         return []
 
     def _get_access_token(self) -> str | None:
-        """
-        Retrieve access token from the request.
-
-        :return: Access token string or None.
-        """
         if hasattr(self.request.state, "access_token"):
             return self.request.state.access_token
 
@@ -132,11 +127,6 @@ class JWTAuth(ITokenAuth):
                 return token
 
     def _get_refresh_token(self) -> str | None:
-        """
-        Retrieve refresh token from the request.
-
-        :return: Refresh token string or None.
-        """
         for transport in self._get_transports(TokenType.REFRESH):
             token = transport.get_token(self.request)
             if token is not None:

@@ -2,7 +2,6 @@ import datetime
 
 from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.types import String, UUID
 
 from src.db.base import Base
 from src.utils.datetimes import get_timezone_now

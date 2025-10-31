@@ -4,10 +4,10 @@ from src.core.domain.entities import CustomModel
 
 
 class User(CustomModel):
-    id: str
+    id: int
     first_name: str
     last_name: str
-    birthday: str
+    birthday: datetime.date
     email: str
     hashed_password: str
 
@@ -15,14 +15,14 @@ class User(CustomModel):
 class UserCreate(CustomModel):
     first_name: str
     last_name: str
-    birthday: str
+    birthday: datetime.date
     email: str
     hashed_password: str
 
 
 class UserUpdate(CustomModel):
-    id: str
+    id: int
     first_name: str | None = None
     last_name: str | None = None
-    birthday: str | None = None
+    birthday: datetime.date | None = None
     email: str | None = None

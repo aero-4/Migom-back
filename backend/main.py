@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # await create_db_and_tables()  # Only needed if Alembic is not used
+    await create_db_and_tables()  # Only needed if Alembic is not used
     yield
 
 
@@ -51,3 +51,5 @@ Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
 app.include_router(auth_api_router, prefix='/api/auth', tags=["auth"])
 
+if __name__ == '__main__':
+    uvicorn.run(app, host="127.0.1.1")
