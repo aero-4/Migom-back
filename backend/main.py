@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from src.core.infrastructure.redis import check_redis_connection
 from src.db.utils import create_db_and_tables
 from src.core.config import settings
 from src.core.domain.exceptions import AppException
@@ -16,13 +17,16 @@ from src.auth.presentation.middlewares.authentication import AuthenticationMiddl
 from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware
 from src.auth.presentation.api import auth_api_router
 
+import src.core.infrastructure.logging_setup
+from src.users.presentation.api import users_api_router
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_db_and_tables()  # Only needed if Alembic is not used
+    await check_redis_connection()
+    await create_db_and_tables()
     yield
 
 
@@ -49,7 +53,7 @@ async def app_exception_handler(request: Request, exc: AppException):
 
 Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
-app.include_router(auth_api_router, prefix='/api/auth', tags=["auth"])
-
+app.include_router(auth_api_router, prefix='/api/auth', tags=["Authentication"])
+app.include_router(users_api_router, prefix='/api/users', tags=["Users"])
 if __name__ == '__main__':
-    uvicorn.run(app, host="127.0.1.1")
+    uvicorn.run(app)

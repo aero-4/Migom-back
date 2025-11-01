@@ -21,6 +21,7 @@ class PGUserRepository(IUserRepository, ABC):
 
         try:
             await self.session.flush()
+            await self.session.commit()
         except IntegrityError as e:
             try:
                 detail = "User can't be created. " + str(e.orig).split('\nDETAIL:  ')[1]
@@ -41,10 +42,21 @@ class PGUserRepository(IUserRepository, ABC):
 
         return self._to_domain(obj)
 
+    async def get_by_id(self, id: int) -> User:
+        stmt = select(UserOrm).where(UserOrm.id == id)
+        result = await self.session.execute(stmt)
+        obj: UserOrm = result.scalar_one_or_none()
+
+        if not obj:
+            raise UserNotFound(detail=f"User with id {id} not found")
+
+        return self._to_domain(obj)
+
     async def update(self, user: UserUpdate) -> User:
         obj = UserOrm(**user.model_dump(mode='python'))
         self.session.add(obj)
         await self.session.flush()
+
         return self._to_domain(obj)
 
     async def delete(self, user: User):

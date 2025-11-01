@@ -17,7 +17,6 @@ async def login(credentials: AuthUserDTO,
     return {"message": "Login successful"}
 
 
-
 @auth_api_router.post("/register")
 async def register(credentials: RegisterUserDTO,
                    pwd_hasher: PasswordHasherDep,

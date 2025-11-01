@@ -20,6 +20,13 @@ class IUserRepository(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def get_by_id(self, id: int) -> User:
+        """
+        Get user by id
+        """
+        pass
+
+    @abc.abstractmethod
     def delete(self, id: int) -> bool:
         """
         Delete user by id

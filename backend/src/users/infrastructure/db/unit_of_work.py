@@ -13,6 +13,7 @@ class PGUserUnitOfWork(IUserUnitOfWork):
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
         self.users = PGUserRepository(self.session)
+
         return await super().__aenter__()
 
     async def __aexit__(self, *args):

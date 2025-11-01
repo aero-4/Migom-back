@@ -58,14 +58,6 @@ class JWTProvider(ITokenProvider):
 
 
 class JWTAuth(ITokenAuth):
-    """
-    Implementation of ITokenAuth for handling JWT-based authentication.
-
-    Provides methods to issue, revoke, refresh, and retrieve access/refresh tokens
-    from the request/response cycle.
-    Integrates with a token storage backend for additional validation like token revocation.
-    """
-
     def __init__(
             self,
             token_provider: ITokenProvider,
@@ -81,7 +73,7 @@ class JWTAuth(ITokenAuth):
 
     async def set_tokens(self, user: User) -> None:
         data = {
-            "user_id": str(user.id),
+            "user_id": user.id,
         }
         access_token = self.token_provider.create_access_token(data)
         refresh_token = self.token_provider.create_refresh_token(data)
@@ -100,6 +92,12 @@ class JWTAuth(ITokenAuth):
         token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
         token_data = self.token_provider.read_token(token)
         return await self._validate_token_or_none(token_data)
+
+
+    async def get_token_user_id(self, token_type: TokenType) -> int | None:
+        token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
+        token_data = self.token_provider.read_token(token)
+        return token_data.user_id if token_data else None
 
     async def _validate_token_or_none(self, token_data: TokenData) -> TokenData | None:
         if not token_data:
