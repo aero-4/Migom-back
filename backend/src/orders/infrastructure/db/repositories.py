@@ -57,7 +57,7 @@ class PGOrdersRepository(IOrderRepository):
 
             link = OrderProductsOrm(
                 order_id=obj.id,
-                product_id=obj.id,
+                product_id=product.id,
                 quantity=item.quantity,
                 amount=product.price
             )
