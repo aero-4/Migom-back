@@ -10,5 +10,4 @@ users_api_router = APIRouter()
 @users_api_router.get("/info")
 async def get_user_info(uow: UserUoWDep,
                         auth: TokenAuthDep):
-    response = await information(uow, auth)
-    return response
+    return await information(uow, auth)

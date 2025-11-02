@@ -12,6 +12,13 @@ class User(CustomModel):
     hashed_password: str
 
 
+class UserInfo(CustomModel):
+    first_name: str
+    last_name: str
+    birthday: datetime.date
+    email: str
+
+
 class UserCreate(CustomModel):
     first_name: str
     last_name: str

@@ -56,7 +56,6 @@ class PGUserRepository(IUserRepository, ABC):
         obj = UserOrm(**user.model_dump(mode='python'))
         self.session.add(obj)
         await self.session.flush()
-
         return self._to_domain(obj)
 
     async def delete(self, user: User):
