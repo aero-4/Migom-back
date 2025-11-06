@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.auth.application.use_cases.authenication import authenticate, registration
+from src.auth.application.use_cases.authenication import authenticate
+from src.auth.application.use_cases.registration import registrate
 from src.auth.presentation.dependencies import PasswordHasherDep, TokenAuthDep
 from src.auth.presentation.dtos import AuthUserDTO, RegisterUserDTO
 from src.users.presentation.dependencies import UserUoWDep
@@ -19,8 +20,8 @@ async def login(credentials: AuthUserDTO,
 
 @auth_api_router.post("/register")
 async def register(credentials: RegisterUserDTO,
-                   pwd_hasher: PasswordHasherDep,
-                   uow: UserUoWDep,
-                   auth: TokenAuthDep):
-    await registration(credentials.email, credentials.password, credentials.first_name, credentials.last_name, credentials.birthday, pwd_hasher, uow, auth)
+              pwd_hasher: PasswordHasherDep,
+              uow: UserUoWDep,
+              auth: TokenAuthDep):
+    await registrate(credentials.email, credentials.password, credentials.first_name, credentials.last_name, credentials.birthday, pwd_hasher, uow, auth)
     return {"msg": "Register successful"}
