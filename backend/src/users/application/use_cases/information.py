@@ -7,7 +7,10 @@ from src.users.domain.interfaces.user_uow import IUserUnitOfWork
 
 async def information(uow: IUserUnitOfWork, auth: TokenAuthDep):
     async with uow:
-        user_id = await auth.get_token_id(TokenType.ACCESS)
+        user_id = await auth.get_token_id()
         user = await uow.users.get_by_id(user_id)
-        user_info = UserInfo(first_name=user.first_name, last_name=user.last_name, birthday=user.birthday, email=user.email)
+        user_info = UserInfo(first_name=user.first_name,
+                             last_name=user.last_name,
+                             birthday=user.birthday,
+                             email=user.email)
         return user_info

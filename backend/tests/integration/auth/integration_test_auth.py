@@ -1,11 +1,12 @@
 import datetime
+import random
 
 import pytest
 import httpx
 
 from src.users.domain.dtos import UserCreateDTO
 
-new_user = UserCreateDTO(
+TEST_USER_DTO = UserCreateDTO(
     email="olegtinkov@gmail.com",
     password="securepass",
     first_name="Oleg",
@@ -15,10 +16,11 @@ new_user = UserCreateDTO(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_login(clear_db, user_factory):
-    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
-        await user_factory(client=client, user=new_user)
-        login_data = {"email": new_user.email, "password": new_user.password}
+async def test_login_success(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        await user_factory(client=client, user=TEST_USER_DTO)
+
+        login_data = {"email": TEST_USER_DTO.email, "password": TEST_USER_DTO.password}
         await _login_and_set_cookies(client, login_data)
 
 
@@ -29,4 +31,39 @@ async def _login_and_set_cookies(client: httpx.AsyncClient, login_data: dict):
         client.cookies.set(token, response.cookies.get(token))
 
     assert response.status_code == 200
-    assert response.json() == {"detail": "Tokens set"}
+    assert response.json() == {"msg": "Login successful"}
+    assert (response.cookies.get("access_token") is not None and
+            response.cookies.get("refresh_token") is not None)
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_login_not_found_user(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        login_data = {"email": TEST_USER_DTO.email, "password": "123456791"}
+        response = await client.post("/api/auth/login", json=login_data)
+
+        assert response.status_code == 404
+        assert response.json() == {"detail": f"User with email {TEST_USER_DTO.email} not found"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_login_invalid_credentials(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        await user_factory(client=client, user=TEST_USER_DTO)
+        login_data = {"email": TEST_USER_DTO.email, "password": "12345678"}
+        response = await client.post("/api/auth/login", json=login_data)
+
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Invalid email or password"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_register_already_user_exists(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        # 1 try
+        await user_factory(client=client, user=TEST_USER_DTO)
+
+        # 2 try already exists
+        response = await client.post("/api/auth/register", json=TEST_USER_DTO.model_dump(mode="json"))
+        assert response.status_code == 409
+        assert response.json() == {"detail": "Email is already taken"}

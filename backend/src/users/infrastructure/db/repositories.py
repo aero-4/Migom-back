@@ -22,19 +22,14 @@ class PGUserRepository(IUserRepository, ABC):
         try:
             await self.session.flush()
             await self.session.commit()
-        except IntegrityError as e:
-            try:
-                detail = "User can't be created. " + str(e.orig).split('\nDETAIL:  ')[1]
-            except IndexError:
-                detail = "User can't be created due to integrity error."
-            raise UserAlreadyExists(detail=detail)
+        except IntegrityError:
+            raise UserAlreadyExists()
 
         return self._to_domain(obj)
 
     async def get_by_email(self, email: str) -> User:
         stmt = select(UserOrm).where(UserOrm.email == email)
         result = await self.session.execute(stmt)
-
         obj: UserOrm = result.scalar_one_or_none()
 
         if not obj:

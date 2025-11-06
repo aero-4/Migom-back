@@ -80,7 +80,6 @@ class JWTAuth(ITokenAuth):
         await self.set_token(access_token, TokenType.ACCESS)
         await self.set_token(refresh_token, TokenType.REFRESH)
 
-
     async def set_token(self, token: str, token_type: TokenType) -> None:
         for transport in self._get_transports(token_type):
             transport.set_token(self.response, token)
@@ -91,12 +90,13 @@ class JWTAuth(ITokenAuth):
     async def read_token(self, token_type: TokenType) -> TokenData | None:
         token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
         token_data = self.token_provider.read_token(token)
+
         return await self._validate_token_or_none(token_data)
 
-
-    async def get_token_id(self, token_type: TokenType) -> int | None:
-        token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
+    async def get_token_id(self) -> int | None:
+        token = self._get_access_token()
         token_data = self.token_provider.read_token(token)
+
         return token_data.user_id if token_data else None
 
     async def _validate_token_or_none(self, token_data: TokenData) -> TokenData | None:
@@ -107,12 +107,14 @@ class JWTAuth(ITokenAuth):
             is_active = await self.token_storage.is_token_active(token_data.jti)
             if not is_active:
                 return None
+
         return token_data
 
     def _get_transports(self, transport_type: TokenType) -> list[IAuthTransport]:
         for token_type, transports in self.transports.items():
             if token_type == transport_type:
                 return transports
+
         return []
 
     def _get_access_token(self) -> str | None:

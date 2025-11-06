@@ -26,10 +26,13 @@ async def clear_db():
 
 @pytest_asyncio.fixture
 def user_factory():
-    async def _create(client: httpx.AsyncClient, user: UserCreateDTO) -> dict:
+    async def _create(client: httpx.AsyncClient, user: UserCreateDTO) -> UserCreateDTO:
         response = await client.post("/api/auth/register", json=user.model_dump(mode="json"))
-        new_user = response.json()
+        data = response.json()
+
         assert response.status_code == 200
-        assert new_user["email"] == user.email
-        return new_user
+        assert data["msg"] == "Register successful"
+
+        return user
+
     return _create

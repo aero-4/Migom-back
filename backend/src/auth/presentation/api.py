@@ -14,7 +14,7 @@ async def login(credentials: AuthUserDTO,
                 uow: UserUoWDep,
                 auth: TokenAuthDep):
     await authenticate(credentials.email, credentials.password, pwd_hasher, uow, auth)
-    return {"message": "Login successful"}
+    return {"msg": "Login successful"}
 
 
 @auth_api_router.post("/register")
@@ -23,4 +23,4 @@ async def register(credentials: RegisterUserDTO,
                    uow: UserUoWDep,
                    auth: TokenAuthDep):
     await registration(credentials.email, credentials.password, credentials.first_name, credentials.last_name, credentials.birthday, pwd_hasher, uow, auth)
-    return {"message": "Register successful"}
+    return {"msg": "Register successful"}
