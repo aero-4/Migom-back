@@ -21,7 +21,6 @@ class PGUserRepository(IUserRepository, ABC):
 
         try:
             await self.session.flush()
-            await self.session.commit()
         except IntegrityError:
             raise UserAlreadyExists()
 

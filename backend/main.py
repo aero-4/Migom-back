@@ -16,6 +16,7 @@ from src.auth.presentation.middlewares.security import SecurityMiddleware
 from src.auth.presentation.middlewares.authentication import AuthenticationMiddleware
 from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware
 from src.auth.presentation.api import auth_api_router
+from src.products.presentation.api import products_api_router
 
 # import src.core.infrastructure.logging_setup
 from src.users.presentation.api import users_api_router
@@ -55,7 +56,7 @@ Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
 app.include_router(auth_api_router, prefix='/api/auth', tags=["Authentication"])
 app.include_router(users_api_router, prefix='/api/users', tags=["Users"])
-
+app.include_router(products_api_router, prefix='/api/products', tags=["Products"])
 
 if __name__ == '__main__':
     uvicorn.run(app)
