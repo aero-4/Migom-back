@@ -27,21 +27,21 @@ class PGCategoriesRepository(ICategoryRepository):
             self._to_domain(category) for category in result
         ]
 
-    async def get_one(self, uuid: UUID) -> Category:
-        stmt = select(CategoriesOrm).where(CategoriesOrm.uuid == uuid)
+    async def get_one(self, id: id) -> Category:
+        stmt = select(CategoriesOrm).where(CategoriesOrm.id == id)
 
         result = await self.session.execute(stmt)
         obj: CategoriesOrm = result.scalar_one_or_none()
 
         return self._to_domain(obj)
 
-    async def delete(self, uuid: UUID):
-        stmt = delete(CategoriesOrm).where(CategoriesOrm.uuid == uuid)
+    async def delete(self, id: int):
+        stmt = delete(CategoriesOrm).where(CategoriesOrm.id == id)
 
         result = await self.session.execute(stmt)
         obj: CategoriesOrm = result.scalar_one_or_none()
         if not obj:
-            raise NotFound(detail=f"Category with uuid {uuid} not found")
+            raise NotFound(detail=f"Category with id {id} not found")
 
         await self.session.delete(obj)
         await self.session.flush()
@@ -59,12 +59,12 @@ class PGCategoriesRepository(ICategoryRepository):
         return self._to_domain(obj)
 
     async def update(self, category: CategoryUpdate) -> Category:
-        stmt = select(CategoriesOrm).where(CategoriesOrm.uuid == category.uuid)
+        stmt = select(CategoriesOrm).where(CategoriesOrm.id == category.id)
         result = await self.session.execute(stmt)
         obj: CategoriesOrm = result.scalar_one_or_none()
 
         if not obj:
-            raise NotFound(detail=f"Category with uuid {category.uuid} not found")
+            raise NotFound(detail=f"Category with id {category.id} not found")
 
         for field, value in category.model_dump(exclude_unset=True).items():
             setattr(obj, field, value)
@@ -76,7 +76,6 @@ class PGCategoriesRepository(ICategoryRepository):
     def _to_domain(category: CategoriesOrm) -> Category:
         return Category(
             id=category.id,
-            uuid=category.uuid,
             name=category.name,
             slug=category.slug,
             photo=category.photo

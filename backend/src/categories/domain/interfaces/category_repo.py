@@ -16,11 +16,11 @@ class ICategoryRepository(abc.ABC):
         ...
 
     @abc.abstractmethod
-    async def get_one(self, uuid: UUID) -> Category:
+    async def get_one(self, id: int) -> Category:
         ...
 
     @abc.abstractmethod
-    async def delete(self, uuid: UUID) -> Category:
+    async def delete(self, id: int) -> Category:
         ...
 
     @abc.abstractmethod
