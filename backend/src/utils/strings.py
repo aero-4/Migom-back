@@ -35,3 +35,7 @@ def string_list_to_int_list(string_list: list | str | None) -> Optional[list[int
         return [int(number) for number in string_list.split(',')]
     elif isinstance(string_list, list):
         return [int(number) for number in string_list[0].split(',')]
+
+
+def generate_slug(string: str) -> str:
+    return "-".join(string.lower().split())

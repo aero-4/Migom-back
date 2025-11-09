@@ -5,8 +5,8 @@ from redis.asyncio import Redis
 
 from src.core.config import settings
 
-
 logger = logging.getLogger(__name__)
+
 
 @lru_cache
 def get_redis_client() -> Redis:

@@ -10,7 +10,7 @@ from src.users.domain.interfaces.user_repo import IUserRepository
 from src.users.infrastructure.db.orm import UserOrm
 
 
-class PGUserRepository(IUserRepository, ABC):
+class PGUserRepository(IUserRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__()
         self.session = session

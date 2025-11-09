@@ -1,4 +1,4 @@
-from src.core.domain.exceptions import NotAuthenticated, AlreadyExists, NotFound
+from src.core.domain.exceptions import NotAuthenticated, AlreadyExists, NotFound, BadRequest
 
 
 class ErrorCode:
@@ -22,3 +22,5 @@ class UserAlreadyExists(AlreadyExists):
 
 class UserNotFound(NotFound):
     detail = ErrorCode.NOT_FOUND
+
+

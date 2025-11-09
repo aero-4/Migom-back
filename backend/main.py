@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from src.categories.presentation.api import categories_api_router
 from src.core.infrastructure.redis import check_redis_connection
 from src.db.utils import create_db_and_tables
 from src.core.config import settings
@@ -56,6 +57,7 @@ Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
 app.include_router(auth_api_router, prefix='/api/auth', tags=["Authentication"])
 app.include_router(users_api_router, prefix='/api/users', tags=["Users"])
+app.include_router(categories_api_router, prefix="/api/categories", tags=["Categories"])
 app.include_router(products_api_router, prefix='/api/products', tags=["Products"])
 
 if __name__ == '__main__':

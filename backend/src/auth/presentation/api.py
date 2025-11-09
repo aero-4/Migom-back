@@ -20,8 +20,8 @@ async def login(credentials: AuthUserDTO,
 
 @auth_api_router.post("/register")
 async def register(credentials: RegisterUserDTO,
-              pwd_hasher: PasswordHasherDep,
-              uow: UserUoWDep,
-              auth: TokenAuthDep):
+                   pwd_hasher: PasswordHasherDep,
+                   uow: UserUoWDep,
+                   auth: TokenAuthDep):
     await registrate(credentials.email, credentials.password, credentials.first_name, credentials.last_name, credentials.birthday, pwd_hasher, uow, auth)
     return {"msg": "Register successful"}
