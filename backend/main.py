@@ -18,8 +18,6 @@ from src.auth.presentation.middlewares.authentication import AuthenticationMiddl
 from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware
 from src.auth.presentation.api import auth_api_router
 from src.products.presentation.api import products_api_router
-
-# import src.core.infrastructure.logging_setup
 from src.users.presentation.api import users_api_router
 
 logger = logging.getLogger(__name__)
@@ -28,7 +26,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await check_redis_connection()
-    await create_db_and_tables()
+    # await create_db_and_tables()
     yield
 
 

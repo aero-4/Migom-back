@@ -15,7 +15,7 @@ async def add_category(
     async with uow:
         category = await uow.categories.add(category_data)
         await uow.commit()
-        return category
+    return category
 
 
 

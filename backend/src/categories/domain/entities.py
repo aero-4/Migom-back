@@ -20,4 +20,5 @@ class CategoryCreate(CustomModel):
 class CategoryUpdate(CustomModel):
     id: int
     name: str | None = None
+    slug: str | None = None
     photo: str | None = None

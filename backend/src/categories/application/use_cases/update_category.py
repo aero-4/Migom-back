@@ -11,6 +11,7 @@ async def update_category(
 ) -> Category:
     async with uow:
         slug = generate_slug(category_data.name)
-        category = await uow.categories.update(category_data.to_entity(id, slug))
+        category = category_data.to_entity(id, slug)
+        category = await uow.categories.update(category)
         await uow.commit()
     return category
