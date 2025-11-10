@@ -1,5 +1,4 @@
 import datetime
-
 import pytest
 
 from src.auth.application.use_cases.authenication import authenticate

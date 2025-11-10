@@ -7,6 +7,7 @@ import pytest_asyncio
 from _pytest.warning_types import PytestDeprecationWarning
 
 from main import app
+from tests.fakes.categories import FakeCategoryUnitOfWork
 from tests.fakes.users import FakeUserUnitOfWork
 
 
@@ -19,3 +20,7 @@ async def client() -> AsyncIterator[httpx.AsyncClient]:
 @pytest.fixture
 def fake_user_uow():
     return FakeUserUnitOfWork()
+
+@pytest.fixture
+def fake_cat_uow():
+    return FakeCategoryUnitOfWork()

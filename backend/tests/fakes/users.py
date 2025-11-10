@@ -31,7 +31,8 @@ class FakeUserRepository(IUserRepository):
 
     async def get_by_id(self, id: int) -> User:
         for user in self._users:
-            if user.id == id: return user
+            if user.id == id:
+                return user
 
         raise UserNotFound(detail=f"User not found")
 
