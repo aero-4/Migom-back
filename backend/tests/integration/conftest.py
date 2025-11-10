@@ -8,7 +8,7 @@ from src.db.engine import engine
 from src.users.domain.dtos import UserCreateDTO
 
 TABLES_TO_TRUNCATE = [
-    "users",
+    "users", "categories", "products"
 ]
 
 
