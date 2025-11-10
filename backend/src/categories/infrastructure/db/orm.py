@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import List
 
 from sqlalchemy import DateTime, ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,3 +19,5 @@ class CategoriesOrm(Base):
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     slug: Mapped[str] = mapped_column(nullable=True)
     photo: Mapped[str] = mapped_column(nullable=True)
+
+    products: Mapped[List["ProductsOrm"]] = relationship(back_populates="category", cascade="all, delete-orphan")

@@ -53,7 +53,7 @@ class PGCategoriesRepository(ICategoryRepository):
         try:
             await self.session.flush()
         except IntegrityError as e:
-            raise AlreadyExists()
+            raise AlreadyExists(detail=f"Already exists with id {obj.id}")
 
         return self._to_domain(obj)
 

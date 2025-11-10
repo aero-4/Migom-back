@@ -33,4 +33,4 @@ class ProductsOrm(Base):
     photo: Mapped[str] = mapped_column(nullable=True)
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"), nullable=True)
-    category: Mapped['CategoriesOrm'] = relationship(back_populates="categories")
+    category: Mapped['CategoriesOrm'] = relationship(back_populates="products")

@@ -4,8 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.domain.exceptions import AlreadyExists
-from src.products.domain.entities import Product, ProductCreate
+from src.core.domain.exceptions import AlreadyExists, NotFound
+from src.products.domain.entities import Product, ProductCreate, ProductUpdate
 from src.products.domain.interfaces.product_repo import IProductRepository
 from src.products.infrasctructure.db.orm import ProductsOrm
 
@@ -30,21 +30,47 @@ class PGProductsRepository(IProductRepository):
 
         result = await self.session.execute(stmt)
         obj: ProductsOrm = result.scalar_one_or_none()
+        if not obj:
+            raise NotFound()
 
         return self._to_domain(obj)
 
-
     async def add(self, product: ProductCreate) -> Product:
-        obj = ProductsOrm(**product.model_dump(mode="python"))
-        self.session.add(product)
+        obj: ProductsOrm = ProductsOrm(**product.model_dump(mode="python"))
+        self.session.add(obj)
 
         try:
             await self.session.flush()
         except IntegrityError:
-            raise AlreadyExists()
+            raise AlreadyExists(detail=f"Already exists with id {obj.id}")
 
         return self._to_domain(obj)
 
+    async def delete(self, id: int) -> None:
+        stmt = select(ProductsOrm).where(ProductsOrm.id == id)
+
+        result = await self.session.execute(stmt)
+        obj: ProductsOrm = result.scalar_one_or_none()
+        if not obj:
+            raise NotFound()
+
+        await self.session.delete(obj)
+        await self.session.flush()
+
+    async def update(self, product_data: ProductUpdate) -> Product:
+        stmt = select(ProductsOrm).where(ProductsOrm.id == product_data.id)
+
+        result = await self.session.execute(stmt)
+        obj: ProductsOrm = result.scalar_one_or_none()
+        if not obj:
+            raise NotFound()
+
+        for key, value in product_data.model_dump(mode="python").items():
+            setattr(obj, key, value)
+
+        await self.session.flush()
+
+        return self._to_domain(obj)
 
     @staticmethod
     def _to_domain(product: ProductsOrm):
@@ -65,5 +91,4 @@ class PGProductsRepository(IProductRepository):
             carbohydrates=product.carbohydrates,
             photo=product.photo,
             category_id=product.category_id,
-            category=product.category
         )
