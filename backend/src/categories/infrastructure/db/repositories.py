@@ -36,7 +36,7 @@ class PGCategoriesRepository(ICategoryRepository):
         return self._to_domain(obj)
 
     async def delete(self, id: int):
-        stmt = delete(CategoriesOrm).where(CategoriesOrm.id == id)
+        stmt = select(CategoriesOrm).where(CategoriesOrm.id == id)
 
         result = await self.session.execute(stmt)
         obj: CategoriesOrm = result.scalar_one_or_none()
@@ -53,7 +53,7 @@ class PGCategoriesRepository(ICategoryRepository):
         try:
             await self.session.flush()
         except IntegrityError as e:
-            raise AlreadyExists(detail=f"Already exists with id {obj.id}")
+            raise AlreadyExists()
 
         return self._to_domain(obj)
 
