@@ -22,6 +22,7 @@ async def client() -> AsyncIterator[httpx.AsyncClient]:
 def fake_user_uow():
     return FakeUserUnitOfWork()
 
+
 @pytest.fixture
 def fake_cat_uow():
     return FakeCategoryUnitOfWork()

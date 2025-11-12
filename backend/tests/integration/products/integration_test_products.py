@@ -4,6 +4,7 @@ import httpx
 import pytest
 
 from src.categories.presentation.dtos import CategoryCreateDTO
+from src.products.application.use_cases.delete_product import delete_product
 from src.products.domain.entities import Product
 from src.products.presentation.dtos import ProductCreateDTO
 
@@ -84,3 +85,64 @@ async def test_not_found_get_one_product(clear_db):
         assert response.status_code == 404
         assert response.json() == {"detail": "Not found"}
 
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_create_product(clear_db):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        product = await create_product(client)
+
+        assert product.name == TEST_PRODUCT_DTO.name
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_already_exists_create_product(clear_db):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await create_product(client)
+
+        response_create = await client.post("/api/products/", json=TEST_PRODUCT_DTO.model_dump(mode="json"))
+
+        assert response_create.status_code == 409
+        assert response_create.json() == {"detail": "Already exists"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_delete_product(clear_db):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        product = await create_product(client)
+
+        response = await client.delete(f"/api/products/{product.id}")
+
+        assert response.json() is None
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_nof_found_delete_product(clear_db):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        product_id = 1
+
+        response = await client.delete(f"/api/products/{product_id}")
+
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Not found"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_update_product(clear_db):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        product: Product = await create_product(client)
+        product.name = "Пицца"
+        response = await client.patch(f"/api/products/{product.id}", json=product.model_dump())
+
+        assert response.status_code == 200
+        assert response.json()["name"] == product.name
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_not_found_update_product(clear_db):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        # product: Product = await create_product(client)
+        product_id = 1
+        response = await client.patch(f"/api/products/{product_id}", json=TEST_PRODUCT_DTO.model_dump())
+
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Not found"}

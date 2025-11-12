@@ -30,11 +30,11 @@ class FakeProductRepository:
         return self.get_by_pk(id)
 
     async def delete(self, id: int) -> None:
-        product = await self.get_by_pk(id)
+        product = self.get_by_pk(id)
         self._products.remove(product)
 
     async def update(self, product_data: ProductUpdate) -> Product:
-        product = await self.get_by_pk(product_data.id)
+        product = self.get_by_pk(product_data.id)
 
         for field, value in product_data.model_dump(exclude_unset=True).items():
             setattr(product, field, value)
