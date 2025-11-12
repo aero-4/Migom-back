@@ -9,7 +9,7 @@ async def collect_products(
 ) -> List[Product]:
     async with uow:
         products = await uow.products.get_all()
-        return products
+    return products
 
 
 async def collect_product(
@@ -18,4 +18,4 @@ async def collect_product(
 ) -> Product:
     async with uow:
         product = await uow.products.get_one(id_pk)
-        return product
+    return product

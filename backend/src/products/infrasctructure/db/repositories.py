@@ -42,7 +42,7 @@ class PGProductsRepository(IProductRepository):
         try:
             await self.session.flush()
         except IntegrityError:
-            raise AlreadyExists(detail=f"Already exists with id {obj.id}")
+            raise AlreadyExists()
 
         return self._to_domain(obj)
 

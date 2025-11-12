@@ -16,7 +16,7 @@ class FakeProductRepository:
         self._products.append(product)
         return product
 
-    async def get_by_pk(self, pk: int) -> Product:
+    def get_by_pk(self, pk: int) -> Product:
         for product in self._products:
             if product.id == pk:
                 return product
@@ -27,7 +27,7 @@ class FakeProductRepository:
         return self._products
 
     async def get_one(self, id: int) -> Product:
-        await self.get_by_pk(id)
+        return self.get_by_pk(id)
 
     async def delete(self, id: int) -> None:
         product = await self.get_by_pk(id)
