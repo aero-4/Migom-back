@@ -8,6 +8,7 @@ from _pytest.warning_types import PytestDeprecationWarning
 
 from main import app
 from tests.fakes.categories import FakeCategoryUnitOfWork
+from tests.fakes.products import FakeProductUnitOfWork
 from tests.fakes.users import FakeUserUnitOfWork
 
 
@@ -24,3 +25,8 @@ def fake_user_uow():
 @pytest.fixture
 def fake_cat_uow():
     return FakeCategoryUnitOfWork()
+
+
+@pytest.fixture
+def fake_product_uow():
+    return FakeProductUnitOfWork()
