@@ -1,14 +1,24 @@
+from typing import BinaryIO
+
+import aiofiles
 import uuid6
 
 from contextlib import asynccontextmanager
 from aiobotocore.session import get_session, ClientCreatorContext
 from pathlib import Path
 
+from fastapi import UploadFile
+
+from src.core.config import settings
+
 
 class S3Storage:
-    def __init__(self, access_key: str, secret_key: str, endpoint_url: str, bucket_name: str, public_url: str = None):
+    def __init__(self, access_key: str = settings.S3_ACCESS_KEY, secret_key: str = settings.S3_SECRET_KEY,
+                 endpoint_url: str = settings.S3_ENDPOINT_URL, bucket_name: str = settings.S3_BUCKET_NAME,
+                 public_url: str = settings.S3_URL) -> None:
         self.bucket_name = bucket_name
         self.public_url = public_url
+
         self.config = {
             "aws_access_key_id": access_key,
             "aws_secret_access_key": secret_key,
@@ -33,3 +43,8 @@ class S3Storage:
             return f"{self.public_url}/{object_name}"
 
         return None
+
+    @staticmethod
+    async def save_file(file_name: str, file: BinaryIO):
+        async with aiofiles.open(file_name, "wb") as f:
+            await f.write(file.read())

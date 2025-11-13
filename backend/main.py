@@ -17,6 +17,7 @@ from src.auth.presentation.middlewares.security import SecurityMiddleware
 from src.auth.presentation.middlewares.authentication import AuthenticationMiddleware
 from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware
 from src.auth.presentation.api import auth_api_router
+from src.files.presentation.api import files_api_router
 from src.products.presentation.api import products_api_router
 from src.users.presentation.api import users_api_router
 
@@ -57,6 +58,7 @@ app.include_router(auth_api_router, prefix='/api/auth', tags=["Authentication"])
 app.include_router(users_api_router, prefix='/api/users', tags=["Users"])
 app.include_router(categories_api_router, prefix="/api/categories", tags=["Categories"])
 app.include_router(products_api_router, prefix='/api/products', tags=["Products"])
+app.include_router(files_api_router, prefix='/api/files', tags=["Files"])
 
 if __name__ == '__main__':
     uvicorn.run(app)

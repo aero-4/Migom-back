@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-from src.categories.domain.entities import Category
 from src.products.domain.entities import ProductUpdate
 
 
