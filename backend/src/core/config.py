@@ -91,5 +91,11 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str | None = None
     EMAIL_FROM: EmailStr | None = None
 
+    S3_ACCESS_KEY: str | None = None
+    S3_SECRET_KEY: str | None = None
+    S3_ENDPOINT_URL: str | None = None
+    S3_URL: str | None = None
+    S3_BUCKET_NAME: str | None = None
+
 
 settings = Settings()
