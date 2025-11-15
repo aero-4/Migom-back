@@ -48,9 +48,9 @@ async def app_exception_handler(request: Request, exc: AppException):
     )
 
 
-# app.add_middleware(SecurityMiddleware)
-# app.add_middleware(AuthenticationMiddleware)
-# app.add_middleware(JWTRefreshMiddleware)
+app.add_middleware(SecurityMiddleware)
+app.add_middleware(AuthenticationMiddleware)
+app.add_middleware(JWTRefreshMiddleware)
 
 Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 

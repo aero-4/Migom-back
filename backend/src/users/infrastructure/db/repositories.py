@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.users.domain.entities import User, UserCreate, UserUpdate
 from src.users.domain.exceptions import UserAlreadyExists, UserNotFound
 from src.users.domain.interfaces.user_repo import IUserRepository
-from src.users.infrastructure.db.orm import UserOrm
+from src.users.infrastructure.db.orm import UsersOrm
 
 
 class PGUserRepository(IUserRepository):
@@ -16,7 +16,7 @@ class PGUserRepository(IUserRepository):
         self.session = session
 
     async def add(self, user: UserCreate) -> User:
-        obj = UserOrm(**user.model_dump(mode='python'))
+        obj = UsersOrm(**user.model_dump(mode='python'))
         self.session.add(obj)
 
         try:
@@ -27,9 +27,9 @@ class PGUserRepository(IUserRepository):
         return self._to_domain(obj)
 
     async def get_by_email(self, email: str) -> User:
-        stmt = select(UserOrm).where(UserOrm.email == email)
+        stmt = select(UsersOrm).where(UsersOrm.email == email)
         result = await self.session.execute(stmt)
-        obj: UserOrm = result.scalar_one_or_none()
+        obj: UsersOrm = result.scalar_one_or_none()
 
         if not obj:
             raise UserNotFound(detail=f"User with email {email} not found")
@@ -37,25 +37,22 @@ class PGUserRepository(IUserRepository):
         return self._to_domain(obj)
 
     async def get_by_id(self, id: int) -> User:
-        stmt = select(UserOrm).where(UserOrm.id == id)
-        result = await self.session.execute(stmt)
-        obj: UserOrm = result.scalar_one_or_none()
-
+        obj: UsersOrm | None = await self.session.get(UsersOrm, id)
         if not obj:
             raise UserNotFound(detail=f"User not found")
 
         return self._to_domain(obj)
 
     async def update(self, user: UserUpdate) -> User:
-        obj = UserOrm(**user.model_dump(mode='python'))
+        obj = UsersOrm(**user.model_dump(mode='python'))
         self.session.add(obj)
         await self.session.flush()
         return self._to_domain(obj)
 
     async def delete(self, user: User):
-        stmt = select(UserOrm).where(UserOrm.id == user.id)
+        stmt = select(UsersOrm).where(UsersOrm.id == user.id)
         result = await self.session.execute(stmt)
-        obj: UserOrm = result.scalar_one_or_none()
+        obj: UsersOrm = result.scalar_one_or_none()
 
         if not obj:
             raise UserNotFound(detail=f"User with id {user.id} not found")
@@ -64,7 +61,7 @@ class PGUserRepository(IUserRepository):
         await self.session.flush()
 
     @staticmethod
-    def _to_domain(obj: UserOrm) -> User:
+    def _to_domain(obj: UsersOrm) -> User:
         return User(
             id=obj.id,
             birthday=obj.birthday,

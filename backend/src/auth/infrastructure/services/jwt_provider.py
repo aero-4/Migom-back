@@ -1,3 +1,4 @@
+import logging
 import uuid
 from datetime import timedelta
 
@@ -8,6 +9,7 @@ from starlette.requests import Request
 
 from src.auth.config import auth_settings
 from src.auth.domain.entities import TokenData, TokenType
+from src.auth.domain.exceptions import RefreshTokenInvalid
 from src.auth.domain.interfaces.token_auth import ITokenAuth
 from src.auth.domain.interfaces.token_provider import ITokenProvider
 from src.auth.domain.interfaces.token_storage import ITokenStorage
@@ -34,7 +36,8 @@ class JWTProvider(ITokenProvider):
                 return None
 
             return TokenData(**data)
-        except JWTError:
+        except JWTError as e:
+            # logging.exception(e, exc_info=True)
             return None
 
     def _encode_jwt(self, data: dict, secret: SecretStr | str, algorithm: str = auth_settings.JWT_ALGORITHM, expire_seconds: int | None = None) -> str:
@@ -93,11 +96,30 @@ class JWTAuth(ITokenAuth):
 
         return await self._validate_token_or_none(token_data)
 
-    async def get_token_id(self) -> int | None:
-        token = self._get_access_token()
-        token_data = self.token_provider.read_token(token)
+    async def refresh_access_token(self) -> None:
+        refresh_token = self.token_provider.read_token(TokenType.REFRESH)
+        if not refresh_token:
+            raise RefreshTokenInvalid()
 
-        return token_data.user_id if token_data else None
+        access_token = self.token_provider.create_access_token(refresh_token.model_dump())
+        self.request.state.access_token = access_token
+
+        if self.token_storage:
+            await self.token_storage.store_token(self.token_provider.read_token(access_token))
+
+        if self.response:
+            for transport in self._get_transports(TokenType.ACCESS):
+                transport.set_token(self.response, access_token)
+
+
+
+
+    async def inject_access_token_from_request(self, response: Response):
+        if hasattr(self.request.state, "access_token"):
+            access_token = self.request.state.access_token
+            self.response = response
+
+            await self.set_token(access_token, TokenType.ACCESS)
 
     async def _validate_token_or_none(self, token_data: TokenData) -> TokenData | None:
         if not token_data:
