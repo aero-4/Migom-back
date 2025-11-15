@@ -2,10 +2,10 @@ services:
   backend:
     build:
       context: ./backend
-    image: job_scope_backend:latest  # можно использовать как ссылку
+    image: migom_backend:latest  # можно использовать как ссылку
 
   app:
-    image: job_scope_backend:latest
+    image: migom_backend:latest
     depends_on:
       - db
       - elasticsearch
@@ -46,7 +46,7 @@ services:
     command: celery --broker=redis://redis:6379/0 flower
 
   celery:
-    image: job_scope_backend:latest
+    image: migom_backend:latest
     depends_on:
       - redis
       - app
@@ -60,7 +60,7 @@ services:
     command: celery -A src.core.infrastructure.celery worker --loglevel=info
 
   celery-beat:
-    image: job_scope_backend:latest
+    image: migom_backend:latest
     depends_on:
       - redis
       - celery
