@@ -45,11 +45,10 @@ class S3Storage:
         return None
 
     @staticmethod
-    async def save_file(file_path: str, file: UploadFile):
-        content = await file.read()
+    async def save_file(file_path: str, content: bytes):
         async with aiofiles.open(file_path, "wb") as f:
             await f.write(content)
-        await file.close()
+
 
     @staticmethod
     async def delete_file(file_path: str):

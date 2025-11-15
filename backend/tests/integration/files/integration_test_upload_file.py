@@ -20,7 +20,6 @@ async def test_success_upload_file(clear_db, s3_storage):
 
             await s3_storage.save_file(TEST_FILE_NAME, upload)
             url = await s3_storage.upload_file(TEST_FILE_NAME, TEST_FILE_NAME.split(".")[0])
-            # await s3_storage.delete_file(TEST_FILE_NAME)
 
             created_file_name = url.split("/")[-1]
 
