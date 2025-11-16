@@ -3,6 +3,8 @@ import pytest
 import httpx
 from httpx import Response
 
+from src.categories.domain.entities import CategoryCreate, Category
+from src.categories.presentation.dtos import CategoryCreateDTO
 from src.orders.domain.entities import Order, OrderStatus, OrderCreate
 from src.orders.presentation.dtos import OrderCreateDTO
 from src.products.domain.entities import ProductCreate, Product
@@ -19,7 +21,7 @@ TEST_USER_DTO = UserCreateDTO(
 
 
 async def _create_user(client: httpx.AsyncClient, user: UserCreateDTO):
-    response = await client.post("/api/auth/register", json=user.model_dump(mode="json"))
+    response = await client.post("/api/auth/register", json=user.model_dump())
     data = response.json()
     for token in ["access_token", "refresh_token"]:
         client.cookies.set(token, response.cookies.get(token))
@@ -30,9 +32,17 @@ async def _create_user(client: httpx.AsyncClient, user: UserCreateDTO):
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_success_new_order(clear_db, user_factory):
-    async with httpx.AsyncClient(base_url='http://127.0.0.2:8000') as client:
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         # create user
         await _create_user(client, TEST_USER_DTO)
+
+        # create category
+
+        category = CategoryCreateDTO(name="Пицца американская",
+    photo="src/pizza.jpg")
+
+        response = await client.post("/api/categories/", json=category.model_dump())
+        category = Category(**response.json())
 
         # create products
         products = []
@@ -47,7 +57,7 @@ async def test_success_new_order(clear_db, user_factory):
                                     fats=1,
                                     carbohydrates=1,
                                     photo="test photo",
-                                    category_id=1)
+                                    category_id=category.id)
             response = await client.post("/api/products/", json=product.model_dump())
             print(response.text)
             assert response.status_code == 200

@@ -18,4 +18,4 @@ class UsersOrm(Base):
     birthday: Mapped[datetime.datetime] = mapped_column(nullable=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
-    user: Mapped[List['OrdersOrm']] = relationship(back_populates="creator")
+    orders: Mapped[List['OrdersOrm']] = relationship(back_populates="creator")

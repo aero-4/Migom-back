@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import List
 
 from sqlalchemy import DateTime, ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -26,6 +27,8 @@ class ProductsOrm(Base):
     fats: Mapped[int] = mapped_column(default=0)
     carbohydrates: Mapped[int] = mapped_column(default=0)
     photo: Mapped[str] = mapped_column(nullable=True)
+
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"), nullable=True)
     category: Mapped['CategoriesOrm'] = relationship(back_populates="products")
-    orders: Mapped['OrdersOrm'] = relationship(back_populates="products")
+
+    orders: Mapped[List['OrdersOrm']] = relationship(back_populates="products")

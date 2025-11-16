@@ -11,7 +11,7 @@ class PGOrderUnitOfWork(IOrderUnitOfWork):
 
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
-        self.categories = PGOrdersRepository(self.session)
+        self.orders = PGOrdersRepository(self.session)
 
         return await super().__aenter__()
 
