@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await check_redis_connection()
-    # await create_db_and_tables()
+    await create_db_and_tables()
     yield
 
 

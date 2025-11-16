@@ -16,7 +16,7 @@ class Product(CustomModel):
     fats: int
     carbohydrates: int
     photo: str | None = None
-    category_id: int
+    category_id: int | None = None
 
 
 class ProductCreate(CustomModel):
@@ -32,7 +32,7 @@ class ProductCreate(CustomModel):
     fats: int
     carbohydrates: int
     photo: str | None = None
-    category_id: int
+    category_id: int | None = None
 
 
 class ProductUpdate(CustomModel):
@@ -50,4 +50,3 @@ class ProductUpdate(CustomModel):
     carbohydrates: int | None = None
     photo: str | None = None
     category_id: int | None = None
-

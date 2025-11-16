@@ -1,19 +1,11 @@
 import datetime
-import enum
-from typing import List
 
 from sqlalchemy import DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.db.base import Base
+from src.orders.domain.entities import OrderStatus
 from src.utils.datetimes import get_timezone_now
-
-
-class PaymentStatus(enum.Enum):
-    CREATED = "created"
-    PENDING = "pending"
-    SUCCESS = "success"
-    ERROR = "error"
 
 
 class OrdersOrm(Base):
@@ -27,6 +19,6 @@ class OrdersOrm(Base):
     products: Mapped[list['ProductsOrm']] = relationship(
         back_populates="order"
     )
-    status: Mapped[PaymentStatus]
+    status: Mapped[OrderStatus]
     delivery_address: Mapped[str] = mapped_column(nullable=True)
     amount: Mapped[int] = mapped_column(default=0)

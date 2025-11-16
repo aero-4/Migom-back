@@ -1,0 +1,45 @@
+import datetime
+
+from src.orders.domain.entities import OrderCreate, Order
+from src.orders.domain.interfaces.order_repo import IOrderRepository
+from src.orders.domain.interfaces.order_uow import IOrderUnitOfWork
+
+
+class FakeOrderUnitOfWork(IOrderUnitOfWork):
+    orders: IOrderRepository
+    committed: bool
+
+    def __init__(self):
+        self.orders = FakeOrderRepository()
+        self.committed = False
+
+    async def _commit(self):
+        self.committed = True
+
+    async def rollback(self):
+        pass
+
+
+class FakeOrderRepository(IOrderRepository):
+
+    def __init__(self):
+        self._last_id = 0
+        self._orders = []
+
+    async def add(self, order: OrderCreate) -> Order:
+        order = Order(id=self._get_id(), created_at=datetime.datetime.now(), update_at=datetime.datetime.now(), status=Order, **order.model_dump())
+        self._orders.append(order)
+        return order
+
+    async def get(self, id: int) -> Order:
+        return self._orders[id]
+
+    async def get_all(self) -> list[Order]:
+        return self._orders
+
+    async def delete(self, id: int) -> None:
+        self._orders.remove(self._orders[id])
+
+    def _get_id(self) -> int:
+        self._last_id += 1
+        return self._last_id

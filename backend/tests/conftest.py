@@ -9,6 +9,7 @@ from _pytest.warning_types import PytestDeprecationWarning
 from main import app
 from src.files.infrastructure.services.s3 import S3Storage
 from tests.fakes.categories import FakeCategoryUnitOfWork
+from tests.fakes.orders import FakeOrderUnitOfWork
 from tests.fakes.products import FakeProductUnitOfWork
 from tests.fakes.users import FakeUserUnitOfWork
 
@@ -33,6 +34,10 @@ def fake_cat_uow():
 def fake_product_uow():
     return FakeProductUnitOfWork()
 
+
+@pytest.fixture
+def fake_order_uow():
+    return FakeOrderUnitOfWork()
 
 @pytest.fixture()
 def s3_storage():

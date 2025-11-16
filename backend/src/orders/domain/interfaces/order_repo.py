@@ -14,6 +14,9 @@ class IOrderRepository(abc.ABC):
         ...
 
     @abc.abstractmethod
-    async def delete(self, id: int) -> None:
+    async def get_all(self) -> list[Order]:
         ...
 
+    @abc.abstractmethod
+    async def delete(self, id: int) -> None:
+        ...

@@ -1,7 +1,16 @@
 import datetime
+import enum
 from typing import List
 
 from src.core.domain.entities import CustomModel
+
+
+class OrderStatus(enum.Enum):
+    CREATED = "created"
+    PENDING = "pending"
+    DELIVERING = "delivering"
+    SUCCESS = "success"
+    ERROR = "error"
 
 
 class Order(CustomModel):
@@ -20,6 +29,3 @@ class OrderCreate(CustomModel):
     products: List[int]
     delivery_address: str
     amount: int
-    delivery_address: str
-
-

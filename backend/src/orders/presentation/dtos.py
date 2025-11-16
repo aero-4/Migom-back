@@ -8,4 +8,3 @@ class OrderCreateDTO(CustomModel):
     products: List[int]
     delivery_address: str
     amount: int
-    status: str
