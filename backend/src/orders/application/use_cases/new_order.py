@@ -1,4 +1,3 @@
-from src.auth.domain.interfaces.token_auth import ITokenAuth
 from src.orders.domain.entities import Order, OrderCreate
 from src.orders.domain.interfaces.order_uow import IOrderUnitOfWork
 from src.orders.presentation.dtos import OrderCreateDTO

@@ -63,4 +63,4 @@ app.include_router(files_api_router, prefix='/api/files', tags=["Files"])
 app.include_router(orders_api_router, prefix='/api/orders', tags=["Orders"])
 
 if __name__ == '__main__':
-    uvicorn.run(app)
+    uvicorn.run(app, host="127.0.0.2")

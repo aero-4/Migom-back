@@ -1,4 +1,7 @@
+import logging
+
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.domain.exceptions import AlreadyExists, NotFound
@@ -19,7 +22,8 @@ class PGOrdersRepository(IOrderRepository):
 
         try:
             await self.session.flush()
-        except:
+        except Exception as ex:
+            logging.exception(ex, exc_info=True)
             raise AlreadyExists()
 
         return self._to_entity(obj)
