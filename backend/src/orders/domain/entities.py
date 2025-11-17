@@ -13,6 +13,11 @@ class OrderStatus(enum.Enum):
     ERROR = "error"
 
 
+class CartItem(CustomModel):
+    product_id: int
+    quantity: int
+
+
 class Order(CustomModel):
     id: int
     created_at: datetime.datetime
@@ -26,6 +31,5 @@ class Order(CustomModel):
 
 class OrderCreate(CustomModel):
     creator_id: int
-    products: List[int]
     delivery_address: str
-    amount: int
+    products: List[CartItem]

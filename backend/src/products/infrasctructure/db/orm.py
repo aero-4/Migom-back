@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, ForeignKey, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.base import Base
+from src.orders.infrastructure.db.orm import OrderProductsOrm
 from src.utils.datetimes import get_timezone_now
 
 
@@ -31,4 +32,6 @@ class ProductsOrm(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"), nullable=True)
     category: Mapped['CategoriesOrm'] = relationship(back_populates="products")
 
-    orders: Mapped[List['OrdersOrm']] = relationship(back_populates="products")
+    order_links: Mapped[list[OrderProductsOrm]] = relationship(
+        "OrderProductsOrm", back_populates="product"
+    )

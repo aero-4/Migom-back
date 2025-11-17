@@ -8,15 +8,15 @@ class ProductCreateDTO(BaseModel):
     content: str
     composition: str
     price: float
-    discount_price: float | None = None
-    discount: int | None = None
+    category_id: int
     count: int
     grams: int
     protein: int
     fats: int
     carbohydrates: int
+    discount_price: float | None = None
+    discount: int | None = None
     photo: str | None = None
-    category_id: int
 
 
 class ProductUpdateDTO(BaseModel):
