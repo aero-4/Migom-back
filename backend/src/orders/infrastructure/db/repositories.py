@@ -91,7 +91,9 @@ class PGOrdersRepository(IOrderRepository):
         return [self._to_entity(obj) for obj in objs]
 
     async def delete(self, id: int) -> None:
-        obj: OrdersOrm | None = await self.session.get(OrdersOrm, OrdersOrm.id == id)
+        stmt = select(OrdersOrm).where(OrdersOrm.id == id)
+        result = await self.session.execute(stmt)
+        obj: OrdersOrm | None = result.scalar_one_or_none()
 
         if not obj:
             raise NotFound()
