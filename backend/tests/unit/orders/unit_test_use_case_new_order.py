@@ -38,8 +38,7 @@ async def test_new_order(monkeypatch, fake_order_uow: IOrderUnitOfWork, fake_use
 
     order = OrderCreateDTO(creator_id=user_data.id,
                            products=[i.id for i in await fake_product_uow.products.get_all()],
-                           delivery_address="Ул Пушкина д. 10, кв. 1, г. Москва",
-                           amount=141)
+                           delivery_address="Ул Пушкина д. 10, кв. 1, г. Москва")
 
     result: Order = await new_order(
         order=order,

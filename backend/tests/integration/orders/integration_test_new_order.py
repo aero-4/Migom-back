@@ -3,12 +3,11 @@ import pytest
 import httpx
 from httpx import Response
 
-from src.categories.domain.entities import CategoryCreate, Category
+from src.categories.domain.entities import Category
 from src.categories.presentation.dtos import CategoryCreateDTO
-from src.orders.domain.entities import Order, OrderStatus, OrderCreate
+from src.orders.domain.entities import Order, OrderStatus
 from src.orders.presentation.dtos import OrderCreateDTO, CartItemDTO
 from src.products.domain.entities import ProductCreate, Product
-from src.products.presentation.dtos import ProductCreateDTO
 from src.users.domain.dtos import UserCreateDTO
 
 TEST_USER_DTO = UserCreateDTO(

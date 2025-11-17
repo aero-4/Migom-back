@@ -29,7 +29,7 @@ class PGOrdersRepository(IOrderRepository):
             logging.exception(ex, exc_info=True)
             raise AlreadyExists()
 
-        await self.add_all_links(order_data, obj)
+        await self._create_links(order_data, obj)
 
         result = await self.session.execute(
             select(OrdersOrm).options(selectinload(OrdersOrm.product_links)).where(OrdersOrm.id == obj.id)
@@ -40,9 +40,9 @@ class PGOrdersRepository(IOrderRepository):
 
         return self._to_entity(order_data)
 
-    async def add_all_links(self, order_data: OrderCreate, obj: OrdersOrm):
+    async def _create_links(self, order_data: OrderCreate, obj: OrdersOrm):
         product_ids = [item.product_id for item in order_data.products]
-        stmt = select(ProductsOrm).where(ProductsOrm.id.in_(product_ids))  # find ids in db
+        stmt = select(ProductsOrm).where(ProductsOrm.id.in_(product_ids))
         result = await self.session.execute(stmt)
         products: List[ProductsOrm] = result.scalars().all()
 

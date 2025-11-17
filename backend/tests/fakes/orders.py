@@ -27,18 +27,27 @@ class FakeOrderRepository(IOrderRepository):
         self._orders = []
 
     async def add(self, order: OrderCreate) -> Order:
-        order = Order(id=self._get_id(), created_at=datetime.datetime.now(), update_at=datetime.datetime.now(), status=Order, **order.model_dump())
+        order = Order(id=self._get_id(),
+                      created_at=datetime.datetime.now(),
+                      update_at=datetime.datetime.now(),
+                      status="created", amount=0,
+                      products=[i.product_id for i in order.products],
+                      creator_id=order.creator_id,
+                      delivery_address=order.delivery_address)
         self._orders.append(order)
         return order
 
     async def get(self, id: int) -> Order:
-        return self._orders[id]
+        for order in self._orders:
+            if order.id == id:
+                return order
 
     async def get_all(self) -> list[Order]:
         return self._orders
 
     async def delete(self, id: int) -> None:
-        self._orders.remove(self._orders[id])
+        order = await self.get(id)
+        self._orders.remove(order)
 
     def _get_id(self) -> int:
         self._last_id += 1
