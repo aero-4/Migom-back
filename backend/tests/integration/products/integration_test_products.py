@@ -1,10 +1,8 @@
 import random
-
 import httpx
 import pytest
 
 from src.categories.presentation.dtos import CategoryCreateDTO
-from src.products.application.use_cases.delete_product import delete_product
 from src.products.domain.entities import Product
 from src.products.presentation.dtos import ProductCreateDTO
 

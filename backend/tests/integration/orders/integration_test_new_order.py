@@ -76,8 +76,6 @@ async def test_success_new_order(clear_db, user_factory):
         response = await client.post("/api/orders/", json=TEST_ORDER_DTO.model_dump())
         order: Order = Order(**response.json())
 
-        print(order)
-
         assert response.status_code == 200
-        assert order.products == TEST_ORDER_DTO.products
-        assert order.status == OrderStatus.CREATED
+        assert order.products == [p.product_id for p in TEST_ORDER_DTO.products]
+        assert order.status == OrderStatus.CREATED.value
