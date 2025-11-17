@@ -76,7 +76,7 @@ class PGOrdersRepository(IOrderRepository):
             raise AlreadyExists() from ex
 
     async def get(self, id: int) -> Order:
-        obj: OrdersOrm | None = await self.session.get(OrdersOrm, OrdersOrm.id == id)
+        obj: OrdersOrm | None = await self.session.get(OrdersOrm, id)
 
         if not obj:
             raise NotFound()
@@ -86,7 +86,7 @@ class PGOrdersRepository(IOrderRepository):
     async def get_all(self) -> list[Order]:
         stmt = select(OrdersOrm)
         result = await self.session.execute(stmt)
-        objs: list[OrdersOrm] = result.scalars().unique().all()
+        objs: list[OrdersOrm] = result.scalars().all()
 
         return [self._to_entity(obj) for obj in objs]
 
