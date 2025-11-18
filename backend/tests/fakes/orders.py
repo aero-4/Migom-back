@@ -37,6 +37,14 @@ class FakeOrderRepository(IOrderRepository):
         self._orders.append(order)
         return order
 
+    async def update(self, order_data: OrderCreate) -> Order:
+        order = await self.get(order_data.id)
+        for key, value in order_data.model_dump().items():
+            setattr(order, key, value)
+
+        self._orders[self._orders.index(order)] = order
+        return order
+
     async def get(self, id: int) -> Order:
         for order in self._orders:
             if order.id == id:
