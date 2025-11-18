@@ -1,7 +1,7 @@
 [project]
-name = "migom-back"
+name = "Migom"
 version = "0.1.0"
-description = "Backend Online cafe - Migom"
+description = "Online cafe"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
