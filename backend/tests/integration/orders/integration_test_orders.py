@@ -211,12 +211,72 @@ async def test_success_update_order(clear_db, user_factory):
 
         order: Order = random.choice(orders)
 
-        order_data = OrderUpdateDTO(creator_id=1, products=[CartItemDTO(product_id=10, quantity=4)])
+        order_data = OrderUpdateDTO(creator_id=1,
+                                    delivery_address="г. Санкт-Петербург ул Колотушкина д. 15",
+                                    amount=1234)
 
         response = await client.patch(f"/api/orders/{order.id}", json=order_data.model_dump())
         order_updated = Order(**response.json())
 
         assert response.status_code == 200
-        assert order_updated.id == order.id
-        assert order_updated.products == order.products
-        assert order_updated.delivery_address == order.delivery_address
+        assert order_updated.delivery_address == order_data.delivery_address
+        assert order_data.amount == order_updated.amount
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_update_order_statuses(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        orders = []
+        for i in range(3):
+            order = await create_order(client, user_factory)
+            orders.append(order)
+
+        order: Order = random.choice(orders)
+
+        # update statuses
+        for status in [OrderStatus.CREATED, OrderStatus.PENDING, OrderStatus.DELIVERING, OrderStatus.SUCCESS]:
+            order_data = OrderUpdateDTO(creator_id=1,
+                                        status=status)
+            response = await client.patch(f"/api/orders/{order.id}", json=order_data.model_dump())
+            order_updated = Order(**response.json())
+
+            assert response.status_code == 200
+            assert order_updated.status == order_data.status
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_update_order_statuses(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        orders = []
+        for i in range(3):
+            order = await create_order(client, user_factory)
+            orders.append(order)
+
+        order: Order = random.choice(orders)
+
+        # update statuses
+        for status in [OrderStatus.CREATED, OrderStatus.PENDING, OrderStatus.DELIVERING, OrderStatus.SUCCESS]:
+            order_data = OrderUpdateDTO(creator_id=1,
+                                        status=status)
+            response = await client.patch(f"/api/orders/{order.id}", json=order_data.model_dump())
+            order_updated = Order(**response.json())
+
+            assert response.status_code == 200
+            assert order_updated.status == order_data.status
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_not_found_update_order(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        orders = []
+        for i in range(3):
+            order = await create_order(client, user_factory)
+            orders.append(order)
+
+        random_id = 1234
+        order_data = OrderUpdateDTO(creator_id=1,
+                                    status=OrderStatus.DELIVERING)
+        response = await client.patch(f"/api/orders/{random_id}", json=order_data.model_dump())
+
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Not found"}

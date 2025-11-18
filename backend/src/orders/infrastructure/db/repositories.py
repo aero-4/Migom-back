@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.core.domain.exceptions import AlreadyExists, NotFound
-from src.orders.domain.entities import OrderCreate, Order, OrderUpdate
+from src.orders.domain.entities import OrderCreate, Order, OrderUpdate, OrderStatus
 from src.orders.domain.interfaces.order_repo import IOrderRepository
 from src.orders.infrastructure.db.orm import OrdersOrm, OrderProductsOrm
 from src.products.infrasctructure.db.orm import ProductsOrm
@@ -109,7 +109,9 @@ class PGOrdersRepository(IOrderRepository):
         if not obj:
             raise NotFound()
 
-        for key, value in order_data.model_dump().items():
+        order_data.status = OrderStatus(order_data.status) if order_data.status else None
+
+        for key, value in order_data.model_dump(exclude_none=True).items():
             setattr(obj, key, value)
 
         await self.session.flush()

@@ -38,7 +38,6 @@ class OrderCreate(CustomModel):
 class OrderUpdate(CustomModel):
     id: int
     creator_id: int | None = None
-    products: List[CartItem] | None = None
     status: str | None = None
     amount: int | None = None
     delivery_address: str | None = None

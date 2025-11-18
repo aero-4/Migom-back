@@ -16,7 +16,6 @@ class OrderCreateDTO(CustomModel):
 
 class OrderUpdateDTO(CustomModel):
     creator_id: int
-    products: List[CartItemDTO] | None = None
     status: str | None = None
     amount: int | None = None
     delivery_address: str | None = None
