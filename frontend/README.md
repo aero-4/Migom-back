@@ -1,1 +1,1 @@
-Migom Frontend
+#### Stack Frontend: React TypeScript, TailwindCSS.
