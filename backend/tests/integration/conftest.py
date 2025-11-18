@@ -21,9 +21,9 @@ async def clear_db():
     async with engine.begin() as conn:
         tables = ", ".join(TABLES_TO_TRUNCATE)
         query = f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE;"
-        print(await conn.execute(text(query)))
+        await conn.execute(text(query))
 
-        return True
+    return True
 
 
 @pytest_asyncio.fixture

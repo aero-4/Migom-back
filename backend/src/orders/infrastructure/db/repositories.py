@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.core.domain.exceptions import AlreadyExists, NotFound
-from src.orders.domain.entities import OrderCreate, Order
+from src.orders.domain.entities import OrderCreate, Order, OrderUpdate
 from src.orders.domain.interfaces.order_repo import IOrderRepository
 from src.orders.infrastructure.db.orm import OrdersOrm, OrderProductsOrm
 from src.products.infrasctructure.db.orm import ProductsOrm
@@ -100,6 +100,21 @@ class PGOrdersRepository(IOrderRepository):
 
         await self.session.delete(obj)
         await self.session.flush()
+
+    async def update(self, order_data: OrderUpdate) -> Order:
+        stmt = select(OrdersOrm).where(OrdersOrm.id == order_data.id)
+        result = await self.session.execute(stmt)
+        obj: OrdersOrm | None = result.scalar_one_or_none()
+
+        if not obj:
+            raise NotFound()
+
+        for key, value in order_data.model_dump().items():
+            setattr(obj, key, value)
+
+        await self.session.flush()
+
+        return self._to_entity(obj)
 
     @staticmethod
     def _to_entity(order_data: OrdersOrm) -> Order:

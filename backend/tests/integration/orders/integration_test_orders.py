@@ -1,4 +1,6 @@
 import datetime
+import random
+
 import pytest
 import httpx
 from httpx import Response
@@ -6,12 +8,13 @@ from httpx import Response
 from src.categories.domain.entities import Category
 from src.categories.presentation.dtos import CategoryCreateDTO
 from src.orders.domain.entities import Order, OrderStatus
-from src.orders.presentation.dtos import OrderCreateDTO, CartItemDTO
+from src.orders.presentation.dtos import OrderCreateDTO, CartItemDTO, OrderUpdateDTO
 from src.products.domain.entities import ProductCreate, Product
 from src.users.domain.dtos import UserCreateDTO
+from src.utils.strings import generate_random_alphanum
 
 TEST_USER_DTO = UserCreateDTO(
-    email="olegtinkov@gmail.com",
+    email=f"olegtinkov{random.randint(100, 999)}@gmail.com",
     password="securepass",
     first_name="Oleg",
     last_name="Tinkov",
@@ -20,10 +23,17 @@ TEST_USER_DTO = UserCreateDTO(
 
 
 async def create_order(client, user_factory) -> Order:
-    await user_factory(client, TEST_USER_DTO)
+    user_data = UserCreateDTO(
+        email=f"olegtinkov{random.randint(100, 999)}@gmail.com",
+        password=f"securepass{random.randint(100, 999)}",
+        first_name=f"Oleg{random.randint(100, 999)}",
+        last_name=f"Tinkov{random.randint(100, 999)}",
+        birthday=datetime.date(2025, 1, 1)
+    )
+    await user_factory(client, user_data)
 
     # create category
-    category = CategoryCreateDTO(name="Пицца американская",
+    category = CategoryCreateDTO(name=generate_random_alphanum(),
                                  photo="src/pizza.jpg")
 
     response = await client.post("/api/categories/", json=category.model_dump())
@@ -32,7 +42,7 @@ async def create_order(client, user_factory) -> Order:
     # create products
     products = []
     for i in range(3):
-        product_data = ProductCreate(name=f"product {i}",
+        product_data = ProductCreate(name=f"product {random.randint(100, 999)}",
                                      content="test content",
                                      composition="test composition",
                                      price=100,
@@ -164,3 +174,49 @@ async def test_not_found_get_one_order(clear_db, user_factory):
 
         assert response.status_code == 404
         assert response.json() == {"detail": "Not found"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_collect_orders(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        orders = []
+        for i in range(3):
+            order = await create_order(client, user_factory)
+            orders.append(order)
+
+        response = await client.get(f"/api/orders/")
+        collect_orders = [Order(**o) for o in response.json()]
+
+        assert response.status_code == 200
+        assert collect_orders == orders
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_null_collect_orders(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        response = await client.get(f"/api/orders/")
+        collect_orders = [Order(**o) for o in response.json()]
+
+        assert response.status_code == 200
+        assert collect_orders == []
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_update_order(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        orders = []
+        for i in range(3):
+            order = await create_order(client, user_factory)
+            orders.append(order)
+
+        order: Order = random.choice(orders)
+
+        order_data = OrderUpdateDTO(creator_id=1, products=[CartItemDTO(product_id=10, quantity=4)])
+
+        response = await client.patch(f"/api/orders/{order.id}", json=order_data.model_dump())
+        order_updated = Order(**response.json())
+
+        assert response.status_code == 200
+        assert order_updated.id == order.id
+        assert order_updated.products == order.products
+        assert order_updated.delivery_address == order.delivery_address
