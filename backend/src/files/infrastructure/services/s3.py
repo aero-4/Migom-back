@@ -1,13 +1,9 @@
-from typing import BinaryIO
-
 import aiofiles
 import uuid6
 
 from contextlib import asynccontextmanager
 from aiobotocore.session import get_session, ClientCreatorContext
 from pathlib import Path
-
-from fastapi import UploadFile
 
 from src.core.config import settings
 

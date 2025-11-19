@@ -1,12 +1,10 @@
-import warnings
-from typing import AsyncIterator
-
 import httpx
 import pytest
 import pytest_asyncio
-from _pytest.warning_types import PytestDeprecationWarning
 
-from main import app
+from typing import AsyncIterator
+
+from src.main import app
 from src.files.infrastructure.services.s3 import S3Storage
 from tests.fakes.categories import FakeCategoryUnitOfWork
 from tests.fakes.orders import FakeOrderUnitOfWork
@@ -38,6 +36,7 @@ def fake_product_uow():
 @pytest.fixture
 def fake_order_uow():
     return FakeOrderUnitOfWork()
+
 
 @pytest.fixture()
 def s3_storage():

@@ -1,18 +1,16 @@
 import logging
-
-from contextlib import asynccontextmanager
-
 import uvicorn
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
+from contextlib import asynccontextmanager
 
 from src.categories.presentation.api import categories_api_router
 from src.core.infrastructure.redis import check_redis_connection
 from src.db.utils import create_db_and_tables
 from src.core.config import settings
 from src.core.domain.exceptions import AppException
-
 from src.auth.presentation.middlewares.security import SecurityMiddleware
 from src.auth.presentation.middlewares.authentication import AuthenticationMiddleware
 from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware

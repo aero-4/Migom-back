@@ -2,11 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import DeliveryFormLarge from "../Forms/DeliveryForm.tsx";
 
-/**
- * Adaptive, large, accessible CartWidget (Sber-like style)
- * - Uses Tailwind classes (you already have Tailwind in project)
- * - Focus management, Escape to close, body scroll lock
- */
 export const CartWidget: React.FC = () => {
     const {
         items,
@@ -26,10 +21,8 @@ export const CartWidget: React.FC = () => {
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-    // focus management: when opening focus close button; when closing restore focus to trigger
     useEffect(() => {
         if (isOpen) {
-            // lock body scroll
             document.body.style.overflow = "hidden";
             setTimeout(() => closeButtonRef.current?.focus(), 120);
         } else {
@@ -42,7 +35,6 @@ export const CartWidget: React.FC = () => {
         };
     }, [isOpen]);
 
-    // close on Escape
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape" && isOpen) close();
@@ -71,14 +63,12 @@ export const CartWidget: React.FC = () => {
 
     return (
         <>
-            {/* Floating button - larger & Sber-like green */}
             <button
                 ref={triggerRef}
                 aria-label="Открыть корзину"
                 onClick={toggle}
-                className="fixed right-6 bottom-6 z-50 inline-flex items-center justify-center w-16 h-16 rounded-full shadow-2xl bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+                className="fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
             >
-                {/* shopping cart icon */}
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path
                         d="M15 11C15 12.6569 13.6569 14 12 14C10.3431 14 9 12.6569 9 11M4 7H20M4 7V13C4 19.3668 5.12797 20.5 12 20.5C18.872 20.5 20 19.3668 20 13V7M4 7L5.44721 4.10557C5.786 3.428 6.47852 3 7.23607 3H16.7639C17.5215 3 18.214 3.428 18.5528 4.10557L20 7"
@@ -91,15 +81,14 @@ export const CartWidget: React.FC = () => {
 
                 {totalItems > 0 && (
                     <span
-                        className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-semibold leading-none text-white bg-red-600 rounded-full shadow"
+                        className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-semibold leading-none text-white bg-orange-500 rounded-full shadow"
                         aria-live="polite"
                     >
-            {totalItems}
-          </span>
+                        {totalItems}
+                    </span>
                 )}
             </button>
 
-            {/* Backdrop */}
             {isOpen && (
                 <div
                     onClick={close}
@@ -108,7 +97,6 @@ export const CartWidget: React.FC = () => {
                 />
             )}
 
-            {/* Drawer */}
             <aside
                 className={`fixed top-0 right-0 z-50 h-full w-full transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
                     isOpen ? "translate-x-0" : "translate-x-full"
@@ -117,16 +105,13 @@ export const CartWidget: React.FC = () => {
                 aria-modal="true"
                 aria-labelledby="cart-title"
             >
-                {/* Container responsive: full width on small, two-column on md+ */}
-                <div className="flex h-full flex-col md:flex-row md:max-w-4xl md:ml-auto">
-                    {/* left: list (on md takes 2/3) */}
+                <div className="flex h-full flex-col md:flex-row">
                     <div className="w-full md:w-2/3 flex flex-col">
                         <div className="flex items-center justify-between p-6 border-b">
                             <div>
                                 <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
                                     Корзина
                                 </h3>
-                                <p className="text-sm text-gray-500 mt-1">Товары, которые вы выбрали</p>
                             </div>
 
                             <div className="flex items-center gap-3">
@@ -150,11 +135,8 @@ export const CartWidget: React.FC = () => {
                         <div className="p-6 flex-1 overflow-auto">
                             {items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
-                                    <svg className="w-16 h-16 mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                                        <path strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
-                                    </svg>
                                     <div className="text-lg font-medium">Корзина пуста</div>
-                                    <div className="text-sm mt-2">Добавьте товары — они появятся тут</div>
+                                    <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
                                 </div>
                             ) : (
                                 <ul className="space-y-5">
@@ -181,7 +163,10 @@ export const CartWidget: React.FC = () => {
                                                             className="text-sm text-red-600 hover:underline"
                                                             aria-label={`Удалить ${it.name}`}
                                                         >
-                                                            Удалить
+                                                            <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                                                className="hover:opacity-85">
+                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="#0F1729"/>
+                                                            </svg>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -217,23 +202,21 @@ export const CartWidget: React.FC = () => {
 
 
 
-                    {/* right: summary (on md takes 1/3) */}
                     <div className="w-full md:w-1/3 border-l border-gray-100 bg-gray-50 flex flex-col">
                         <div className="p-6 flex-1 flex flex-col">
-                            <div className="mb-6">
-                                <div className="text-sm text-gray-600">Итого</div>
-                                <div className="mt-2 text-2xl font-extrabold text-gray-900">{totalPrice.toLocaleString()} ₽</div>
-                                <div className="text-sm text-gray-500 mt-1">({totalItems} {totalItems === 1 ? "товар" : "товара"})</div>
+                            <div className="mb-6 items-center justify-center flex flex-row">
+                                <div className="text-sm text-gray-600">К оплате:</div>
+                                <div className="text-2xl font-extrabold text-gray-900">{totalPrice.toLocaleString()} ₽</div>
                             </div>
 
-                            {/* extra info / form fields can be added here */}
+
                             <div className="mt-auto">
                                 <button
                                     onClick={handleCheckout}
                                     disabled={loading || items.length === 0}
                                     className={`w-full flex items-center justify-center gap-3 py-3 rounded-md text-white ${
-                                        loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"
-                                    } focus:outline-none focus:ring-4 focus:ring-emerald-300`}
+                                        loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                                    } focus:outline-none focus:ring-4 focus:ring-red-300`}
                                 >
                                     {loading ? "Отправка..." : "Оформить заказ"}
                                 </button>
@@ -246,18 +229,9 @@ export const CartWidget: React.FC = () => {
                                     Очистить корзину
                                 </button>
 
-                                <button
-                                    onClick={close}
-                                    className="w-full mt-3 py-3 rounded-md text-gray-600 hover:bg-gray-50"
-                                >
-                                    Продолжить покупки
-                                </button>
                             </div>
                         </div>
 
-                        <div className="p-4 border-t text-xs text-gray-500">
-                            Безопасная оплата. Доставка и возврат — по условиям магазина.
-                        </div>
                     </div>
                 </div>
             </aside>

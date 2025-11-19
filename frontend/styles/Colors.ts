@@ -1,4 +1,3 @@
-// src/styles/Colors.ts;
 
 const Base = {
     Grey: {

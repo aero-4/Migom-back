@@ -33,5 +33,7 @@ dependencies = [
     "pyjwt>=2.10.1",
     "jose>=1.0.0",
     "python-dotenv>=1.2.1",
+    "aiofiles",
+    "aiobotocore>=2.25.2",
 ]
 
