@@ -32,13 +32,11 @@ class OrdersOrm(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), default=get_timezone_now)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), onupdate=get_timezone_now, default=get_timezone_now)
-
     status: Mapped[OrderStatus] = mapped_column(Enum(OrderStatus), default=OrderStatus.CREATED)
-    delivery_address: Mapped[str | None] = mapped_column(nullable=True)
     amount: Mapped[int] = mapped_column(default=0)
 
     creator: Mapped['UsersOrm'] = relationship(back_populates="orders")
-    creator_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    creator_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     product_links: Mapped[list[OrderProductsOrm]] = relationship(
         "OrderProductsOrm",

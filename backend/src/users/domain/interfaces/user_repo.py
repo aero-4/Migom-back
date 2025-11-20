@@ -33,10 +33,4 @@ class IUserRepository(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
-    def update(self, user_update: UserUpdate) -> User:
-        """
-        Updates user attributes
-        """
-        pass
 

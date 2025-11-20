@@ -43,12 +43,6 @@ class PGUserRepository(IUserRepository):
 
         return self._to_domain(obj)
 
-    async def update(self, user: UserUpdate) -> User:
-        obj = UsersOrm(**user.model_dump(mode='python'))
-        self.session.add(obj)
-        await self.session.flush()
-        return self._to_domain(obj)
-
     async def delete(self, user: User):
         stmt = select(UsersOrm).where(UsersOrm.id == user.id)
         result = await self.session.execute(stmt)

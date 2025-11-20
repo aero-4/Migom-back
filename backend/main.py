@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 
 from src.categories.presentation.api import categories_api_router
 from src.core.infrastructure.redis import check_redis_connection
-from src.db.utils import create_db_and_tables
+from src.db.utils import create_and_delete_tables_db
 from src.core.config import settings
 from src.core.domain.exceptions import AppException
 from src.auth.presentation.middlewares.security import SecurityMiddleware
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await check_redis_connection()
-    await create_db_and_tables()
+    await create_and_delete_tables_db()
     yield
 
 
