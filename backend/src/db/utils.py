@@ -12,5 +12,8 @@ async def drop_all_tables_cascade():
 
 async def create_and_delete_tables_db():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        try:
+            await conn.run_sync(Base.metadata.drop_all)
+        except:
+            await drop_all_tables_cascade()
         await conn.run_sync(Base.metadata.create_all)

@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="6f860411-ead3-41ca-9280-aa1a784d7646" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/addresses/presentation/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/addresses/presentation/api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/db/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/db/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/orders/infrastructure/db/orm.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/orders/infrastructure/db/orm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/users/infrastructure/db/orm.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/users/infrastructure/db/orm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/users/presentation/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/users/presentation/api.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -369,7 +366,8 @@
       <workItem from="1763557244262" duration="508000" />
       <workItem from="1763557955566" duration="82000" />
       <workItem from="1763558108878" duration="856000" />
-      <workItem from="1763646938461" duration="608000" />
+      <workItem from="1763646938461" duration="611000" />
+      <workItem from="1763661770984" duration="159000" />
     </task>
     <servers />
   </component>

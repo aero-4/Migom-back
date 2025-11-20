@@ -91,7 +91,7 @@ class JWTAuth(ITokenAuth):
             await self.token_storage.store_token(self.token_provider.read_token(token))
 
     async def read_token(self, token_type: TokenType) -> TokenData | None:
-        token = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
+        token: str | None = self._get_access_token() if token_type == TokenType.ACCESS else self._get_refresh_token()
         token_data = self.token_provider.read_token(token)
 
         return await self._validate_token_or_none(token_data)

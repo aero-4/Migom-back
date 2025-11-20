@@ -19,11 +19,11 @@ class AddressCreate(CustomModel):
     city: str
     street: str
     house_number: int
-    entrance: int
-    floor: int
-    apartment_number: int
-    comment: str
-    is_leave_at_door: bool
+    entrance: int | None
+    floor: int | None
+    apartment_number: int | None
+    comment: str | None
+    is_leave_at_door: bool | None
 
 
 class AddressUpdate(CustomModel):

@@ -12,7 +12,7 @@ class AddressesOrm(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    user: Mapped['UsersOrm'] = relationship(back_populates="users_delivering_info")
+    user: Mapped['UsersOrm'] = relationship(back_populates="addresses")
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), default=get_timezone_now)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), onupdate=get_timezone_now, default=get_timezone_now)
     city: Mapped[str] = mapped_column(nullable=False)

@@ -4,8 +4,9 @@ import pytest_asyncio
 
 from typing import AsyncIterator
 
-from src.main import app
+from src import app
 from src.files.infrastructure.services.s3 import S3Storage
+
 from tests.fakes.categories import FakeCategoryUnitOfWork
 from tests.fakes.orders import FakeOrderUnitOfWork
 from tests.fakes.products import FakeProductUnitOfWork
