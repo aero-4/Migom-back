@@ -21,5 +21,5 @@ class AddressesOrm(Base):
     entrance: Mapped[int | None] = mapped_column(nullable=True)
     floor: Mapped[int | None] = mapped_column(nullable=True)
     apartment_number: Mapped[int | None] = mapped_column(nullable=True)
-    comment: Mapped[int | None] = mapped_column(nullable=True)
+    comment: Mapped[str | None] = mapped_column(nullable=True)
     is_leave_at_door: Mapped[bool | None] = mapped_column(default=False)

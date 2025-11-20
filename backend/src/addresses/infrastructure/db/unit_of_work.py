@@ -12,7 +12,7 @@ class AddressUnitOfWork(IAddressUnitOfWork):
 
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
-        self.users = PGAddressRepository(self.session)
+        self.addresses = PGAddressRepository(self.session)
 
         return await super().__aenter__()
 

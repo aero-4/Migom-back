@@ -10,9 +10,9 @@ TEST_USER = UserCreateDTO(email="test@test.com", password="test12345", first_nam
 
 
 @pytest.mark.asyncio
-async def test_success_add_address(address_factory, user_factory):
+async def test_success_add_address(clear_db, address_factory, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         await user_factory(client, TEST_USER)
 
-        address_data = AddressCreateDTO(city="Москва", street="Колотушкина", house_number=12)
+        address_data = AddressCreateDTO(city="Москва", street="Колотушкина", house_number=123)
         await address_factory(client, address_data)

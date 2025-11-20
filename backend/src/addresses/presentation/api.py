@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from starlette.requests import Request
 
 from src.addresses.application.use_cases.add_address import add_address
 from src.addresses.application.use_cases.collect_addresses import collect_addresses
@@ -12,20 +13,20 @@ addresses_api_router = APIRouter()
 
 
 @addresses_api_router.post("/")
-async def add(address_data: AddressCreateDTO, uow: AddressUoWDeps, auth: TokenAuthDep):
-    return await add_address(address_data, uow, auth)
+async def add(request: Request, address_data: AddressCreateDTO, uow: AddressUoWDeps):
+    return await add_address(address_data, uow, request.state.user)
 
 
-@addresses_api_router.get("/")
-async def get_all(uow: AddressUoWDeps, auth: TokenAuthDep):
-    return await collect_addresses(uow, auth)
-
-
-@addresses_api_router.patch("/{id}")
-async def update(id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps, auth: TokenAuthDep):
-    return await update_address(id, address_update, uow, auth)
-
-
-@addresses_api_router.delete("/{id}")
-async def delete(id: int, uow: AddressUoWDeps, auth: TokenAuthDep):
-    return await delete_address(id, uow, auth)
+# @addresses_api_router.get("/")
+# async def get_all(uow: AddressUoWDeps, auth: TokenAuthDep):
+#     return await collect_addresses(uow, auth)
+#
+#
+# @addresses_api_router.patch("/{id}")
+# async def update(id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps, auth: TokenAuthDep):
+#     return await update_address(id, address_update, uow, auth)
+#
+#
+# @addresses_api_router.delete("/{id}")
+# async def delete(id: int, uow: AddressUoWDeps, auth: TokenAuthDep):
+#     return await delete_address(id, uow, auth)

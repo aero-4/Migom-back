@@ -32,13 +32,15 @@ async def clear_db():
 def user_factory():
     async def _create(client: httpx.AsyncClient, user: UserCreateDTO) -> UserCreateDTO:
         response = await client.post("/api/auth/register", json=user.model_dump(mode="json"))
-        print(response.text)
 
         assert response.status_code == 200
 
         data = response.json()
 
         assert data["msg"] == "Register successful"
+
+        for token in ["access_token", "refresh_token"]:
+            client.cookies.set(token, response.cookies.get(token))
 
         return user
 
@@ -48,7 +50,7 @@ def user_factory():
 @pytest_asyncio.fixture
 def address_factory():
     async def _create(client: httpx.AsyncClient, address: AddressCreateDTO) -> Address:
-        response = await client.post("/api/addresses/", json=address.model_dump())
+        response = await client.post("/api/addresses/", json=address.model_dump(mode="json"))
         print(response.text)
         assert response.status_code == 200
 
