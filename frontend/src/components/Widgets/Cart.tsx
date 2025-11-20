@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCart } from "../../context/CartContext";
-import DeliveryFormLarge from "../Forms/DeliveryForm.tsx";
+import DeliveryForm from "../Forms/DeliveryForm";
+import closeSvg from "../../assets/close.svg";
+import QuantityInput from "../Ui/QuantityInput.tsx";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -8,7 +10,6 @@ export const CartWidget: React.FC = () => {
         totalItems,
         totalPrice,
         isOpen,
-        open,
         close,
         toggle,
         setQty,
@@ -18,13 +19,16 @@ export const CartWidget: React.FC = () => {
     } = useCart();
 
     const [loading, setLoading] = useState(false);
+    const [isDeliveringForm, setDeliveringForm] = useState(false);
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
+        let timer: number | undefined;
+
         if (isOpen) {
             document.body.style.overflow = "hidden";
-            setTimeout(() => closeButtonRef.current?.focus(), 120);
+            timer = window.setTimeout(() => closeButtonRef.current?.focus(), 120);
         } else {
             document.body.style.overflow = "";
             triggerRef.current?.focus();
@@ -32,6 +36,7 @@ export const CartWidget: React.FC = () => {
 
         return () => {
             document.body.style.overflow = "";
+            if (timer) clearTimeout(timer);
         };
     }, [isOpen]);
 
@@ -42,6 +47,11 @@ export const CartWidget: React.FC = () => {
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [isOpen, close]);
+
+
+    const handleSwitchToDeliveringForm = () => {
+        setDeliveringForm(true);
+    };
 
     const handleCheckout = async () => {
         if (items.length === 0) {
@@ -64,6 +74,7 @@ export const CartWidget: React.FC = () => {
     return (
         <>
             <button
+                type="button"
                 ref={triggerRef}
                 aria-label="Открыть корзину"
                 onClick={toggle}
@@ -105,135 +116,122 @@ export const CartWidget: React.FC = () => {
                 aria-modal="true"
                 aria-labelledby="cart-title"
             >
-                <div className="flex h-full flex-col md:flex-row">
-                    <div className="w-full md:w-2/3 flex flex-col">
-                        <div className="flex items-center justify-between p-6 border-b">
-                            <div>
-                                <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
-                                    Корзина
-                                </h3>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={clear}
-                                    className="text-sm text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md border border-gray-100 bg-gray-50"
-                                >
-                                    Очистить
-                                </button>
-                                <button
-                                    ref={closeButtonRef}
-                                    onClick={close}
-                                    aria-label="Закрыть корзину"
-                                    className="p-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="p-6 flex-1 overflow-auto">
-                            {items.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
-                                    <div className="text-lg font-medium">Корзина пуста</div>
-                                    <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
+                {!isDeliveringForm ? (
+                    <div className="flex h-full flex-col md:flex-row">
+                        <div className="w-full md:w-2/3 flex flex-col">
+                            <div className="flex items-center justify-between p-6 border-b">
+                                <div>
+                                    <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
+                                        Корзина
+                                    </h3>
                                 </div>
-                            ) : (
-                                <ul className="space-y-5">
-                                    {items.map((it) => (
-                                        <li key={it.id} className="flex gap-4 items-start p-4 rounded-lg border border-gray-100">
-                                            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
-                                                {it.image ? (
-                                                    <img src={it.image} alt={it.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="text-xs text-gray-400">no photo</div>
-                                                )}
-                                            </div>
 
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <div>
-                                                        <div className="text-lg font-medium text-gray-800 truncate">{it.name}</div>
-                                                        <div className="text-sm text-gray-500 mt-1">{it.price.toLocaleString()} ₽</div>
-                                                    </div>
+                                <div className="flex items-center gap-3">
 
-                                                    <div className="text-right">
-                                                        <button
-                                                            onClick={() => removeItem(it.id)}
-                                                            className="text-sm text-red-600 hover:underline"
-                                                            aria-label={`Удалить ${it.name}`}
-                                                        >
-                                                            <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                                                className="hover:opacity-85">
-                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="#0F1729"/>
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-4 flex items-center gap-3">
-                                                    <div className="flex items-center rounded-lg border border-gray-200">
-                                                        <button
-                                                            onClick={() => setQty(it.id, Math.max(0, it.qty - 1))}
-                                                            className="px-4 py-2 text-lg font-medium hover:bg-gray-50 disabled:opacity-50"
-                                                            aria-label={`Уменьшить количество ${it.name}`}
-                                                        >
-                                                            −
-                                                        </button>
-                                                        <div className="px-5 py-2 text-lg font-medium min-w-[48px] text-center">{it.qty}</div>
-                                                        <button
-                                                            onClick={() => setQty(it.id, it.qty + 1)}
-                                                            className="px-4 py-2 text-lg font-medium hover:bg-gray-50"
-                                                            aria-label={`Увеличить количество ${it.name}`}
-                                                        >
-                                                            +
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="ml-auto text-sm text-gray-600">Сумма: <span className="font-semibold text-gray-800">{(it.price * it.qty).toLocaleString()} ₽</span></div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </div>
-
-
-
-                    <div className="w-full md:w-1/3 border-l border-gray-100 bg-gray-50 flex flex-col">
-                        <div className="p-6 flex-1 flex flex-col">
-                            <div className="mb-6 items-center justify-center flex flex-row">
-                                <div className="text-sm text-gray-600">К оплате:</div>
-                                <div className="text-2xl font-extrabold text-gray-900">{totalPrice.toLocaleString()} ₽</div>
+                                    <button
+                                        type="button"
+                                        ref={closeButtonRef}
+                                        onClick={close}
+                                        aria-label="Закрыть корзину"
+                                        className="p-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2"
+                                    >
+                                        <img className="w-4 h-4" src={closeSvg} alt=""/>
+                                    </button>
+                                </div>
                             </div>
 
+                            <div className="p-6 flex-1 overflow-auto">
+                                {items.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
+                                        <div className="text-lg font-medium">Корзина пуста</div>
+                                        <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
+                                    </div>
+                                ) : (
+                                    <ul className="space-y-5">
+                                        {items.map((item) => (
+                                            <li key={item.id} className="flex gap-4 items-start p-4 rounded-lg border border-gray-100">
+                                                <div
+                                                    className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                                                    {item.image ? (
+                                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover"/>
+                                                    ) : (
+                                                        <div className="text-xs text-gray-400">no photo</div>
+                                                    )}
+                                                </div>
 
-                            <div className="mt-auto">
-                                <button
-                                    onClick={handleCheckout}
-                                    disabled={loading || items.length === 0}
-                                    className={`w-full flex items-center justify-center gap-3 py-3 rounded-md text-white ${
-                                        loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
-                                    } focus:outline-none focus:ring-4 focus:ring-red-300`}
-                                >
-                                    {loading ? "Отправка..." : "Оформить заказ"}
-                                </button>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div>
+                                                            <div className="font-medium text-gray-800 truncate">{item.name}</div>
+                                                        </div>
 
-                                <button
-                                    onClick={clear}
-                                    disabled={items.length === 0}
-                                    className="w-full mt-3 py-3 rounded-md border border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
-                                >
-                                    Очистить корзину
-                                </button>
+                                                        <div className="text-right">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeItem(item.id)}
+                                                                className="text-sm text-red-600 hover:underline"
+                                                                aria-label={`Удалить ${item.name}`}
+                                                            >
+                                                                <img className="w-4 h-4" src={closeSvg} alt=""/>
+                                                            </button>
+                                                        </div>
+                                                    </div>
 
+                                                    <div className="mt-4 flex items-center gap-3">
+
+                                                        <QuantityInput item={item} setQty={setQty}/>
+
+                                                        <div className="ml-auto text-sm text-gray-600"><span
+                                                            className="font-semibold text-gray-800">{(item.price * item.qty).toLocaleString()} ₽</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                         </div>
 
+                        <div className="mt-auto w-full md:w-1/3 border-l border-gray-100 flex flex-col">
+                            <div className="p-6 flex-1 flex flex-col">
+                            <div className="text-gray-600">К оплате:</div>
+
+
+                                <div className="mb-6 items-centerflex flex-row">
+
+                                    <div className="text-3xl text-gray-900 text-center">{totalPrice.toLocaleString()} ₽</div>
+
+                                </div>
+
+
+                                <div className="">
+                                    <button
+                                        type="button"
+                                        onClick={handleSwitchToDeliveringForm}
+                                        disabled={loading || items.length === 0}
+                                        className={`w-full flex items-center justify-center gap-3 py-3 rounded-md text-white ${
+                                            loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                                        } focus:outline-none focus:ring-4 focus:ring-red-300`}
+                                    >
+                                        {"Продолжить"}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={clear}
+                                        disabled={items.length === 0}
+                                        className="w-full mt-3 py-3 rounded-md border border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
+                                    >
+                                        Очистить корзину
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
+                ) : <DeliveryForm onSubmit={handleCheckout} />}
             </aside>
         </>
     );
