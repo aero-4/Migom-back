@@ -3,6 +3,7 @@ import datetime
 import httpx
 import pytest
 
+from src.addresses.domain.entities import Address
 from src.addresses.presentation.dtos import AddressCreateDTO
 from src.users.domain.dtos import UserCreateDTO
 
@@ -26,3 +27,20 @@ async def test_add_address_not_authenticated(clear_db, address_factory):
 
         assert response.status_code == 401
         assert response.json() == {"detail": "User not authenticated"}
+
+
+@pytest.mark.asyncio
+async def test_success_get_all_addresses(clear_db, address_factory, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_USER)
+        addresses = []
+        for i in range(5):
+            address_data = AddressCreateDTO(city="Москва", street="Колотушкина", house_number=123)
+            address: Address = await address_factory(client, address_data)
+            addresses.append(address)
+
+        response = await client.get("/api/addresses/")
+
+        assert response.status_code == 200
+        print(response.json())
+        assert response.json() == [address.model_dump() for address in addresses]

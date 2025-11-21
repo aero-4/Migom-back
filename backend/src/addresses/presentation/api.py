@@ -17,16 +17,16 @@ async def add(request: Request, address_data: AddressCreateDTO, uow: AddressUoWD
     return await add_address(address_data, uow, request.state.user)
 
 
-# @addresses_api_router.get("/")
-# async def get_all(uow: AddressUoWDeps, auth: TokenAuthDep):
-#     return await collect_addresses(uow, auth)
-#
-#
-# @addresses_api_router.patch("/{id}")
-# async def update(id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps, auth: TokenAuthDep):
-#     return await update_address(id, address_update, uow, auth)
-#
-#
-# @addresses_api_router.delete("/{id}")
-# async def delete(id: int, uow: AddressUoWDeps, auth: TokenAuthDep):
-#     return await delete_address(id, uow, auth)
+@addresses_api_router.get("/")
+async def get_all(uow: AddressUoWDeps):
+    return await collect_addresses(uow)
+
+
+@addresses_api_router.patch("/{id}")
+async def update(id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps):
+    return await update_address(id, address_update, uow)
+
+
+@addresses_api_router.delete("/{id}")
+async def delete(id: int, uow: AddressUoWDeps, auth: TokenAuthDep):
+    return await delete_address(id, uow, auth)

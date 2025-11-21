@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import DeliveryForm from "../Forms/DeliveryForm";
 import closeSvg from "../../assets/close.svg";
+import backSvg from "../../assets/left.svg"
 import QuantityInput from "../Ui/QuantityInput.tsx";
+import BackButton from "../Ui/BackButton.tsx";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -100,14 +102,6 @@ export const CartWidget: React.FC = () => {
                 )}
             </button>
 
-            {isOpen && (
-                <div
-                    onClick={close}
-                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
-                    aria-hidden
-                />
-            )}
-
             <aside
                 className={`fixed top-0 right-0 z-50 h-full w-full transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
                     isOpen ? "translate-x-0" : "translate-x-full"
@@ -117,14 +111,12 @@ export const CartWidget: React.FC = () => {
                 aria-labelledby="cart-title"
             >
                 {!isDeliveringForm ? (
-                    <div className="flex h-full flex-col md:flex-row">
-                        <div className="w-full md:w-2/3 flex flex-col">
-                            <div className="flex items-center justify-between p-6 border-b">
-                                <div>
-                                    <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
-                                        Корзина
-                                    </h3>
-                                </div>
+                    <div className="h-full w-full flex flex-col md:flex-row">
+                        <div className="w-full md:w-2/3 flex flex-col min-h-0">
+                            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                                <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
+                                    Корзина
+                                </h3>
 
                                 <div className="flex items-center gap-3">
 
@@ -137,17 +129,18 @@ export const CartWidget: React.FC = () => {
                                     >
                                         <img className="w-4 h-4" src={closeSvg} alt=""/>
                                     </button>
+
                                 </div>
                             </div>
 
-                            <div className="p-6 flex-1 overflow-auto">
+                            <div className="p-6 overflow-y-auto">
                                 {items.length === 0 ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
-                                        <div className="text-lg font-medium">Корзина пуста</div>
+                                    <div className="flex flex-col my-auto text-center items-center justify-center items-center text-gray-500">
+                                        <div className="text-2xl font-medium">Корзина пуста</div>
                                         <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
                                     </div>
                                 ) : (
-                                    <ul className="space-y-5">
+                                    <ul className="space-y-5 w-full ">
                                         {items.map((item) => (
                                             <li key={item.id} className="flex gap-4 items-start p-4 rounded-lg border border-gray-100">
                                                 <div
@@ -181,7 +174,7 @@ export const CartWidget: React.FC = () => {
 
                                                         <QuantityInput item={item} setQty={setQty}/>
 
-                                                        <div className="ml-auto text-sm text-gray-600"><span
+                                                        <div className="ml-auto text-lg text-gray-600"><span
                                                             className="font-semibold text-gray-800">{(item.price * item.qty).toLocaleString()} ₽</span>
                                                         </div>
                                                     </div>
@@ -193,12 +186,11 @@ export const CartWidget: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="mt-auto w-full md:w-1/3 border-l border-gray-100 flex flex-col">
-                            <div className="p-6 flex-1 flex flex-col">
-                            <div className="text-gray-600">К оплате:</div>
+                        <div className="mt-auto w-full md:w-1/3 flex flex-col">
+                            <div className="p-6 flex flex-col">
 
-
-                                <div className="mb-6 items-centerflex flex-row">
+                                <div className="mb-6 flex-row">
+                                    <div className="text-gray-600 justify-center">К оплате:</div>
 
                                     <div className="text-3xl text-gray-900 text-center">{totalPrice.toLocaleString()} ₽</div>
 
@@ -214,7 +206,7 @@ export const CartWidget: React.FC = () => {
                                             loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
                                         } focus:outline-none focus:ring-4 focus:ring-red-300`}
                                     >
-                                        {"Продолжить"}
+                                        Продолжить
                                     </button>
 
                                     <button

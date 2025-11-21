@@ -51,7 +51,6 @@ def user_factory():
 def address_factory():
     async def _create(client: httpx.AsyncClient, address: AddressCreateDTO) -> Address:
         response = await client.post("/api/addresses/", json=address.model_dump(mode="json"))
-        print(response.text)
         assert response.status_code == 200
 
         address_created = Address(**response.json())

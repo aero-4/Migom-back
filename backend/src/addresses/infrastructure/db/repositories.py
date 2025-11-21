@@ -30,7 +30,6 @@ class PGAddressRepository(IAddressRepository):
         stmt = select(AddressesOrm)
         result = await self.session.execute(stmt)
         objs: list[AddressesOrm] = result.scalars().all()
-
         return [self._to_domain(obj) for obj in objs]
 
     async def update(self, address_update: AddressUpdate) -> Address:

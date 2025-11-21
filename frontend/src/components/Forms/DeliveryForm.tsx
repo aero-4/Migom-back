@@ -48,24 +48,30 @@ export const DeliveryForm: React.FC<Props> = ({
     };
 
     const handlePay = async () => {
-        // Placeholder: integrate with your payment flow
         alert("Здесь должна быть интеграция с платежным шлюзом (mock)");
     };
 
     return (
-        <div className={`w-full max-w-xl mx-auto p-4 ${className}`}>
+        <div className={`w-full max-w-xl mx-auto p-3 ${className}`}>
             {step === "address" ? (
-                <form onSubmit={handleAddressSubmit} className="bg-white rounded-xl shadow p-4 md:p-6">
+                <form onSubmit={handleAddressSubmit} className="bg-white rounded-xl p-4 md:p-6">
                     <h3 className="text-lg font-semibold mb-4">Адрес доставки</h3>
 
-                    <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">Улица, дом, корпус</label>
+                    <div className="space-y-4">
+
+                        <div className="grid grid-cols-2 gap-3">
                             <input
                                 type="text"
                                 value={addr.addressLine ?? ""}
-                                onChange={(e) => update({ addressLine: e.target.value })}
-                                placeholder="ул. Ленина, д. 10"
+                                onChange={(e) => update({addressLine: e.target.value})}
+                                placeholder="Город"
+                                className="w-full rounded-lg border px-3 py-2 text-base border-gray-200"
+                            />
+                            <input
+                                type="text"
+                                value={addr.addressLine ?? ""}
+                                onChange={(e) => update({addressLine: e.target.value})}
+                                placeholder="ул. Ленина"
                                 className="w-full rounded-lg border px-3 py-2 text-base border-gray-200"
                             />
                         </div>
@@ -74,8 +80,8 @@ export const DeliveryForm: React.FC<Props> = ({
                             <input
                                 type="text"
                                 value={addr.house ?? ""}
-                                onChange={(e) => update({ house: e.target.value })}
-                                placeholder="№ дома / кв"
+                                onChange={(e) => update({house: e.target.value})}
+                                placeholder="Номер дома"
                                 className="w-full rounded-lg border px-3 py-2 text-base border-gray-200"
                             />
 
@@ -83,7 +89,7 @@ export const DeliveryForm: React.FC<Props> = ({
                                 type="text"
                                 value={addr.flat ?? ""}
                                 onChange={(e) => update({ flat: e.target.value })}
-                                placeholder="Квартира / офис"
+                                placeholder="Номер квартиры"
                                 className="w-full rounded-lg border px-3 py-2 text-base border-gray-200"
                             />
                         </div>
@@ -101,7 +107,7 @@ export const DeliveryForm: React.FC<Props> = ({
                                 type="text"
                                 value={addr.intercom ?? ""}
                                 onChange={(e) => update({ intercom: e.target.value })}
-                                placeholder="Домофон / код"
+                                placeholder="Домофон"
                                 className="w-full rounded-lg border px-3 py-2 text-base border-gray-200"
                             />
                         </div>
@@ -113,7 +119,7 @@ export const DeliveryForm: React.FC<Props> = ({
                                 value={addr.comment ?? ""}
                                 onChange={(e) => update({ comment: e.target.value })}
                                 placeholder="Например: оставить у консьержа, позвонить за 5 минут"
-                                className="w-full rounded-lg border px-3 py-2 text-base border-gray-200 resize-none"
+                                className="form__field"
                             />
                         </div>
 
