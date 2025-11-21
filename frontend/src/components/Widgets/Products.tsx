@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from "react";
+import React, {JSX, useEffect, useState} from "react";
 
 import fishJpeg from "../../assets/image_test.jpg";
 import AddInCartBtn from "../Ui/AddInCartButton.tsx";
@@ -27,18 +27,15 @@ export default function Products(): JSX.Element {
     };
 
     const mock = [
-        { name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400 },
-        { name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400 },
-        { name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
-        { name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400 },
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+
     ];
 
     // Нормализуем и добавляем id если нет
@@ -80,23 +77,24 @@ export default function Products(): JSX.Element {
 
     return (
         <>
-            <div className="justify-center font-bold flex flex-wrap gap-2 items-center bg-white rounded-xl p-3 ">
-                {products.map((product) => (
-                    <div className="product__card" key={product.id ?? product.slug}>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2 mt-2">
+                {products.map(product => (
+                    <div
+                        key={product.id ?? product.slug}
+                        className="product__card"
+                    >
                         <a href={`/product/${product.slug}`}>
-                            <img src={product.photo} alt={product.slug} className="product__img" />
+                            <img src={product.photo} alt={product.slug} className="product__img"/>
                         </a>
-                        <div className="min-w-0">
-                            <p className="font-bold text-xs text-gray truncate">{product.name}</p>
-                            <div className="flex flex-row">
-                                <div className="flex flex-col flex-wrap">
-                                    <p className="text-lg">{product.price} ₽</p>
-                                    <span className="text-gray-500 text-xs">{product.gramme} г</span>
-                                </div>
-                                <div className="ml-auto mt-2">
-                                    <AddInCartBtn product={product} />
-                                </div>
+
+                        <p className="product__name">{product.name}</p>
+
+                        <div className="flex items-center mt-2">
+                            <div className="min-w-0">
+                                <span className="text-gray-500 text-xs block">{product.gramme} г</span>
+                                <p className="text-lg md:text-xl font-medium">{product.price} ₽</p>
                             </div>
+                            <div className="ml-auto mt-2"><AddInCartBtn product={product}/></div>
                         </div>
                     </div>
                 ))}

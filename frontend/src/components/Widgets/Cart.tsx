@@ -2,9 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import DeliveryForm from "../Forms/DeliveryForm";
 import closeSvg from "../../assets/close.svg";
-import backSvg from "../../assets/left.svg"
 import QuantityInput from "../Ui/QuantityInput.tsx";
-import BackButton from "../Ui/BackButton.tsx";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -133,10 +131,10 @@ export const CartWidget: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="p-6 overflow-y-auto">
+                            <div className="overflow-y-auto">
                                 {items.length === 0 ? (
-                                    <div className="flex flex-col my-auto text-center items-center justify-center items-center text-gray-500">
-                                        <div className="text-2xl font-medium">Корзина пуста</div>
+                                    <div className="flex flex-col my-auto text-center items-center justify-center text-gray-600">
+                                        <div className="text-3xl font-medium">Корзина пуста</div>
                                         <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
                                     </div>
                                 ) : (
@@ -172,7 +170,7 @@ export const CartWidget: React.FC = () => {
 
                                                     <div className="mt-4 flex items-center gap-3">
 
-                                                        <QuantityInput item={item} setQty={setQty}/>
+                                                        <QuantityInput item={item} setQty={setQty} max={item.count}/>
 
                                                         <div className="ml-auto text-lg text-gray-600"><span
                                                             className="font-semibold text-gray-800">{(item.price * item.qty).toLocaleString()} ₽</span>

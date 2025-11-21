@@ -13,17 +13,19 @@ export default function AddInCartBtn({product}): JSX.Element {
         const delta = name === "plus" ? 1 : name === "minus" ? -1 : 0;
         const newCount = count + delta;
 
-        if (newCount < 0 || newCount > product.count) return;
+        if (newCount < 0 || newCount > product.count)
+            return;
 
         setCount(prev => prev + delta);
         addItem({ ...product, id: product.id, image: product.photo });
     };
 
     return (
-        <div className="flex flex-row flex-wrap ml-auto gap-2 bg-red-100 rounded-2xl p-1">
+        <div className="flex flex-row flex-wrap ml-auto gap-2 bg-red-100 rounded-2xl">
             {count <= 0 ? (
                 <div>
                     <button
+                        type="button"
                         name="plus"
                         className="add__button"
                         onClick={setCountHandler}

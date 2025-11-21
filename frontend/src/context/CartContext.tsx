@@ -43,8 +43,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
         } catch (e) {
-            // ignore
-            // console.error("Can't save cart", e);
+            console.error("Can't save cart", e);
         }
     }, [items]);
 
@@ -59,7 +58,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return copy;
             }
         });
-        setIsOpen(true);
     };
 
     const removeItem = (id: Product["id"]) => {
@@ -83,11 +81,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const totalItems = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
     const totalPrice = useMemo(() => items.reduce((s, i) => s + i.qty * i.price, 0), [items]);
 
-    /**
-     * createOrder отправляет заказ на сервер
-     * body: { items: CartItem[], meta?: {...} }
-     * Поменяй URL на свой endpoint.
-     */
     const createOrder = async (meta: Record<string, any> = {}) => {
         const payload = { items, meta, totalItems, totalPrice, createdAt: new Date().toISOString() };
         try {

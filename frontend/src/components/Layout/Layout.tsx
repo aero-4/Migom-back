@@ -7,7 +7,7 @@ const Layout: React.FC = () => {
         <div className="flex flex-col min-h-screen justify-center items-center">
             <Navbar />
 
-            <main className="flex-1 flex overflow-auto justify-center items-center p-2">
+            <main className="flex-1 flex overflow-auto justify-center items-center p-1">
                 <Outlet />
             </main>
 
