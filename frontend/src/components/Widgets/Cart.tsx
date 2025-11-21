@@ -78,7 +78,7 @@ export const CartWidget: React.FC = () => {
                 ref={triggerRef}
                 aria-label="Открыть корзину"
                 onClick={toggle}
-                className="fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
+                className="focus:outline-none fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
             >
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path
@@ -170,7 +170,7 @@ export const CartWidget: React.FC = () => {
 
                                                     <div className="mt-4 flex items-center gap-3">
 
-                                                        <QuantityInput item={item} setQty={setQty} max={item.count}/>
+                                                        <QuantityInput item={item} setQty={setQty} max={item.qty}/>
 
                                                         <div className="ml-auto text-lg text-gray-600"><span
                                                             className="font-semibold text-gray-800">{(item.price * item.qty).toLocaleString()} ₽</span>

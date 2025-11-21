@@ -7,7 +7,7 @@ import {useCart} from "../../context/CartContext.tsx";
 export default function AddInCartBtn({product}): JSX.Element {
     const [count, setCount] = useState<number>(0);
     const {addItem} = useCart();
-
+    const {removeItem} = useCart()
     const setCountHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
         const name = e.currentTarget.name;
         const delta = name === "plus" ? 1 : name === "minus" ? -1 : 0;
@@ -16,12 +16,17 @@ export default function AddInCartBtn({product}): JSX.Element {
         if (newCount < 0 || newCount > product.count)
             return;
 
-        setCount(prev => prev + delta);
-        addItem({ ...product, id: product.id, image: product.photo });
+
+        setCount(newCount);
+        if (delta == 1) {
+            addItem({...product, id: product.id, image: product.photo});
+        } else {
+            removeItem(product.id)
+        }
     };
 
     return (
-        <div className="flex flex-row flex-wrap ml-auto gap-2 bg-red-100 rounded-2xl">
+        <div className="flex flex-row flex-wrap ml-auto bg-red-100 rounded-2xl">
             {count <= 0 ? (
                 <div>
                     <button
@@ -31,7 +36,7 @@ export default function AddInCartBtn({product}): JSX.Element {
                         onClick={setCountHandler}
                         aria-label="Добавить"
                     >
-                        <img src={plusPng} alt="Добавить"/>
+                        <img src={plusPng} className="w-3 lg:w-4" alt="Добавить"/>
                     </button>
                 </div>
             ) : (
@@ -42,10 +47,10 @@ export default function AddInCartBtn({product}): JSX.Element {
                         onClick={setCountHandler}
                         aria-label="Уменьшить"
                     >
-                        <img src={minusPng} alt="Уменьшить"/>
+                        <img src={minusPng} className="w-3 lg:w-4" alt="Уменьшить"/>
                     </button>
 
-                    <span className="text-center text-xl">{count}</span>
+                    <span className="text-center text-xs">{count}</span>
 
                     <button
                         name="plus"
@@ -53,7 +58,7 @@ export default function AddInCartBtn({product}): JSX.Element {
                         onClick={setCountHandler}
                         aria-label="Добавить ещё"
                     >
-                        <img src={plusPng} alt="Добавить"/>
+                        <img src={plusPng} className="w-3 lg:w-4" alt="Добавить"/>
                     </button>
                 </div>
             )}

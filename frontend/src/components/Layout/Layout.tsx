@@ -1,21 +1,24 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
+import Footer from "./Footer.tsx";
 
 const Layout: React.FC = () => {
     return (
-        <div className="flex flex-col min-h-screen justify-center items-center">
+        <div className="flex flex-col min-h-screen">
             <Navbar />
 
-            <main className="flex-1 flex overflow-auto justify-center items-center p-1">
-                <Outlet />
-            </main>
+            <div className="w-full">
+                <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-6 lg:px-9">
+                    <main className="flex-1 flex overflow-auto justify-center items-center py-6">
+                        <div className="w-full">
+                            <Outlet/>
+                        </div>
+                    </main>
+                </div>
+            </div>
 
-            <footer className="text-xs lg:text-lg p-3 gap-3 bg-gray-100 w-screen text-center">
-                <a className="block" href="/info/politic_conf">Политика конфиденциальности</a>
-                <a className="block" href="/info/">Условия использования</a>
-                © 2021-2025 "ООО Мигом" ул. Ленина 4 г. Краснодар
-            </footer>
+            <Footer/>
         </div>
     );
 };

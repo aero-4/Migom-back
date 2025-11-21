@@ -31,10 +31,30 @@ export default function Products(): JSX.Element {
         {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
         {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
         {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой и с икрой и с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
+        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
+        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
+        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
 
     ];
 
@@ -77,7 +97,13 @@ export default function Products(): JSX.Element {
 
     return (
         <>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2 mt-2">
+            <div className="grid
+                            grid-cols-[repeat(auto-fit,minmax(150px,1fr))]
+                            sm:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]
+                            md:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]
+                            lg:grid-cols-[repeat(auto-fit,minmax(240px,1fr))]
+                            xl:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]
+                            gap-2 mt-3">
                 {products.map(product => (
                     <div
                         key={product.id ?? product.slug}
@@ -92,7 +118,7 @@ export default function Products(): JSX.Element {
                         <div className="flex items-center mt-2">
                             <div className="min-w-0">
                                 <span className="text-gray-500 text-xs block">{product.gramme} г</span>
-                                <p className="text-lg md:text-xl font-medium">{product.price} ₽</p>
+                                <p className="text-[18px] lg:text-lg font-bold">{product.price} ₽</p>
                             </div>
                             <div className="ml-auto mt-2"><AddInCartBtn product={product}/></div>
                         </div>
