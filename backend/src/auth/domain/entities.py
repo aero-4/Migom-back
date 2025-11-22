@@ -17,10 +17,10 @@ class TokenData(CustomModel):
     exp: datetime.datetime
 
 
-
 class AnonymousUser(CustomModel):
     id: str = None
     first_name: str | None = None
     last_name: str | None = None
     birthday: datetime.date | None = None
     email: str | None = None
+    is_super_user: bool = False

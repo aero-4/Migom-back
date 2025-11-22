@@ -24,7 +24,7 @@ def get_token_storage() -> ITokenStorage:
     return RedisTokenStorage()
 
 
-async def get_token_auth(request: Request = None, response: Response = None) -> JWTAuth:
+def get_token_auth(request: Request = None, response: Response = None) -> JWTAuth:
     jwt_provider = JWTProvider()
 
     access_transports = []

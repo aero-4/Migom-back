@@ -37,7 +37,6 @@ class JWTProvider(ITokenProvider):
 
             return TokenData(**data)
         except JWTError as e:
-            # logging.exception(e, exc_info=True)
             return None
 
     def _encode_jwt(self, data: dict, secret: SecretStr | str, algorithm: str = auth_settings.JWT_ALGORITHM, expire_seconds: int | None = None) -> str:

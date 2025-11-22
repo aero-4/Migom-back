@@ -10,6 +10,7 @@ class User(CustomModel):
     birthday: datetime.date
     email: str
     hashed_password: str
+    is_super_user: bool
 
 
 class UserInfo(CustomModel):
@@ -25,6 +26,7 @@ class UserCreate(CustomModel):
     birthday: datetime.date
     email: str
     hashed_password: str
+    is_super_user: bool = False
 
 
 class UserUpdate(CustomModel):

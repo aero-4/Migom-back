@@ -75,7 +75,6 @@ async def test_success_update_address(clear_db, address_factory, user_factory):
         assert updated_address.house_number == address_update.house_number
 
 
-
 @pytest.mark.asyncio
 async def test_not_found_update_address(clear_db, address_factory, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
@@ -83,6 +82,31 @@ async def test_not_found_update_address(clear_db, address_factory, user_factory)
 
         address_update = AddressUpdateDTO(city="Санкт-Петербург", street="Пушкина", house_number=1)
         response = await client.patch(f"/api/addresses/123", json=address_update.model_dump())
+
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Not found"}
+
+
+@pytest.mark.asyncio
+async def test_success_delete_address(clear_db, address_factory, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_USER)
+
+        address_data = AddressCreateDTO(city="Москва", street="Колотушкина", house_number=123)
+        address: Address = await address_factory(client, address_data)
+
+        response = await client.delete(f"/api/addresses/{address.id}")
+
+        assert response.status_code == 200
+        assert response.json() is None
+
+
+@pytest.mark.asyncio
+async def test_not_found_delete_address(clear_db, address_factory, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_USER)
+
+        response = await client.delete(f"/api/addresses/123")
 
         assert response.status_code == 404
         assert response.json() == {"detail": "Not found"}

@@ -13,7 +13,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        jwt_auth = await get_token_auth(request=request)
+        jwt_auth = get_token_auth(request=request)
         token_data = await jwt_auth.read_token(TokenType.ACCESS)
         if not token_data:
             request.state.user = AnonymousUser()

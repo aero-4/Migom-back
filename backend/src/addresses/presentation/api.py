@@ -28,5 +28,5 @@ async def update(id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps)
 
 
 @addresses_api_router.delete("/{id}")
-async def delete(id: int, uow: AddressUoWDeps, auth: TokenAuthDep):
-    return await delete_address(id, uow, auth)
+async def delete(id: int, uow: AddressUoWDeps):
+    return await delete_address(id, uow)

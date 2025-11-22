@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from contextlib import asynccontextmanager
 
+from starlette.staticfiles import StaticFiles
+
 from src.addresses.presentation.api import addresses_api_router
+from src.auth.presentation.views import auth_view_router
 from src.categories.presentation.api import categories_api_router
 from src.core.infrastructure.redis import check_redis_connection
 from src.db.utils import create_and_delete_tables_db
@@ -19,6 +24,8 @@ from src.products.presentation.api import products_api_router
 from src.users.presentation.api import users_api_router
 from src.core.config import settings
 
+BASE_DIR = Path(__file__).resolve().parent
+static_dir = BASE_DIR / "static"               # <project>/src/static
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -57,3 +64,7 @@ app.include_router(products_api_router, prefix='/api/products', tags=["Products"
 app.include_router(files_api_router, prefix='/api/files', tags=["Files"])
 app.include_router(orders_api_router, prefix='/api/orders', tags=["Orders"])
 app.include_router(addresses_api_router, prefix='/api/addresses', tags=["Addresses"])
+
+
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+app.include_router(auth_view_router, prefix='/auth', tags=["auth"])

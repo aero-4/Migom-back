@@ -62,5 +62,6 @@ class PGUserRepository(IUserRepository):
             email=obj.email,
             hashed_password=obj.hashed_password,
             first_name=obj.first_name,
-            last_name=obj.last_name
+            last_name=obj.last_name,
+            is_super_user=obj.is_super_user
         )
