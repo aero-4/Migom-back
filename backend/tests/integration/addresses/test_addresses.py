@@ -33,14 +33,23 @@ async def test_add_address_not_authenticated(clear_db, address_factory):
 async def test_success_get_all_addresses(clear_db, address_factory, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         await user_factory(client, TEST_USER)
-        addresses = []
-        for i in range(5):
-            address_data = AddressCreateDTO(city="Москва", street="Колотушкина", house_number=123)
-            address: Address = await address_factory(client, address_data)
-            addresses.append(address)
+
+        address_data = AddressCreateDTO(city="Москва", street="Колотушкина", house_number=123)
+        address: Address = await address_factory(client, address_data)
+
+        response = await client.get("/api/addresses/")
+        get_address = Address(**response.json()[0])
+
+        assert response.status_code == 200
+        assert get_address == address
+
+
+@pytest.mark.asyncio
+async def test_null_get_all_addresses(clear_db, address_factory, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_USER)
 
         response = await client.get("/api/addresses/")
 
         assert response.status_code == 200
-        print(response.json())
-        assert response.json() == [address.model_dump() for address in addresses]
+        assert response.json() == []

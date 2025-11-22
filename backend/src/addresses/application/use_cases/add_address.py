@@ -15,4 +15,5 @@ async def add_address(address_data: AddressCreateDTO, uow: IAddressUnitOfWork, u
 
     async with uow:
         address = await uow.addresses.add(address)
+        await uow.commit()
     return address
