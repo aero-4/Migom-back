@@ -8,15 +8,12 @@ export default function Home(): JSX.Element {
     return (
         <>
             <div>
-                {/*<h1 className="text-2xl p-7">*/}
-                {/*    Доставим*/}
-                {/*    <span className="text-red-400"> мигом </span>*/}
-                {/*    за 15 минут!*/}
-                {/*</h1>*/}
-
                 <Categories/>
 
                 <CartProvider>
+
+                    <h1 className="p-3 my-6 text-3xl font-bold">Популярное</h1>
+
                     <Products/>
 
                     <CartWidget/>

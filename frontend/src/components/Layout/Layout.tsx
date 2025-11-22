@@ -6,19 +6,22 @@ import Footer from "./Footer.tsx";
 const Layout: React.FC = () => {
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
 
             <div className="w-full">
-                <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-6 lg:px-9">
-                    <main className="flex-1 flex overflow-auto justify-center items-center py-6">
+                <div className="mx-auto w-full max-w-screen-xl ">
+                    <main className="flex-1 flex overflow-auto justify-center items-center">
                         <div className="w-full">
+                            <Navbar />
+
                             <Outlet/>
+
+                            <Footer/>
+
                         </div>
                     </main>
                 </div>
             </div>
 
-            <Footer/>
         </div>
     );
 };

@@ -134,6 +134,7 @@ button {
         gap-1
         p-3
         overflow-hidden
+        max-w-150
     }
 
     .img {
@@ -141,7 +142,7 @@ button {
     }
 
     .product__img {
-        @apply w-full max-w-50 max-h-50 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform hover:scale-101;
+        @apply w-full min-w-50 min-h-50 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform hover:scale-101;
     }
 
     .product__name {
@@ -229,6 +230,6 @@ button {
     }
 
     .search__input {
-        @apply w-full h-full p-3 rounded-full focus:outline-none
+        @apply w-full h-full px-6 p-2 rounded-full focus:outline-none
     }
 }

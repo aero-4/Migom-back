@@ -6,16 +6,16 @@ import Search from "../Ui/Search.tsx";
 
 const Navbar: React.FC = () => {
     return (
-        <nav className="flex flex-row gap-9 bg-white rounded-b-3xl p-3 mb-1">
-            <NavLink to="/" className="flex gap-2 justify-center items-center">
-                <img src={homeSvg} alt=""/>
+        <nav className="flex flex-row gap-6 bg-white rounded-b-3xl p-3 mb-1 mb-6">
+            <NavLink to="/" className="flex gap-1 justify-center items-center">
+                <img src={homeSvg} alt="Лого"/>
                 Мигом
             </NavLink>
 
             <Search/>
 
             <NavLink to="/profile" className="my-auto mx-auto">
-                <img src={profileSvg} alt=""/>
+                <img src={profileSvg} alt="Профиль"/>
             </NavLink>
         </nav>
     );

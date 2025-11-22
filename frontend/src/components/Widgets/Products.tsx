@@ -98,12 +98,14 @@ export default function Products(): JSX.Element {
     return (
         <>
             <div className="grid
-                            grid-cols-[repeat(auto-fit,minmax(150px,1fr))]
-                            sm:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]
-                            md:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]
-                            lg:grid-cols-[repeat(auto-fit,minmax(240px,1fr))]
-                            xl:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]
-                            gap-2 mt-3">
+                            grid-cols-2
+                            sm:grid-cols-2
+                            md:grid-cols-3
+                            lg:grid-cols-4
+                            xl:grid-cols-5
+                            gap-2">
+
+
                 {products.map(product => (
                     <div
                         key={product.id ?? product.slug}
@@ -120,7 +122,9 @@ export default function Products(): JSX.Element {
                                 <span className="text-gray-500 text-xs block">{product.gramme} г</span>
                                 <p className="text-[18px] lg:text-lg font-bold">{product.price} ₽</p>
                             </div>
-                            <div className="ml-auto mt-2"><AddInCartBtn product={product}/></div>
+                            <div className="ml-auto mt-2">
+                                <AddInCartBtn product={product}/>
+                            </div>
                         </div>
                     </div>
                 ))}
