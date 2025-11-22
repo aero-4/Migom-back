@@ -31,8 +31,8 @@ class AddressUpdate(CustomModel):
     city: str
     street: str
     house_number: int
-    entrance: int
-    floor: int
-    apartment_number: int
-    comment: str
-    is_leave_at_door: bool
+    entrance: int | None = None
+    floor: int | None = None
+    apartment_number: int | None = None
+    comment: str | None = None
+    is_leave_at_door: bool | None = None

@@ -4,7 +4,7 @@ from src.addresses.presentation.dtos import AddressUpdateDTO
 
 
 async def update_address(id: int, address_update: AddressUpdateDTO, uow: IAddressUnitOfWork) -> Address:
-    address_data = AddressUpdate(id=id, **address_update.model_dump(mode='python'))
+    address_data = AddressUpdate(id=id, **address_update.model_dump())
     async with uow:
         address = await uow.addresses.update(address_data)
         await uow.commit()
