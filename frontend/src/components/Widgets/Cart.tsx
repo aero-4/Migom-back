@@ -184,7 +184,7 @@ export const CartWidget: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="mt-auto w-full md:w-1/3 flex flex-col">
+                        <div className="mt-auto w-full min-w-100 md:w-1/2 flex flex-col">
                             <div className="p-6 flex flex-col">
 
                                 <div className="mb-6 flex-row">
