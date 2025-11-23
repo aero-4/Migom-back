@@ -1,6 +1,4 @@
 import datetime
-import random
-
 import pytest
 import httpx
 
@@ -67,3 +65,46 @@ async def test_register_already_user_exists(clear_db, user_factory):
         response = await client.post("/api/auth/register", json=TEST_USER_DTO.model_dump(mode="json"))
         assert response.status_code == 409
         assert response.json() == {"detail": "Email is already taken"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_refresh_token(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        user = await user_factory(client, TEST_USER_DTO)
+
+        response = await client.post("/api/auth/refresh")
+
+        assert response.json() == {"msg": "Token refreshed"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_not_authenticated_refresh_token(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        response = await client.post("/api/auth/refresh")
+
+        assert response.json() == {"detail": "Refresh token is not valid"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_without_access_refresh_token(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client1:
+        await user_factory(client1, TEST_USER_DTO)
+
+        response1 = await client1.post("/api/auth/refresh")
+
+        response1.cookies.pop("access_token")
+
+        assert response1.json() == {"msg": "Token refreshed"}
+
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_without_refresh_token(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client1:
+        await user_factory(client1, TEST_USER_DTO)
+
+        client1.cookies.pop("refresh_token")
+
+        response1 = await client1.post("/api/auth/refresh")
+
+        assert response1.json() == {"detail": "Refresh token is not valid"}

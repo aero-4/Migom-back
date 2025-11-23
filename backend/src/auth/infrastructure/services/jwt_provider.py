@@ -36,7 +36,7 @@ class JWTProvider(ITokenProvider):
                 return None
 
             return TokenData(**data)
-        except JWTError as e:
+        except JWTError:
             return None
 
     def _encode_jwt(self, data: dict, secret: SecretStr | str, algorithm: str = auth_settings.JWT_ALGORITHM, expire_seconds: int | None = None) -> str:
@@ -96,11 +96,11 @@ class JWTAuth(ITokenAuth):
         return await self._validate_token_or_none(token_data)
 
     async def refresh_access_token(self) -> None:
-        refresh_token = self.token_provider.read_token(TokenType.REFRESH)
+        refresh_token = await self.read_token(TokenType.REFRESH)
         if not refresh_token:
             raise RefreshTokenInvalid()
 
-        access_token = self.token_provider.create_access_token(refresh_token.model_dump())
+        access_token = self.token_provider.create_access_token(refresh_token.model_dump(include={"user_id", "is_super_user"}))
         self.request.state.access_token = access_token
 
         if self.token_storage:
@@ -109,8 +109,6 @@ class JWTAuth(ITokenAuth):
         if self.response:
             for transport in self._get_transports(TokenType.ACCESS):
                 transport.set_token(self.response, access_token)
-
-
 
 
     async def inject_access_token_from_request(self, response: Response):

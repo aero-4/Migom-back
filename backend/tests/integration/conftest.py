@@ -39,6 +39,8 @@ def user_factory():
 
         assert data["msg"] == "Register successful"
 
+        client.cookies.clear()
+
         for token in ["access_token", "refresh_token"]:
             client.cookies.set(token, response.cookies.get(token))
 

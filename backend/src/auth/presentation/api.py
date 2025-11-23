@@ -25,3 +25,9 @@ async def register(credentials: RegisterUserDTO,
                    auth: TokenAuthDep):
     await registrate(credentials.email, credentials.password, credentials.first_name, credentials.last_name, credentials.birthday, pwd_hasher, uow, auth)
     return {"msg": "Register successful"}
+
+
+@auth_api_router.post("/refresh")
+async def refresh(auth: TokenAuthDep):
+    await auth.refresh_access_token()
+    return {"msg": "Token refreshed"}

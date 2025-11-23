@@ -28,10 +28,8 @@ class ProductsOrm(Base):
     fats: Mapped[int] = mapped_column(default=0)
     carbohydrates: Mapped[int] = mapped_column(default=0)
     photo: Mapped[str] = mapped_column(nullable=True)
-
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"), nullable=True)
     category: Mapped['CategoriesOrm'] = relationship(back_populates="products")
-
     order_links: Mapped[list[OrderProductsOrm]] = relationship(
         "OrderProductsOrm", back_populates="product"
     )
