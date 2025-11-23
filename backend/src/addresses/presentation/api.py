@@ -18,13 +18,14 @@ async def add(request: Request, address_data: AddressCreateDTO, uow: AddressUoWD
 
 
 @addresses_api_router.get("/")
-async def get_all(uow: AddressUoWDeps):
-    return await collect_addresses(uow)
+async def get_all(request: Request, uow: AddressUoWDeps):
+    return await collect_addresses(uow, request.state.user)
 
 
+# access control
 @addresses_api_router.patch("/{id}")
-async def update(id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps):
-    return await update_address(id, address_update, uow)
+async def update(request: Request, id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps):
+    return await update_address(id, request.state.user, address_update, uow)
 
 
 @addresses_api_router.delete("/{id}")

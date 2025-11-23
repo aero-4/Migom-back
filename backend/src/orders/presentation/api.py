@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from starlette.requests import Request
 
 from src.orders.application.use_cases.collect_orders import collect_order, collect_orders
 from src.orders.application.use_cases.delete_order import delete_order
@@ -11,8 +12,19 @@ orders_api_router = APIRouter()
 
 
 @orders_api_router.post("/")
-async def create(order: OrderCreateDTO, uow: OrderUoWDeps):
-    return await new_order(order, uow)
+async def create(request: Request, order: OrderCreateDTO, uow: OrderUoWDeps):
+    return await new_order(order, uow, request.state.user)
+
+
+@orders_api_router.get("/")
+async def get_all(request: Request, uow: OrderUoWDeps):
+    return await collect_orders(uow, request.state.user)
+
+
+# access control
+@orders_api_router.patch("/{id}")
+async def update(id: int, order: OrderUpdateDTO, uow: OrderUoWDeps):
+    return await update_order(id, order, uow)
 
 
 @orders_api_router.delete("/{id}")
@@ -23,13 +35,3 @@ async def delete(id: int, uow: OrderUoWDeps):
 @orders_api_router.get("/{id}")
 async def get_one(id: int, uow: OrderUoWDeps):
     return await collect_order(id, uow)
-
-
-@orders_api_router.get("/")
-async def get_all(uow: OrderUoWDeps):
-    return await collect_orders(uow)
-
-
-@orders_api_router.patch("/{id}")
-async def update(id: int, order: OrderUpdateDTO, uow: OrderUoWDeps):
-    return await update_order(id, order, uow)

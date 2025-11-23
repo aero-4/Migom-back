@@ -28,6 +28,7 @@ class AddressCreate(CustomModel):
 
 class AddressUpdate(CustomModel):
     id: int
+    user_id: int
     city: str
     street: str
     house_number: int

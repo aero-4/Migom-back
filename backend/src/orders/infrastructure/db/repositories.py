@@ -83,8 +83,8 @@ class PGOrdersRepository(IOrderRepository):
 
         return self._to_entity(obj)
 
-    async def get_all(self) -> list[Order]:
-        stmt = select(OrdersOrm)
+    async def get_all(self, user_id: int) -> list[Order]:
+        stmt = select(OrdersOrm).where(OrdersOrm.creator_id == user_id)
         result = await self.session.execute(stmt)
         objs: list[OrdersOrm] = result.scalars().all()
 

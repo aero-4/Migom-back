@@ -26,8 +26,8 @@ class PGAddressRepository(IAddressRepository):
 
         return self._to_domain(obj)
 
-    async def get_all(self) -> list[Address]:
-        stmt = select(AddressesOrm)
+    async def get_all(self, user_id: int) -> list[Address]:
+        stmt = select(AddressesOrm).where(AddressesOrm.user_id == user_id)
         result = await self.session.execute(stmt)
         objs: list[AddressesOrm] = result.scalars().all()
         return [self._to_domain(obj) for obj in objs]
@@ -46,7 +46,6 @@ class PGAddressRepository(IAddressRepository):
         await self.session.flush()
 
         return self._to_domain(obj)
-
 
     async def delete(self, id: int) -> None:
         stmt = select(AddressesOrm).where(AddressesOrm.id == id)
