@@ -22,6 +22,7 @@ export const CartWidget: React.FC = () => {
     const [isDeliveringForm, setDeliveringForm] = useState(false);
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
+    const [step, setStep] = useState<"cart" | "address" | "payment">("address");
 
     useEffect(() => {
         let timer: number | undefined;
@@ -51,15 +52,16 @@ export const CartWidget: React.FC = () => {
 
     const handleSwitchToDeliveringForm = () => {
         setDeliveringForm(true);
+        setStep("address"); // открываем сразу на шаге адреса
     };
 
-    const handleCheckout = async () => {
+    const handleCheckout = async (addr?: any) => { // addr передаётся из PaymentForm, если нужно
         if (items.length === 0) {
             alert("Корзина пуста");
             return;
         }
         setLoading(true);
-        const result = await createOrder({source: "web"});
+        const result = await createOrder({source: "web", address: addr});
         setLoading(false);
 
         if (result.ok) {
@@ -100,18 +102,26 @@ export const CartWidget: React.FC = () => {
                 )}
             </button>
 
+            <div
+                aria-hidden={!isOpen}
+                className={`fixed inset-0 z-40 transition-opacity duration-300 ${isOpen ? "opacity-60 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+                style={{backgroundColor: "rgba(0,0,0,0.5)"}}
+                onClick={() => close()}
+            />
+
             <aside
-                className={`h-full w-full xl:max-w-150 2xl:max-w-200 fixed top-0 right-0 z-50 transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+                onClick={(e) => e.stopPropagation()}
+                className={`md:p-6 h-full w-full xl:max-w-150 2xl:max-w-200 fixed top-0 right-0 z-50 transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
                     isOpen ? "translate-x-0" : "translate-x-full"
-                }`}
+                } rounded-l-2xl overflow-hidden`}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="cart-title"
             >
-                {!isDeliveringForm ? (
+                {!isDeliveringForm || step === "cart" ? (
                     <div className="h-full w-full flex flex-col">
                         <div className="w-full flex flex-col min-h-0">
-                            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                            <div className="flex items-center justify-between p-6">
                                 <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
                                     Корзина
                                 </h3>
@@ -197,33 +207,37 @@ export const CartWidget: React.FC = () => {
                                 </div>
 
 
-                                <div>
+                                <div className="flex flex-row gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={clear}
+                                        disabled={items.length === 0}
+                                        className="w-full btn__circle text-gray-700 bg-gray-200 hover:bg-gray-100"
+                                    >
+                                        Очистить корзину
+                                    </button>
+
                                     <button
                                         type="button"
                                         onClick={handleSwitchToDeliveringForm}
                                         disabled={loading || items.length === 0}
-                                        className={`w-full flex items-center justify-center gap-3 py-3 rounded-md text-white ${
+                                        className={`w-full flex items-center justify-center text-white btn__circle ${
                                             loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
                                         } focus:outline-none focus:ring-4 focus:ring-red-300`}
                                     >
                                         Продолжить
                                     </button>
 
-                                    <button
-                                        type="button"
-                                        onClick={clear}
-                                        disabled={items.length === 0}
-                                        className="w-full mt-3 py-3 rounded-md border border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
-                                    >
-                                        Очистить корзину
-                                    </button>
 
                                 </div>
                             </div>
 
                         </div>
                     </div>
-                ) : <DeliveryForm onSubmit={handleCheckout}/>}
+                ) : <DeliveryForm onSubmit={handleCheckout}
+                                  step={step}
+                                  setStep={setStep}
+                                  onClose={close}/>}
             </aside>
         </>
     );

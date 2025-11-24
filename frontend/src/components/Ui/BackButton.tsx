@@ -1,13 +1,19 @@
 import React from "react";
-import backSvg from "../../assets/left.svg"
 
-const BackButton: React.FC<Props> = ({ref}) => {
+
+type Props = {
+    onBack?: () => void;
+};
+
+const BackButton: React.FC<Props> = ({onBack}) => {
     return (
         <div>
-            <button ref={ref} className="p-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2">
-                <img src={backSvg}
-                     alt="Вернуться"
-                     className="w-8 h-8"/>
+            <button
+                type="button"
+                onClick={onBack}
+                className="btn__circle bg-gray-500"
+            >
+                Назад
             </button>
         </div>
     )

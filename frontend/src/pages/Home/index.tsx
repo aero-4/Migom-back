@@ -7,18 +7,18 @@ import {CartProvider} from "../../context/CartContext";
 export default function Home(): JSX.Element {
     return (
         <>
-            <div>
-                <Categories/>
+            <h1 className="p-3 my-6 text-3xl font-bold">Каталог</h1>
 
-                <CartProvider>
+            <Categories/>
 
-                    <h1 className="p-3 my-6 text-3xl font-bold">Популярное</h1>
+            <CartProvider>
 
-                    <Products/>
+                <h1 className="p-3 my-6 text-3xl font-bold">Популярное</h1>
 
-                    <CartWidget/>
-                </CartProvider>
-            </div>
+                <Products/>
+
+                <CartWidget/>
+            </CartProvider>
         </>
     );
 }

@@ -107,7 +107,7 @@ button {
     }
 
     .full__button {
-        @apply text-white p-3 text-center rounded-full duration-200
+        @apply p-3 text-white text-center rounded-full duration-200
     }
 
     .full__button:hover {
@@ -193,6 +193,19 @@ button {
             @apply flex-row
         }
     }
+
+    .input {
+        @apply w-full rounded-lg border px-3 py-6 text-base border-gray-200 rounded-full focus:outline-none
+    }
+
+    .btn__gray {
+        @apply w-full sm:w-auto px-5 py-3 rounded-lg border border-gray-200 bg-white text-sm
+    }
+
+    .btn__circle {
+        @apply w-full p-6 text-xl rounded-full text-white font-semibold
+    }
+
     .btn {
         @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 border border-transparent bg-gray-900 text-white text-sm
     }
