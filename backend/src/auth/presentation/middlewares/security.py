@@ -40,3 +40,4 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
         return response
+create, get all own orders. create address, delete, update, get all addresses. UPDATED integrations tests
