@@ -5,8 +5,8 @@ import NotFound from './pages/NotFound';
 import Loader from "./components/Loaders/Loader.tsx";
 
 const Home = lazy(() => import('./pages/Home'));
-const Profile = lazy(() => import('./pages/Profile'));
 const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 
 function App(): JSX.Element {
     return (
@@ -14,7 +14,7 @@ function App(): JSX.Element {
             <Routes>
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
-                    <Route path="profile" element={<Profile />} />
+                    <Route path="register" element={<Register/>}/>
                     <Route path="login" element={<Login />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>

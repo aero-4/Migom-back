@@ -131,8 +131,9 @@ button {
         bg-white
         rounded-xl
         min-w-0
-        gap-1
+        gap-2
         p-3
+        md:p-4
         overflow-hidden
         max-w-150
     }
@@ -142,7 +143,7 @@ button {
     }
 
     .product__img {
-        @apply w-full min-w-50 min-h-50 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform hover:scale-101;
+        @apply w-full min-w-25 min-h-25 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform hover:scale-101;
     }
 
     .product__name {
@@ -203,7 +204,7 @@ button {
     }
 
     .btn__circle {
-        @apply w-full p-6 text-xl rounded-full text-white font-semibold
+        @apply w-full p-6 text-sm xl:text-xl rounded-full text-white font-semibold
     }
 
     .btn {
@@ -235,11 +236,11 @@ button {
     }
 
     .card {
-        @apply bg-white rounded-2xl shadow p-4
+        @apply bg-white rounded-2xl shadow p-9
     }
 
     .container {
-        @apply w-full max-w-5xl mx-auto px-4
+        @apply w-full max-w-5xl mx-auto p-9
     }
 
     .search__input {

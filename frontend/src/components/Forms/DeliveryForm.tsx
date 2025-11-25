@@ -125,9 +125,9 @@ export const DeliveryForm: React.FC<Props> = ({
     return (
         <div className={`w-full h-full p-6 ${className}`}>
             {step === "address" ? (
-                <form onSubmit={handleAddressSubmit} className="flex flex-col  bg-white rounded-xl ">
+                <form onSubmit={handleAddressSubmit} className="text-xl xl:text-2xl flex flex-col bg-white rounded-xl">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-2xl font-semibold my-6">Адрес доставки</h3>
+                        <h3 className=" font-semibold ">Адрес доставки</h3>
                         <button
                             type="button"
                             onClick={onClose}
@@ -138,7 +138,7 @@ export const DeliveryForm: React.FC<Props> = ({
                         </button>
                     </div>
 
-                    <div className="space-y-6 flex flex-col gap-6">
+                    <div className="space-y-3 flex flex-col gap-3">
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <input

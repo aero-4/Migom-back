@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
 
             <Search/>
 
-            <NavLink to="/profile" className="p-3 ml-auto my-auto justify-center items-center">
+            <NavLink to="/login" className="p-3 ml-auto my-auto justify-center items-center">
                 <img className="w-6 h-6 hover:opacity-80"
                      src={profileSvg}
                      alt="Профиль"/>
