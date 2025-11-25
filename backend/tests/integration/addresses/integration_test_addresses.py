@@ -110,3 +110,6 @@ async def test_not_found_delete_address(clear_db, address_factory, user_factory)
 
         assert response.status_code == 404
         assert response.json() == {"detail": "Not found"}
+
+
+

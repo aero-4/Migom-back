@@ -19,5 +19,5 @@ class IAddressRepository(abc.ABC):
         ...
 
     @abc.abstractmethod
-    async def delete(self, id: int) -> None:
+    async def delete(self, id: int, user_id: int) -> None:
         ...

@@ -33,7 +33,7 @@ class PGAddressRepository(IAddressRepository):
         return [self._to_domain(obj) for obj in objs]
 
     async def update(self, address_update: AddressUpdate) -> Address:
-        stmt = select(AddressesOrm).where(AddressesOrm.id == address_update.id)
+        stmt = select(AddressesOrm).where(AddressesOrm.id == address_update.id and AddressesOrm.user_id == address_update.user_id)
         result = await self.session.execute(stmt)
         obj: AddressesOrm | None = result.scalar_one_or_none()
 
@@ -47,8 +47,8 @@ class PGAddressRepository(IAddressRepository):
 
         return self._to_domain(obj)
 
-    async def delete(self, id: int) -> None:
-        stmt = select(AddressesOrm).where(AddressesOrm.id == id)
+    async def delete(self, id: int, user_id: int) -> None:
+        stmt = select(AddressesOrm).where(AddressesOrm.id == id and AddressesOrm.user_id == user_id)
         result = await self.session.execute(stmt)
         obj: AddressesOrm = result.scalar_one_or_none()
 

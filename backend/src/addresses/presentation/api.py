@@ -8,6 +8,7 @@ from src.addresses.application.use_cases.update_address import update_address
 from src.addresses.presentation.dependencies import AddressUoWDeps
 from src.addresses.presentation.dtos import AddressUpdateDTO, AddressCreateDTO
 from src.auth.presentation.dependencies import TokenAuthDep
+from src.auth.presentation.permissions import access_control
 
 addresses_api_router = APIRouter()
 
@@ -22,12 +23,11 @@ async def get_all(request: Request, uow: AddressUoWDeps):
     return await collect_addresses(uow, request.state.user)
 
 
-# access control
+@addresses_api_router.delete("/{id}")
+async def delete(request: Request, id: int, uow: AddressUoWDeps):
+    return await delete_address(id, request.state.user, uow)
+
+
 @addresses_api_router.patch("/{id}")
 async def update(request: Request, id: int, address_update: AddressUpdateDTO, uow: AddressUoWDeps):
     return await update_address(id, request.state.user, address_update, uow)
-
-
-@addresses_api_router.delete("/{id}")
-async def delete(id: int, uow: AddressUoWDeps):
-    return await delete_address(id, uow)

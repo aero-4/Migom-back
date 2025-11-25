@@ -9,11 +9,11 @@ class CartItemDTO(CustomModel):
 
 
 class OrderCreateDTO(CustomModel):
-    delivery_address: str
+    address_id: int
     products: List[CartItemDTO]
 
 
 class OrderUpdateDTO(CustomModel):
     status: str | None = None
     amount: int | None = None
-    delivery_address: str | None = None
+    address_id: int | None = None

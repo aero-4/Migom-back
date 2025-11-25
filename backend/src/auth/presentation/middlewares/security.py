@@ -22,7 +22,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
         self.secure_paths: list[str] = secure_paths or ["/api", "/admin", "/docs", "/redoc"]
-        self.allowed_paths: list[str] = allowed_paths or ["/api/auth", "/api/users"]
+        self.allowed_paths: list[str] = allowed_paths or [
+            "/api/auth", "/api/users", "/api/addresses", "/api/orders"
+        ]
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request_path = str(request.url)
@@ -30,11 +32,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         is_allowed_paths = any(_ in request_path for _ in self.allowed_paths)
         is_secure_paths = any(_ in request_path for _ in self.secure_paths)
 
-        user: User = request.state.user
+        user = request.state.user
 
         if is_secure_paths and not is_allowed_paths and not user.is_super_user:
             return JSONResponse(status_code=403,
-                                content={"message": "Permission denied"})
+                                content={"detail": "Permission denied"})
 
         response = await call_next(request)
         return response

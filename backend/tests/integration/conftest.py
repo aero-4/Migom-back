@@ -4,10 +4,15 @@ import pytest_asyncio
 
 from sqlalchemy import text
 
+from src.auth.application.use_cases.registration import registrate
+from src.auth.domain.entities import TokenType
+from src.auth.presentation.dependencies import get_token_auth, get_password_hasher, TokenAuthDep
 from src.db.engine import engine
 from src.addresses.domain.entities import Address
 from src.addresses.presentation.dtos import AddressCreateDTO
 from src.users.domain.dtos import UserCreateDTO
+from src.users.domain.entities import User
+from src.users.presentation.dependencies import get_user_uow
 
 TABLES_TO_TRUNCATE = [
     "users", "categories", "products", "addresses", "orders"
@@ -30,7 +35,7 @@ async def clear_db():
 
 @pytest_asyncio.fixture
 def user_factory():
-    async def _create(client: httpx.AsyncClient, user: UserCreateDTO) -> UserCreateDTO:
+    async def _create(client: httpx.AsyncClient, user: UserCreateDTO, auth=get_token_auth(), is_super_user=False) -> User:
         response = await client.post("/api/auth/register", json=user.model_dump(mode="json"))
 
         assert response.status_code == 200
@@ -39,10 +44,8 @@ def user_factory():
 
         assert data["msg"] == "Register successful"
 
-        client.cookies.clear()
-
-        for token in ["access_token", "refresh_token"]:
-            client.cookies.set(token, response.cookies.get(token))
+        client.cookies.set("access_token", response.cookies.get("access_token"))
+        client.cookies.set("refresh_token", response.cookies.get("refresh_token"))
 
         return user
 

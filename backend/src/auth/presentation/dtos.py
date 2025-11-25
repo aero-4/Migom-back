@@ -16,3 +16,4 @@ class RegisterUserDTO(CustomModel):
     birthday: datetime.date
     email: EmailStr
     password: str = Field(min_length=8, max_length=32)
+    is_super_user: bool | None = False

@@ -25,13 +25,13 @@ class Order(CustomModel):
     creator_id: int
     products: List[int]
     status: str
-    delivery_address: str
+    address_id: int
     amount: int
 
 
 class OrderCreate(CustomModel):
     creator_id: int
-    delivery_address: str
+    address_id: int
     products: List[CartItem]
 
 
@@ -40,5 +40,5 @@ class OrderUpdate(CustomModel):
     creator_id: int | None = None
     status: str | None = None
     amount: int | None = None
-    delivery_address: str | None = None
+    address_id: int | None = None
 

@@ -25,7 +25,7 @@ from src.users.presentation.api import users_api_router
 from src.core.config import settings
 
 BASE_DIR = Path(__file__).resolve().parent
-static_dir = BASE_DIR / "static"               # <project>/src/static
+static_dir = BASE_DIR / "static"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -53,10 +53,12 @@ async def app_exception_handler(request: Request, exc: AppException):
 
 Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
+# middlewares
 app.add_middleware(SecurityMiddleware)
 app.add_middleware(AuthenticationMiddleware)
 app.add_middleware(JWTRefreshMiddleware)
 
+# routers
 app.include_router(auth_api_router, prefix='/api/auth', tags=["Authentication"])
 app.include_router(users_api_router, prefix='/api/users', tags=["Users"])
 app.include_router(categories_api_router, prefix="/api/categories", tags=["Categories"])
@@ -65,6 +67,6 @@ app.include_router(files_api_router, prefix='/api/files', tags=["Files"])
 app.include_router(orders_api_router, prefix='/api/orders', tags=["Orders"])
 app.include_router(addresses_api_router, prefix='/api/addresses', tags=["Addresses"])
 
-
+# static
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(auth_view_router, prefix='/auth', tags=["auth"])

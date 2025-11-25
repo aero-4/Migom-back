@@ -4,7 +4,7 @@ import enum
 from src.core.domain.entities import CustomModel
 
 
-class TokenType(str, enum.Enum):
+class TokenType(enum.StrEnum):
     ACCESS = "access"
     REFRESH = "refresh"
 

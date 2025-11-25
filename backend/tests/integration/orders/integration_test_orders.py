@@ -1,16 +1,18 @@
 import datetime
 import random
-
 import pytest
 import httpx
-from httpx import Response
 
+from src.addresses.domain.entities import Address
+from src.addresses.presentation.dtos import AddressCreateDTO
+from src.auth.presentation.dtos import RegisterUserDTO
 from src.categories.domain.entities import Category
 from src.categories.presentation.dtos import CategoryCreateDTO
 from src.orders.domain.entities import Order, OrderStatus
 from src.orders.presentation.dtos import OrderCreateDTO, CartItemDTO, OrderUpdateDTO
 from src.products.domain.entities import ProductCreate, Product
 from src.users.domain.dtos import UserCreateDTO
+from src.users.domain.entities import User
 from src.utils.strings import generate_random_alphanum
 
 TEST_USER_DTO = UserCreateDTO(
@@ -18,8 +20,16 @@ TEST_USER_DTO = UserCreateDTO(
     password="securepass",
     first_name="Oleg",
     last_name="Tinkov",
-    birthday=datetime.date(2025, 1, 1)
+    birthday=datetime.date(2025, 1, 1),
+    is_super_user=True
 )
+
+
+async def create_address(client) -> Address:
+    address = AddressCreateDTO(city="Москва", street="Ул Пушкина", house_number=random.randint(10, 100))
+    response = await client.post("/api/addresses/", json=address.model_dump())
+    address = Address(**response.json())
+    return address
 
 
 async def create_order(client, user_factory) -> Order:
@@ -28,9 +38,11 @@ async def create_order(client, user_factory) -> Order:
         password=f"securepass{random.randint(100, 999)}",
         first_name=f"Oleg{random.randint(100, 999)}",
         last_name=f"Tinkov{random.randint(100, 999)}",
-        birthday=datetime.date(2025, 1, 1)
+        birthday=datetime.date(2025, 1, 1),
+        is_super_user=True
     )
-    await user_factory(client, user_data)
+    # register admin user
+    await user_factory(client, user_data, is_super_user=True)
 
     # create category
     category = CategoryCreateDTO(name=generate_random_alphanum(),
@@ -63,11 +75,14 @@ async def create_order(client, user_factory) -> Order:
 
         products.append(product)
 
-    # create order's
+    # create address
+    address = await create_address(client)
+
+    # create order
     TEST_ORDER_DTO = OrderCreateDTO(
         creator_id=1,
         products=[CartItemDTO(product_id=p.id, quantity=p.count) for p in products],
-        delivery_address="Ул Пушкина д. 10, кв. 1, г. Москва",
+        address_id=address.id,
     )
     response = await client.post("/api/orders/", json=TEST_ORDER_DTO.model_dump())
     order: Order = Order(**response.json())
@@ -89,7 +104,7 @@ async def test_success_new_order(clear_db, user_factory):
 async def test_not_found_products_new_order(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         # create user
-        await user_factory(client, TEST_USER_DTO)
+        user: User = await user_factory(client, TEST_USER_DTO)
 
         # create category
         category = CategoryCreateDTO(name="Пицца американская",
@@ -123,11 +138,13 @@ async def test_not_found_products_new_order(clear_db, user_factory):
 
             products.append(product)
 
+        address = await create_address(client)
+
         # create order's
         TEST_ORDER_DTO = OrderCreateDTO(
             creator_id=1,
             products=[CartItemDTO(product_id=random_id, quantity=p.count) for p in products],
-            delivery_address="Ул Пушкина д. 10, кв. 1, г. Москва",
+            address_id=address.id,
         )
         response = await client.post("/api/orders/", json=TEST_ORDER_DTO.model_dump())
 
@@ -163,7 +180,7 @@ async def test_success_get_one_order(clear_db, user_factory):
         order_get = Order(**response.json())
 
         assert response.status_code == 200
-        assert order_get.delivery_address == order.delivery_address and order_get.id == order.id
+        assert order_get.address_id == order.address_id and order_get.id == order.id
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -180,9 +197,8 @@ async def test_not_found_get_one_order(clear_db, user_factory):
 async def test_collect_orders(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         orders = []
-        for i in range(3):
-            order = await create_order(client, user_factory)
-            orders.append(order)
+        order = await create_order(client, user_factory)
+        orders.append(order)
 
         response = await client.get(f"/api/orders/")
         collect_orders = [Order(**o) for o in response.json()]
@@ -209,17 +225,20 @@ async def test_success_update_order(clear_db, user_factory):
             order = await create_order(client, user_factory)
             orders.append(order)
 
+        address = await create_address(client)
+        address2 = await create_address(client)
+
         order: Order = random.choice(orders)
 
         order_data = OrderUpdateDTO(creator_id=1,
-                                    delivery_address="г. Санкт-Петербург ул Колотушкина д. 15",
+                                    address_id=address2.id,
                                     amount=1234)
 
         response = await client.patch(f"/api/orders/{order.id}", json=order_data.model_dump())
         order_updated = Order(**response.json())
 
         assert response.status_code == 200
-        assert order_updated.delivery_address == order_data.delivery_address
+        assert order_updated.address_id == order_data.address_id
         assert order_data.amount == order_updated.amount
 
 
@@ -273,7 +292,7 @@ async def test_not_found_update_order(clear_db, user_factory):
             order = await create_order(client, user_factory)
             orders.append(order)
 
-        random_id = 1234
+        random_id = random.randint(100, 999)
         order_data = OrderUpdateDTO(creator_id=1,
                                     status=OrderStatus.DELIVERING)
         response = await client.patch(f"/api/orders/{random_id}", json=order_data.model_dump())

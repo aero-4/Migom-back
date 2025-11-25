@@ -9,3 +9,4 @@ class UserCreateDTO(CustomModel):
     first_name: str
     last_name: str
     birthday: datetime.date
+    is_super_user: bool | None = False
