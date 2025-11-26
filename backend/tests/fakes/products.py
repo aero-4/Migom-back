@@ -1,6 +1,6 @@
 from typing import List
 
-from src.products.domain.entities import ProductUpdate, Product, ProductCreate
+from src.products.domain.entities import ProductUpdate, Product, ProductCreate, SearchData
 from src.products.domain.interfaces.product_repo import IProductRepository
 from src.products.domain.interfaces.product_uow import IProductUnitOfWork
 from src.users.domain.exceptions import UserNotFound
@@ -25,6 +25,33 @@ class FakeProductRepository:
 
     async def get_all(self) -> List[Product]:
         return self._products
+
+    async def get_by_filters(self, search: SearchData) -> List[Product]:
+        products = []
+        filters = search.model_dump()
+
+        for product in self._products:
+            match = True
+            for field, value in filters.items():
+                if not value:
+                    continue
+
+                product_value = getattr(product, field)
+
+                if isinstance(product_value, str) and isinstance(value, str):
+                    if value.lower() not in product_value.lower():
+                        match = False
+                        break
+
+                else:
+                    if product_value != value:
+                        match = False
+                        break
+
+            if match:
+                products.append(product)
+
+        return products
 
     async def get_one(self, id: int) -> Product:
         return self.get_by_pk(id)

@@ -37,3 +37,13 @@ class ProductUpdateDTO(BaseModel):
     def to_entity(self, id: int):
         return ProductUpdate(id=id, **self.model_dump(exclude_unset=True))
 
+
+class SearchDataDTO(BaseModel):
+    name: str | None = None
+    content: str | None = None
+    category_id: int | None = None
+    price: float | None = None
+    grams: int | None = None
+    protein: int | None = None
+    fats: int | None = None
+    carbohydrates: int | None = None

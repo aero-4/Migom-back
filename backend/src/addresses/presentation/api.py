@@ -7,8 +7,6 @@ from src.addresses.application.use_cases.delete_address import delete_address
 from src.addresses.application.use_cases.update_address import update_address
 from src.addresses.presentation.dependencies import AddressUoWDeps
 from src.addresses.presentation.dtos import AddressUpdateDTO, AddressCreateDTO
-from src.auth.presentation.dependencies import TokenAuthDep
-from src.auth.presentation.permissions import access_control
 
 addresses_api_router = APIRouter()
 

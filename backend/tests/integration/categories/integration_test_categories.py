@@ -10,7 +10,7 @@ from src.categories.presentation.dtos import CategoryCreateDTO
 from src.users.domain.dtos import UserCreateDTO
 
 TEST_CATEGORY_DTO = CategoryCreateDTO(
-    name="Пицца американская",
+    name="Пицца",
     photo="src/pizza.jpg"
 )
 

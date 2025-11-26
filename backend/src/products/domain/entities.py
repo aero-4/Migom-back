@@ -50,3 +50,15 @@ class ProductUpdate(CustomModel):
     carbohydrates: int | None = None
     photo: str | None = None
     category_id: int | None = None
+
+
+class SearchData(CustomModel):
+    name: str | None = None
+    content: str | None = None
+    category_id: int | None = None
+    price: float | None = None
+    discount: int | None = None
+    grams: int | None = None
+    protein: int | None = None
+    fats: int | None = None
+    carbohydrates: int | None = None

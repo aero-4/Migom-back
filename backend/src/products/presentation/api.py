@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 
-from src.products.application.use_cases.collect_product import collect_products, collect_product
+from src.products.application.use_cases.collect_product import collect_products, collect_product, collect_products_by_filters
 from src.products.application.use_cases.create_product import create_product
 from src.products.application.use_cases.delete_product import delete_product
 from src.products.application.use_cases.update_product import update_product
+from src.products.domain.entities import SearchData
 from src.products.presentation.dependencies import ProductUoWDep
-from src.products.presentation.dtos import ProductCreateDTO, ProductUpdateDTO
+from src.products.presentation.dtos import ProductCreateDTO, ProductUpdateDTO, SearchDataDTO
 
 products_api_router = APIRouter()
 
@@ -23,6 +24,11 @@ async def get(product_id: int, uow: ProductUoWDep):
 @products_api_router.post("/")
 async def add(product_data: ProductCreateDTO, uow: ProductUoWDep):
     return await create_product(product_data, uow)
+
+
+@products_api_router.post("/search")
+async def search(search_data: SearchDataDTO, uow: ProductUoWDep):
+    return await collect_products_by_filters(search_data, uow)
 
 
 @products_api_router.patch("/{product_id}")

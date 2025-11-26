@@ -1,11 +1,11 @@
 from typing import List, Any, Coroutine
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.domain.exceptions import AlreadyExists, NotFound
-from src.products.domain.entities import Product, ProductCreate, ProductUpdate
+from src.products.domain.entities import Product, ProductCreate, ProductUpdate, SearchData
 from src.products.domain.interfaces.product_repo import IProductRepository
 from src.products.infrasctructure.db.orm import ProductsOrm
 
@@ -21,6 +21,27 @@ class PGProductsRepository(IProductRepository):
 
         result = await self.session.execute(stmt)
         result = result.unique().scalars().all()
+        return [
+            self._to_domain(product) for product in result
+        ]
+
+    async def get_by_filters(self, search: SearchData):
+        stmt = (
+            select(ProductsOrm)
+            .filter(
+                or_(ProductsOrm.name.like(f"%{search.name}%"),
+                    ProductsOrm.content.like(f"%{search.content}%"),
+                    ProductsOrm.category_id == search.category_id,
+                    ProductsOrm.price == search.price,
+                    ProductsOrm.discount == search.discount,
+                    ProductsOrm.grams == search.grams,
+                    ProductsOrm.protein == search.protein,
+                    ProductsOrm.fats == search.fats,
+                    ProductsOrm.carbohydrates == search.carbohydrates)
+            )
+        )
+        result = await self.session.execute(stmt)
+        result: List[ProductsOrm] = result.scalars().all()
         return [
             self._to_domain(product) for product in result
         ]
@@ -41,7 +62,8 @@ class PGProductsRepository(IProductRepository):
 
         try:
             await self.session.flush()
-        except IntegrityError:
+        except IntegrityError as e:
+            print(e)
             raise AlreadyExists()
 
         return self._to_domain(obj)
