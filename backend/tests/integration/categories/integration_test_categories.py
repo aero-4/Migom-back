@@ -14,10 +14,13 @@ TEST_CATEGORY_DTO = CategoryCreateDTO(
     photo="src/pizza.jpg"
 )
 
+TEST_SUPER_USER = UserCreateDTO(email="test@test.com", password="test12345", first_name="Test", last_name="Test", birthday=datetime.date(1990, 1, 1), is_super_user=True)
+
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_success_collect_categories(clear_db):
+async def test_success_collect_categories(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        await user_factory(client, TEST_SUPER_USER)
         await client.post("/api/categories/", json=TEST_CATEGORY_DTO.model_dump(mode="python"))
         response = await client.get("/api/categories/")
         categories = response.json()
@@ -27,8 +30,9 @@ async def test_success_collect_categories(clear_db):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_success_delete_category(clear_db):
+async def test_success_delete_category(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        await user_factory(client, TEST_SUPER_USER)
         category_data = TEST_CATEGORY_DTO.model_dump()
         response = await client.post("/api/categories/", json=category_data)
         category = response.json()
@@ -38,8 +42,9 @@ async def test_success_delete_category(clear_db):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_not_found_delete_category(clear_db):
+async def test_not_found_delete_category(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        await user_factory(client, TEST_SUPER_USER)
         category_data = TEST_CATEGORY_DTO.model_dump()
         response = await client.post("/api/categories/", json=category_data)
         category = response.json()
@@ -51,8 +56,9 @@ async def test_not_found_delete_category(clear_db):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_success_update_category(clear_db):
+async def test_success_update_category(clear_db, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_SUPER_USER)
         category_data = TEST_CATEGORY_DTO.model_dump()
         response = await client.post("/api/categories/", json=category_data)
 
@@ -67,8 +73,9 @@ async def test_success_update_category(clear_db):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_not_found_update_category(clear_db):
+async def test_not_found_update_category(clear_db, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_SUPER_USER)
         category_data = TEST_CATEGORY_DTO.model_dump()
         response = await client.post("/api/categories/", json=category_data)
 
@@ -83,8 +90,9 @@ async def test_not_found_update_category(clear_db):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_success_add_category(clear_db):
+async def test_success_add_category(clear_db, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_SUPER_USER)
         category_data = TEST_CATEGORY_DTO.model_dump()
         response = await client.post("/api/categories/", json=category_data)
         category = Category(**response.json())
@@ -94,8 +102,9 @@ async def test_success_add_category(clear_db):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_already_exists_add_category(clear_db):
+async def test_already_exists_add_category(clear_db, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_SUPER_USER)
         category_data = TEST_CATEGORY_DTO.model_dump()
         response1 = await client.post("/api/categories/", json=category_data)
         response2 = await client.post("/api/categories/", json=category_data)
