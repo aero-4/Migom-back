@@ -42,7 +42,7 @@ async def create_order(client, user_factory) -> Order:
         is_super_user=True
     )
     # register admin user
-    await user_factory(client, user_data, is_super_user=True)
+    await user_factory(client, user_data)
 
     # create category
     category = CategoryCreateDTO(name=generate_random_alphanum(),

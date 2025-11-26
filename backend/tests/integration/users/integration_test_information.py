@@ -17,14 +17,11 @@ TEST_USER_DTO = UserCreateDTO(
 @pytest.mark.asyncio(loop_scope="session")
 async def test_get_me_success(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
-        response = await user_factory(client, TEST_USER_DTO)
+        await user_factory(client, TEST_USER_DTO)
 
         response2 = await client.get("/api/users/me")
 
-        user_data = TEST_USER_DTO.model_dump(mode="json")
-        user_data.pop("password")
-
-        assert response2.json() == user_data
+        assert response2.json() == TEST_USER_DTO.model_dump(exclude={"password", "is_super_user"}, mode="json")
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -40,13 +37,12 @@ async def test_user_permission_denied(clear_db, user_factory):
 async def test_allowed_paths_user(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         # allowed
-
         user = await user_factory(client, TEST_USER_DTO)
 
         response2 = await client.get("/api/users/me")
 
         assert response2.status_code == 200
-        assert response2.json() == user.model_dump(exclude={"password"}, mode="json")
+        assert response2.json() == TEST_USER_DTO.model_dump(exclude={"password", "is_super_user"}, mode="json")
 
 
 

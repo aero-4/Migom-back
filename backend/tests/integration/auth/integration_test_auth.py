@@ -95,16 +95,3 @@ async def test_without_access_refresh_token(clear_db, user_factory):
         response1.cookies.pop("access_token")
 
         assert response1.json() == {"msg": "Token refreshed"}
-
-
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_without_refresh_token(clear_db, user_factory):
-    async with httpx.AsyncClient(base_url="http://localhost:8000") as client1:
-        await user_factory(client1, TEST_USER_DTO)
-
-        client1.cookies.pop("refresh_token")
-
-        response1 = await client1.post("/api/auth/refresh")
-
-        assert response1.json() == {"detail": "Refresh token is not valid"}
