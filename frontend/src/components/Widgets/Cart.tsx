@@ -80,8 +80,9 @@ export const CartWidget: React.FC = () => {
                 ref={triggerRef}
                 aria-label="Открыть корзину"
                 onClick={toggle}
-                className="focus:outline-none fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
+                className="rounded-full focus:outline-none fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
             >
+
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path
                         d="M15 11C15 12.6569 13.6569 14 12 14C10.3431 14 9 12.6569 9 11M4 7H20M4 7V13C4 19.3668 5.12797 20.5 12 20.5C18.872 20.5 20 19.3668 20 13V7M4 7L5.44721 4.10557C5.786 3.428 6.47852 3 7.23607 3H16.7639C17.5215 3 18.214 3.428 18.5528 4.10557L20 7"
@@ -91,6 +92,8 @@ export const CartWidget: React.FC = () => {
                         strokeLinejoin="round"
                     />
                 </svg>
+
+                <p>Корзина</p>
 
                 {totalItems > 0 && (
                     <span

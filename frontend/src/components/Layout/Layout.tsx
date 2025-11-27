@@ -8,7 +8,7 @@ const Layout: React.FC = () => {
         <div className="flex flex-col min-h-screen">
 
             <div className="w-full">
-                <div className="mx-auto w-full max-w-screen-xs">
+                <div className="mx-auto w-full max-w-screen-xl">
                     <main className="flex-1 flex overflow-auto justify-center items-center">
                         <div className="w-full">
                             <Navbar />
