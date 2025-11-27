@@ -25,8 +25,7 @@ class PGOrdersRepository(IOrderRepository):
 
         try:
             await self.session.flush()
-        except Exception as ex:
-            logging.exception(ex, exc_info=True)
+        except IntegrityError:
             raise AlreadyExists()
 
         await self._add_links(order_data, obj)
