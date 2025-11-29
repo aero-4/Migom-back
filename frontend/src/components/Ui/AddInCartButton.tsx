@@ -4,7 +4,7 @@ import minusPng from "../../assets/minus-sign.png";
 import {useCart} from "../../context/CartContext.tsx";
 
 
-export default function AddInCartBtn({product}): JSX.Element {
+export default function AddInCartBtn({product, className="", label=""}): JSX.Element {
     const [count, setCount] = useState<number>(0);
     const {addItem} = useCart();
     const {removeItem} = useCart()
@@ -26,7 +26,7 @@ export default function AddInCartBtn({product}): JSX.Element {
     };
 
     return (
-        <div className="flex flex-row flex-wrap ml-auto bg-red-100 rounded-2xl">
+        <div className={`${className} flex flex-row flex-wrap ml-auto bg-lime-50 rounded-2xl`}>
             {count <= 0 ? (
                 <div>
                     <button
@@ -36,7 +36,8 @@ export default function AddInCartBtn({product}): JSX.Element {
                         onClick={setCountHandler}
                         aria-label="Добавить"
                     >
-                        <img src={plusPng} className="w-3 lg:w-4" alt="Добавить"/>
+                        <img src={plusPng} className={`w-3 lg:w-5`} alt="Добавить"/>
+                        {label && <span className="text-sm md:text-lg text-gray-800 my-2 px-3">{label}</span>}
                     </button>
                 </div>
             ) : (
@@ -47,10 +48,12 @@ export default function AddInCartBtn({product}): JSX.Element {
                         onClick={setCountHandler}
                         aria-label="Уменьшить"
                     >
-                        <img src={minusPng} className="w-3 lg:w-4" alt="Уменьшить"/>
+                        <img src={minusPng} className={`w-3 lg:w-5`} alt="Уменьшить"/>
+
+                        {label && <span className="text-sm md:text-lg text-gray-800 my-2 px-3">Убрать</span>}
                     </button>
 
-                    <span className="text-center text-xs">{count}</span>
+                    <span className="text-center text-xs md:text-lg">{count}</span>
 
                     <button
                         name="plus"
@@ -58,7 +61,9 @@ export default function AddInCartBtn({product}): JSX.Element {
                         onClick={setCountHandler}
                         aria-label="Добавить ещё"
                     >
-                        <img src={plusPng} className="w-3 lg:w-4" alt="Добавить"/>
+                        <img src={plusPng} className={`w-3 lg:w-5`} alt="Добавить"/>
+
+                        {label && <span className="text-sm md:text-lg text-gray-800 my-2 px-3">Добавить</span>}
                     </button>
                 </div>
             )}

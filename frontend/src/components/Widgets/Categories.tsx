@@ -22,7 +22,7 @@ export default function Categories(): JSX.Element {
                         <img
                             src={category.photo}
                             alt="Фото категории"
-                            className="img"
+                            className="cat__img"
                         />
                         <span
                             className="font-medium text-2xs text-gray text-center estra">

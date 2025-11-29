@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from "./Footer.tsx";
-
+import {CartProvider} from "../../context/CartContext.tsx";
 const Layout: React.FC = () => {
     return (
         <div className="flex flex-col min-h-screen">
@@ -12,11 +12,10 @@ const Layout: React.FC = () => {
                     <main className="flex-1 flex overflow-auto justify-center items-center">
                         <div className="w-full">
                             <Navbar />
-
-                            <Outlet/>
-
+                            <CartProvider>
+                                <Outlet/>
+                            </CartProvider>
                             <Footer/>
-
                         </div>
                     </main>
                 </div>

@@ -131,15 +131,10 @@ export function AuthProvider({ children }) {
 
 
             if (!res.ok) {
-                if (json && json.detail) return { ok: false, message: json.detail };
+                console.log(json.detail)
+                if (json && json.detail)
+                    return { ok: false, message: json.detail };
                 return { ok: false, message: (json && (json.error || json.message)) || `Ошибка: ${res.status}` };
-            }
-
-            if (json && json.access_token) {
-                setCookie("access_token", res.access_token, { path: "/", sameSite: "Lax", secure: true });
-            }
-            if (json && json.refresh_token) {
-                setCookie("refresh_token", json.refresh_token, { path: "/", sameSite: "Lax", secure: true });
             }
 
             if (json && json.msg && String(json.msg).toLowerCase().includes("login success")) {
@@ -162,7 +157,9 @@ export function AuthProvider({ children }) {
                 method: "POST",
                 credentials: "include",
             });
-        } catch (e) {}
+        } catch (e) {
+
+        }
         setUser(null);
         setIsAuthenticated(false);
         setCookie("access_token", "", { maxAge: 0, path: "/" });

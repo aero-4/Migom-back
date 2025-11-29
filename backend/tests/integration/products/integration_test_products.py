@@ -1,4 +1,5 @@
 import datetime
+import os
 import random
 import httpx
 import pytest
@@ -32,10 +33,22 @@ TEST_SUPER_USER = UserCreateDTO(email="test@test.com", password="test12345", fir
 
 
 async def create_product(client, product=None):
+    TEST_PHOTOS = ["test (1).jpeg",
+                   "test (2).jpeg",
+                   "test (3).jpeg",
+                   "test (4).jpeg",
+                   "test (5).jpeg",
+                   "test (6).jpeg",
+                   "test (7).jpeg",
+                   "test (8).jpeg"]
+    resp = await client.post("/api/files/", files={"file": open(random.choice(TEST_PHOTOS), "rb")})
+    url = resp.json()["url"]
+
     TEST_CATEGORY_DTO.name = "Бургеры " + str(random.randint(1, 1000))
+    TEST_CATEGORY_DTO.photo = url
+
     response1 = await client.post("/api/categories/", json=TEST_CATEGORY_DTO.model_dump(mode="json"))
     category = Category(**response1.json())
-    print(category)
     product = product or ProductCreateDTO(
         name=f"Бургер - Бургерный №{random.randint(1, 2000)} ",
         content=f"Бургеры в бургерной скале. Почувствуйте новые вкусы! №{random.randint(1, 200)}",
@@ -48,12 +61,15 @@ async def create_product(client, product=None):
         protein=random.randint(1, 100),
         fats=random.randint(1, 100),
         carbohydrates=random.randint(1, 100),
-        photo="src/photo1.jpg",
+        kilocalorie=random.randint(1, 100),
+        photo=url,
         category_id=category.id
     )
 
     response2 = await client.post("/api/products/", json=product.model_dump())
     product_created = Product(**response2.json())
+
+    print(product_created)
 
     assert product_created.name == product.name
     return product_created
@@ -193,3 +209,18 @@ async def test_success_get_all_by_name_filters(clear_db, user_factory):
         search_result = [Product(**i) for i in search_response.json()]
 
         assert products == search_result
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_add_some_products_and_categories(clear_db, user_factory, count=25):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_SUPER_USER)
+
+        for i in range(count):
+            await create_product(client)
+
+        response = await client.get("/api/products/")
+        products = response.json()
+
+        assert response.status_code == 200
+        assert len(products) == count

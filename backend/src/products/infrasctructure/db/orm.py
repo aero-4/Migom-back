@@ -24,6 +24,7 @@ class ProductsOrm(Base):
     discount: Mapped[int] = mapped_column(nullable=True)
     count: Mapped[int] = mapped_column(default=0)
     grams: Mapped[int] = mapped_column(default=0)
+    kilocalorie: Mapped[int] = mapped_column(default=0, nullable=True)
     protein: Mapped[int] = mapped_column(default=0)
     fats: Mapped[int] = mapped_column(default=0)
     carbohydrates: Mapped[int] = mapped_column(default=0)

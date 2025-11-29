@@ -6,31 +6,16 @@ from src.auth.infrastructure.transports.base import IAuthTransport
 
 
 class CookieTransport(IAuthTransport):
-    """
-    Transport strategy using cookies to manage tokens in HTTP requests and responses.
-    """
-
     def __init__(
-        self,
-        cookie_name: str,
-        cookie_max_age: int | None = None,
-        cookie_path: str = "/",
-        cookie_domain: str | None = None,
-        cookie_secure: bool = True,
-        cookie_httponly: bool = True,
-        cookie_samesite: Literal["lax", "strict", "none"] = "lax",
+            self,
+            cookie_name: str,
+            cookie_max_age: int | None = None,
+            cookie_path: str = "/",
+            cookie_domain: str | None = None,
+            cookie_secure: bool = False,
+            cookie_httponly: bool = False,
+            cookie_samesite: Literal["lax", "strict", "none"] = "none",
     ):
-        """
-        Initialize cookie transports.
-
-        :param cookie_name: Name of the cookie to store the token.
-        :param cookie_max_age: Cookie expiration time in seconds.
-        :param cookie_path: Path for which the cookie is valid.
-        :param cookie_domain: Domain for which the cookie is valid.
-        :param cookie_secure: Whether to use the Secure flag.
-        :param cookie_httponly: Whether to use the HttpOnly flag.
-        :param cookie_samesite: SameSite policy for the cookie.
-        """
         self.cookie_name = cookie_name
         self.cookie_max_age = cookie_max_age
         self.cookie_path = cookie_path
@@ -51,9 +36,9 @@ class CookieTransport(IAuthTransport):
             value=token,
             max_age=self.cookie_max_age,
             path=self.cookie_path,
-            domain=self.cookie_domain,
+            # domain=self.cookie_domain,
             secure=self.cookie_secure,
-            httponly=self.cookie_httponly,
+            # httponly=self.cookie_httponly,
             samesite=self.cookie_samesite,
         )
 

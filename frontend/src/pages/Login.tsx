@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -43,7 +42,7 @@ export default function Login() {
     };
 
     return (
-        <div className="flex items-center justify-center p-4">
+        <div className="flex items-center justify-center p-4 transition">
             <form onSubmit={handleSubmit} className="w-full max-w-md bg-white shadow-md rounded-2xl p-6 gap-4 flex flex-col">
                 <h2 className="text-xl font-semibold text-center">Вход</h2>
 
@@ -79,12 +78,12 @@ export default function Login() {
                         className="btn__circle bg-blue-600 hover:bg-blue-600/90 active:bg-blue-600/80"
                         disabled={loading}
                     >
-                        {loading ? "Вход..." : "Войти"}
+                        Войти
                     </button>
                 </div>
 
                 <div className="text-center mt-3 text-sm">
-                    <button type="button" className="w-full" onClick={() => navigate("/register")}>
+                    <button type="button" className="w-full hover:text-gray-600" onClick={() => navigate("/register")}>
                         Зарегистрироваться
                     </button>
                 </div>

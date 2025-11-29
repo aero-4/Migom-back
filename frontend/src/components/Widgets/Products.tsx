@@ -76,7 +76,8 @@ export default function Products(): JSX.Element {
         const load = async () => {
             try {
                 const res = await fetch("/api/products");
-                if (!res.ok) throw new Error("no products");
+                if (!res.ok)
+                    throw new Error("no products");
                 const data = await res.json();
                 if (!cancelled) {
                     const normalized = normalize(Array.isArray(data) ? data : []);

@@ -14,6 +14,7 @@ class ProductCreateDTO(BaseModel):
     protein: int
     fats: int
     carbohydrates: int
+    kilocalorie: int | None = None
     discount_price: float | None = None
     discount: int | None = None
     photo: str | None = None

@@ -107,6 +107,7 @@ class PGProductsRepository(IProductRepository):
             discount_price=product.discount_price,
             discount=product.discount,
             count=product.count,
+            kilocalorie=product.kilocalorie,
             grams=product.grams,
             protein=product.protein,
             fats=product.fats,

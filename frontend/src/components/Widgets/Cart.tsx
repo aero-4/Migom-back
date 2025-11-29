@@ -4,6 +4,7 @@ import DeliveryForm from "../Forms/DeliveryForm";
 import closeSvg from "../../assets/close.svg";
 import QuantityInput from "../Ui/QuantityInput.tsx";
 import CloseButton from "../Ui/CloseButton.tsx";
+import {useNavigate} from "react-router-dom";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -115,7 +116,7 @@ export const CartWidget: React.FC = () => {
 
             <aside
                 onClick={(e) => e.stopPropagation()}
-                className={`md:p-6 h-full w-full xl:max-w-150 2xl:max-w-200 fixed top-0 right-0 z-50 transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+                className={`md:p-6 h-full w-full xl:max-w-160 2xl:max-w-220 fixed top-0 right-0 z-50 transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
                     isOpen ? "translate-x-0" : "translate-x-full"
                 } rounded-l-2xl overflow-hidden`}
                 role="dialog"
@@ -145,13 +146,19 @@ export const CartWidget: React.FC = () => {
                                 ) : (
                                     <ul className="space-y-5 w-full p-2">
                                         {items.map((item) => (
-                                            <li key={item.id} className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100">
+                                            <li key={item.id}
+                                                className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100"
+                                                onClick={() => useNavigate()}>
                                                 <div
                                                     className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
                                                     {item.image ? (
-                                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover"/>
+                                                        <img src={item.image}
+                                                             alt={item.name}
+                                                             className="w-full h-full object-cover"/>
                                                     ) : (
-                                                        <div className="text-xs text-gray-400">no photo</div>
+                                                        <div className="text-xs text-gray-400">
+                                                            WITHOUT PHOTO
+                                                        </div>
                                                     )}
                                                 </div>
 

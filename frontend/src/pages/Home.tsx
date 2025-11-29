@@ -2,7 +2,6 @@ import React, {JSX} from "react"
 import Categories from "../components/Widgets/Categories";
 import Products from "../components/Widgets/Products";
 import {CartWidget} from "../components/Widgets/Cart";
-import {CartProvider} from "../context/CartContext";
 
 export default function Home(): JSX.Element {
     return (
@@ -11,15 +10,13 @@ export default function Home(): JSX.Element {
 
             <Categories/>
 
-            <CartProvider>
 
-                <h1 className="p-3 my-6 text-3xl font-bold">Популярное</h1>
+            <h1 className="p-3 my-6 text-3xl font-bold">Популярное</h1>
 
-                <Products/>
+            <Products/>
 
-                <CartWidget/>
+            <CartWidget/>
 
-            </CartProvider>
         </>
     );
 }
