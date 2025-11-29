@@ -143,7 +143,7 @@ export const CartWidget: React.FC = () => {
                                         <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
                                     </div>
                                 ) : (
-                                    <ul className="space-y-5 w-full p-6">
+                                    <ul className="space-y-5 w-full p-2">
                                         {items.map((item) => (
                                             <li key={item.id} className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100">
                                                 <div
@@ -220,7 +220,7 @@ export const CartWidget: React.FC = () => {
                                             loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
                                         } focus:outline-none focus:ring-4 focus:ring-red-300`}
                                     >
-                                        Продолжить
+                                        Оформить заказ
                                     </button>
 
 

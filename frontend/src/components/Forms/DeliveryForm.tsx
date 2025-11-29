@@ -148,13 +148,12 @@ const DeliveryForm: React.FC<Props> = ({
             case "house":
             case "flat":
             case "floor": {
-                if (!raw) return null; // optional
+                if (!raw) return null;
                 if (!numericRegex.test(String(raw))) return "Только цифры";
                 return null;
             }
 
             case "intercom": {
-                // Домофон: допустимо пустое значение, "нет" и цифры
                 if (!raw) return null;
                 if (isNoValue(String(raw))) return null;
                 if (!onlyDigits(String(raw))) return 'Только цифры или "нет"';
@@ -296,7 +295,7 @@ const DeliveryForm: React.FC<Props> = ({
                     </div>
 
                     <div className="flex-1 min-h-0 overflow-auto p-4 sm:p-6 space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
                                 <label className="sr-only" htmlFor="city">
                                     Город

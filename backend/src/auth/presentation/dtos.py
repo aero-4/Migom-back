@@ -13,7 +13,7 @@ class AuthUserDTO(CustomModel):
 class RegisterUserDTO(CustomModel):
     first_name: str
     last_name: str
-    birthday: datetime.date
     email: EmailStr
     password: str = Field(min_length=8, max_length=32)
+    birthday: datetime.date | None = None
     is_super_user: bool | None = False
