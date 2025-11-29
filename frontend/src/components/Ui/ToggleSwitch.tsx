@@ -9,7 +9,7 @@ type Props = {
 
 const ToggleSwitch: React.FC<Props> = ({ checked, onCheckedChange, label, className = "" }) => {
     return (
-        <label className={`flex items-center gap-3 cursor-pointer select-none ${className}`}>
+        <label className={`flex items-center gap-2 cursor-pointer select-none ${className}`}>
             <input
                 type="checkbox"
                 className="sr-only"

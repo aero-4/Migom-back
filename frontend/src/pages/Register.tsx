@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Loader from "../components/Loaders/Loader";
 import config from "../../config.ts";
 import ToggleSwitch from "../components/Ui/ToggleSwitch.tsx";
@@ -51,8 +51,8 @@ export default function Register() {
     };
 
     const onChange = (e) => {
-        setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
-        setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+        setForm((s) => ({...s, [e.target.name]: e.target.value}));
+        setErrors((prev) => ({...prev, [e.target.name]: undefined}));
         setServerError(null);
         setSuccess(null);
     };
@@ -77,7 +77,7 @@ export default function Register() {
 
             const res = await fetch(config.API_URL + "/api/auth/register/", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(payload),
             });
 
@@ -102,7 +102,7 @@ export default function Register() {
             }
 
             setSuccess((json && (json.message || "Успешно зарегистрированы!")) || "Успешно зарегистрированы!");
-            setForm({ firstName: "", lastName: "", birthdate: "", email: "", password: "", confirmPassword: "" });
+            setForm({firstName: "", lastName: "", birthdate: "", email: "", password: "", confirmPassword: ""});
         } catch (err) {
             setServerError("Сетевая ошибка. Попробуйте ещё раз.");
         } finally {
@@ -111,10 +111,10 @@ export default function Register() {
     };
 
     return (
-        <div className="flex items-center justify-center p-4">
+        <div className="flex items-center justify-center p-2">
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-md bg-white shadow-md rounded-2xl p-6 gap-5 flex flex-col"
+                className="w-full max-w-lg bg-white shadow-md rounded-2xl p-6 gap-3 flex flex-col"
                 aria-label="Форма регистрации"
             >
                 <h2 className="p-3 text-xl font-semibold text-center">Регистрация</h2>
@@ -218,11 +218,11 @@ export default function Register() {
 
                 <button
                     type="submit"
-                    className={`btn__circle bg-blue-600 hover:bg-blue-600/90 active:bg-blue-600/80`}
+                    className={`${!isConfirmData ? "cursor-not-allowed" : "cursor-pointer"} my-3 btn__circle bg-blue-600 hover:bg-blue-600/90 active:bg-blue-600/80`}
                     disabled={!isConfirmData}
                     aria-busy={loading}
                 >
-                    {loading ? <Loader /> : "Зарегистрироваться"}
+                    Зарегистрироваться
                 </button>
             </form>
         </div>
