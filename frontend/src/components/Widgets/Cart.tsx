@@ -3,6 +3,7 @@ import {useCart} from "../../context/CartContext";
 import DeliveryForm from "../Forms/DeliveryForm";
 import closeSvg from "../../assets/close.svg";
 import QuantityInput from "../Ui/QuantityInput.tsx";
+import CloseButton from "../Ui/CloseButton.tsx";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -83,7 +84,7 @@ export const CartWidget: React.FC = () => {
                 className="rounded-full focus:outline-none fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
             >
 
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path
                         d="M15 11C15 12.6569 13.6569 14 12 14C10.3431 14 9 12.6569 9 11M4 7H20M4 7V13C4 19.3668 5.12797 20.5 12 20.5C18.872 20.5 20 19.3668 20 13V7M4 7L5.44721 4.10557C5.786 3.428 6.47852 3 7.23607 3H16.7639C17.5215 3 18.214 3.428 18.5528 4.10557L20 7"
                         stroke="currentColor"
@@ -93,7 +94,7 @@ export const CartWidget: React.FC = () => {
                     />
                 </svg>
 
-                <p>Корзина</p>
+                <p className="px-2" >Корзина</p>
 
                 {totalItems > 0 && (
                     <span
@@ -124,21 +125,14 @@ export const CartWidget: React.FC = () => {
                 {!isDeliveringForm || step === "cart" ? (
                     <div className="h-full w-full flex flex-col">
                         <div className="w-full flex flex-col min-h-0">
-                            <div className="flex items-center justify-between p-6">
+                            <div className="flex items-center justify-between p-3">
                                 <h3 id="cart-title" className="text-2xl font-semibold text-gray-800">
                                     Корзина
                                 </h3>
 
                                 <div className="flex items-center gap-3">
 
-                                    <button
-                                        type="button"
-                                        onClick={close}
-                                        aria-label="Закрыть корзину"
-                                        className="p-6 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2"
-                                    >
-                                        <img className="w-4 h-4" src={closeSvg} alt=""/>
-                                    </button>
+                                    <CloseButton close={close}/>
                                 </div>
                             </div>
 
@@ -151,7 +145,7 @@ export const CartWidget: React.FC = () => {
                                 ) : (
                                     <ul className="space-y-5 w-full p-6">
                                         {items.map((item) => (
-                                            <li key={item.id} className="flex gap-6 items-start p-6 rounded-lg border border-gray-100">
+                                            <li key={item.id} className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100">
                                                 <div
                                                     className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
                                                     {item.image ? (
@@ -201,7 +195,7 @@ export const CartWidget: React.FC = () => {
                                 <div className="mb-6 flex flex-row items-center justify-center w-full">
                                     <div className="text-gray-600 p-3">К оплате:</div>
 
-                                    <div className="justify-center text-3xl text-gray-900">
+                                    <div className="justify-center text-2xl md:text-3xl text-gray-900">
                                         {totalPrice.toLocaleString()} ₽
                                     </div>
 

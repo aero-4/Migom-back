@@ -1,15 +1,5 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, createContext, useContext } from "react";
 
-/*
-  Файл содержит:
-  - Register (компактная регистрация) — оставлена, экспортирована как именованная
-  - Login (новая страница входа) — запрос на /api/auth/login
-  - AuthProvider + useAuth — провайдер, который при монтировании запрашивает /api/users/me
-    Если ответ не содержит { detail: "Not authenticated" } — сохраняет пользователя в контекст.
-*/
-
-/* ------------------ Auth Context / Provider ------------------ */
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -24,11 +14,9 @@ export function AuthProvider({ children }) {
             const json = await res.json().catch(() => null);
 
             if (!res.ok) {
-                // Если сервер вернул деталь о неаутентифицированности — считаем user = null
                 if (json && json.detail === "Not authenticated") {
                     setUser(null);
                 } else {
-                    // В остальных случаях тоже ставим null — можно логировать
                     setUser(null);
                 }
             } else {
@@ -44,7 +32,6 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         fetchCurrentUser();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Функция входа: вызывает /api/auth/login, затем обновляет user

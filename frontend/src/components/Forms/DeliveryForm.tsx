@@ -1,10 +1,13 @@
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import closeSvg from "../../assets/close.svg";
 import PaymentForm from "./PaymentForm.tsx";
 import BackButton from "../Ui/BackButton.tsx";
 import ToggleSwitch from "../Ui/ToggleSwitch.tsx";
+import Loader from "../Loaders/Loader.tsx";
+import CloseButton from "../Ui/CloseButton.tsx";
 
 export type DeliveryAddress = {
+    id?: number;
     addressLine?: string;
     street?: string;
     house?: string;
@@ -28,217 +31,407 @@ type Props = {
     className?: string;
 };
 
-type Errors = Partial<Record<keyof DeliveryAddress, string>>;
+type Errors = Partial<Record<keyof DeliveryAddress, string | null>>;
 
-export const DeliveryForm: React.FC<Props> = ({
-                                                  value,
-                                                  onChange,
-                                                  onSubmit,
-                                                  step,
-                                                  setStep,
-                                                  onClose,
-                                                  submitLabel = "Оплатить",
-                                                  className = "",
-                                              }) => {
+
+const NO_VALUES = new Set([
+    "нет",
+    "no",
+    "none",
+    "-",
+    "n",
+    "нету",
+    "нет ",
+    "нету ",
+    "none ",
+]);
+
+const isNoValue = (raw?: string) => {
+    if (!raw) return false;
+    return NO_VALUES.has(raw.trim().toLowerCase());
+};
+
+const onlyDigits = (s?: string) => {
+    if (!s) return false;
+    return /^\d+$/.test(s.trim());
+};
+
+
+const DeliveryForm: React.FC<Props> = ({
+                                           value,
+                                           onChange,
+                                           onSubmit,
+                                           step,
+                                           setStep,
+                                           onClose,
+                                           submitLabel = "Оплатить",
+                                           className = "",
+                                       }) => {
     const [addr, setAddr] = useState<DeliveryAddress>(() => value ?? {leaveAtDoor: false});
-    const [loading, setLoading] = useState(false);
+    const [loadingSubmit, setLoadingSubmit] = useState(false);
+    const [loadingFetch, setLoadingFetch] = useState(false);
     const [errors, setErrors] = useState<Errors>({});
 
     const alphaRegex = /^[\p{L}\s\-]+$/u;
     const numericRegex = /^\d+$/;
 
-    const update = (patch: Partial<DeliveryAddress>) => {
-        const next = {...addr, ...patch};
-        setAddr(next);
-        onChange?.(next);
-        for (const key of Object.keys(patch) as (keyof DeliveryAddress)[]) {
-            validateField(key, (next as any)[key]);
-        }
-    };
+    useEffect(() => {
+        const ctrl = new AbortController();
+        const load = async () => {
+            setLoadingFetch(true);
+            try {
+                const res = await fetch("/api/addresses/", {signal: ctrl.signal});
+                if (!res.ok) {
+                    return;
+                }
+                const list = await res.json();
+                if (!Array.isArray(list) || list.length === 0) return;
+
+                const last = list[list.length - 1];
+
+                const mapped: DeliveryAddress = {
+                    id: last.id,
+                    addressLine: last.city ?? "",
+                    street: last.street ?? "",
+                    house: last.house_number != null ? String(last.house_number) : "",
+                    flat: last.apartment_number != null ? String(last.apartment_number) : "",
+                    floor: last.floor != null ? String(last.floor) : "",
+                    intercom: last.entrance != null ? String(last.entrance) : "",
+                    comment: last.comment ?? "",
+                    leaveAtDoor: !!last.is_leave_at_door,
+                };
+
+                setAddr(mapped);
+                onChange?.(mapped);
+            } catch (e) {
+                if ((e as any)?.name === "AbortError") return;
+                console.error("Failed to fetch addresses", e);
+            } finally {
+                setLoadingFetch(false);
+            }
+        };
+
+        load();
+        return () => ctrl.abort();
+    }, []);
+
+
+    const update = useCallback(
+        (patch: Partial<DeliveryAddress>) => {
+            setAddr((prev) => {
+                const next = {...prev, ...patch};
+                onChange?.(next);
+                return next;
+            });
+
+            // validate changed fields
+            for (const k of Object.keys(patch) as (keyof DeliveryAddress)[]) {
+                const v = (patch as any)[k];
+                const err = validateField(k, v ?? (addr as any)[k]);
+                setErrors((prev) => ({...prev, [k]: err}));
+            }
+        },
+        [onChange]
+    );
 
     const validateField = (field: keyof DeliveryAddress, value?: any): string | null => {
-        const str = typeof value === "string" ? value.trim() : value;
+        const raw = typeof value === "string" ? value.trim() : value;
 
         switch (field) {
             case "addressLine":
             case "street": {
-                if (!str) return "Поле обязательно";
-                if (!alphaRegex.test(str)) return "Только буквы, пробелы и дефис";
+                if (!raw) return "Поле обязательно";
+                if (!alphaRegex.test(raw)) return "Только буквы, пробелы и дефис";
                 return null;
             }
+
             case "house":
             case "flat":
-            case "floor":
+            case "floor": {
+                if (!raw) return null; // optional
+                if (!numericRegex.test(String(raw))) return "Только цифры";
+                return null;
+            }
+
             case "intercom": {
-                if (!str) return null; // необязательно
-                if (!numericRegex.test(str)) return "Только цифры";
+                // Домофон: допустимо пустое значение, "нет" и цифры
+                if (!raw) return null;
+                if (isNoValue(String(raw))) return null;
+                if (!onlyDigits(String(raw))) return 'Только цифры или "нет"';
                 return null;
             }
-            case "comment": {
+
+            case "comment":
+            case "leaveAtDoor":
                 return null;
-            }
-            case "leaveAtDoor": {
-                return null;
-            }
+
             default:
                 return null;
         }
     };
 
     const validateAll = (): boolean => {
-        const nextErrors: Errors = {};
-        const requiredFields: (keyof DeliveryAddress)[] = ["addressLine", "street"];
-        requiredFields.forEach((f) => {
+        const next: Errors = {};
+
+        const required: (keyof DeliveryAddress)[] = ["addressLine", "street"];
+        required.forEach((f) => {
             const err = validateField(f, (addr as any)[f]);
-            if (err) nextErrors[f] = err;
+            if (err) next[f] = err;
         });
 
-        const numericFields: (keyof DeliveryAddress)[] = ["house", "flat", "floor", "intercom"];
-        numericFields.forEach((f) => {
+        const numeric: (keyof DeliveryAddress)[] = ["house", "flat", "floor", "intercom"];
+        numeric.forEach((f) => {
             const err = validateField(f, (addr as any)[f]);
-            if (err) nextErrors[f] = err;
+            if (err) next[f] = err;
         });
 
-        setErrors(nextErrors);
-        return Object.keys(nextErrors).length === 0;
+        setErrors(next);
+        return Object.keys(next).length === 0;
+    };
+
+
+    const buildCreateDTO = (a: DeliveryAddress) => {
+        const entrance =
+            !a.intercom || isNoValue(a.intercom) ? null : a.intercom ? Number(a.intercom) : null;
+
+        return {
+            city: a.addressLine ?? "",
+            street: a.street ?? "",
+            house_number: a.house ? Number(a.house) : null,
+            entrance: entrance,
+            floor: a.floor ? Number(a.floor) : null,
+            apartment_number: a.flat ? Number(a.flat) : null,
+            comment: a.comment ?? null,
+            is_leave_at_door: a.leaveAtDoor ?? null,
+        };
+    };
+
+    const buildUpdateDTO = (a: DeliveryAddress) => {
+        const entrance =
+            !a.intercom || isNoValue(a.intercom) ? null : a.intercom ? Number(a.intercom) : null;
+
+        return {
+            id: a.id ?? null,
+            city: a.addressLine ?? null,
+            street: a.street ?? null,
+            house_number: a.house ? Number(a.house) : null,
+            entrance: entrance,
+            floor: a.floor ? Number(a.floor) : null,
+            apartment_number: a.flat ? Number(a.flat) : null,
+            comment: a.comment ?? null,
+            is_leave_at_door: a.leaveAtDoor ?? null,
+        };
     };
 
     const handleAddressSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
-        const ok = validateAll();
-        if (!ok) return;
 
-        setLoading(true);
+        if (!validateAll()) return;
+
+        setLoadingSubmit(true);
         try {
+            if (!addr.id) {
+                const body = buildCreateDTO(addr);
+                const res = await fetch("/api/addresses/", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) {
+                    let message = `Ошибка создания адреса: ${res.status}`;
+                    try {
+                        const json = await res.json();
+                        message = json?.detail || json?.message || message;
+                    } catch {
+                        // ignore
+                    }
+                    throw new Error(message);
+                }
+                const created = await res.json();
+                setAddr((prev) => ({...prev, id: created.id}));
+            } else {
+                const body = buildUpdateDTO(addr);
+                const res = await fetch(`/api/addresses/${addr.id}`, {
+                    method: "PATCH",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) {
+                    let message = `Ошибка обновления адреса: ${res.status}`;
+                    try {
+                        const json = await res.json();
+                        message = json?.detail || json?.message || message;
+                    } catch {
+                        // ignore
+                    }
+                    throw new Error(message);
+                }
+            }
+
             setStep("payment");
+        } catch (err) {
+            console.error(err);
         } finally {
-            setLoading(false);
+            setLoadingSubmit(false);
         }
     };
 
-    const FieldError: React.FC<{ field: keyof DeliveryAddress }> = ({field}) => {
-        const err = errors[field];
-        if (!err) return null;
-        return <div className="text-sm text-red-600 mt-1">{err}</div>;
+
+    const onBlurValidate = (field: keyof DeliveryAddress) => {
+        const err = validateField(field, (addr as any)[field]);
+        setErrors((prev) => ({...prev, [field]: err}));
     };
 
+
     return (
-        <div className={`w-full h-full p-6 ${className}`}>
+        <div className={`w-full h-full ${className}`}>
             {step === "address" ? (
-                <form onSubmit={handleAddressSubmit} className="text-xl xl:text-2xl flex flex-col bg-white rounded-xl">
-                    <div className="flex items-center justify-between">
-                        <h3 className=" font-semibold ">Адрес доставки</h3>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            aria-label="Закрыть корзину"
-                            className="p-6 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2"
-                        >
-                            <img className="w-4 h-4" src={closeSvg} alt=""/>
-                        </button>
+                <form
+                    onSubmit={handleAddressSubmit}
+                    className="h-full flex flex-col  bg-white rounded-xl text-base"
+                >
+                    <div className="flex items-center justify-between p-3">
+                        <h3 className="font-semibold text-2xl">Адрес доставки</h3>
+                        <CloseButton close={onClose}/>
                     </div>
 
-                    <div className="space-y-3 flex flex-col gap-3">
-                        <div className="grid grid-cols-2 gap-2">
+                    <div className="flex-1 min-h-0 overflow-auto p-4 sm:p-6 space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6">
                             <div>
+                                <label className="sr-only" htmlFor="city">
+                                    Город
+                                </label>
                                 <input
+                                    id="city"
+                                    name="city"
                                     type="text"
                                     value={addr.addressLine ?? ""}
                                     onChange={(e) => update({addressLine: e.target.value})}
-                                    onBlur={() => validateField("addressLine", addr.addressLine)}
+                                    onBlur={() => onBlurValidate("addressLine")}
                                     placeholder="Город"
-                                    className={`input ${errors.addressLine ? "border-red-300" : ""}`}
+                                    className={`input text-sm sm:text-base ${errors.addressLine ? "border-red-300" : ""}`}
                                     aria-invalid={!!errors.addressLine}
                                 />
-                                <FieldError field="addressLine"/>
+                                {errors.addressLine ? (
+                                    <div className="text-xs text-red-600 mt-1">{errors.addressLine}</div>
+                                ) : null}
                             </div>
 
                             <div>
+                                <label className="sr-only" htmlFor="street">
+                                    Улица
+                                </label>
                                 <input
+                                    id="street"
+                                    name="street"
                                     type="text"
                                     value={addr.street ?? ""}
                                     onChange={(e) => update({street: e.target.value})}
-                                    onBlur={() => validateField("street", addr.street)}
+                                    onBlur={() => onBlurValidate("street")}
                                     placeholder="Улица"
-                                    className={`input ${errors.street ? "border-red-300" : ""}`}
+                                    className={`input text-sm sm:text-base ${errors.street ? "border-red-300" : ""}`}
                                     aria-invalid={!!errors.street}
                                 />
-                                <FieldError field="street"/>
+                                {errors.street ? <div className="text-xs text-red-600 mt-1">{errors.street}</div> : null}
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
+                                <label className="sr-only" htmlFor="house">
+                                    Номер дома
+                                </label>
                                 <input
+                                    id="house"
+                                    name="house"
                                     inputMode="numeric"
                                     pattern="\d*"
                                     type="text"
                                     value={addr.house ?? ""}
-                                    onChange={(e) => {
-                                        // удаляем все не-цифры при вводе — удобный UX
-                                        const sanitized = e.target.value.replace(/[^\d]/g, "");
-                                        update({house: sanitized});
-                                    }}
+                                    onChange={(e) => update({house: e.target.value.replace(/[^\d]/g, "")})}
+                                    onBlur={() => onBlurValidate("house")}
                                     placeholder="Номер дома"
-                                    className={`input ${errors.house ? "border-red-300" : ""}`}
+                                    className={`input text-sm sm:text-base ${errors.house ? "border-red-300" : ""}`}
                                     aria-invalid={!!errors.house}
                                 />
-                                <FieldError field="house"/>
+                                {errors.house ? <div className="text-xs text-red-600 mt-1">{errors.house}</div> : null}
                             </div>
 
                             <div>
+                                <label className="sr-only" htmlFor="flat">
+                                    Номер квартиры
+                                </label>
                                 <input
+                                    id="flat"
+                                    name="flat"
                                     inputMode="numeric"
                                     pattern="\d*"
                                     type="text"
                                     value={addr.flat ?? ""}
                                     onChange={(e) => update({flat: e.target.value.replace(/[^\d]/g, "")})}
+                                    onBlur={() => onBlurValidate("flat")}
                                     placeholder="Номер квартиры"
-                                    className={`input ${errors.flat ? "border-red-300" : ""}`}
+                                    className={`input text-sm sm:text-base ${errors.flat ? "border-red-300" : ""}`}
                                     aria-invalid={!!errors.flat}
                                 />
-                                <FieldError field="flat"/>
+                                {errors.flat ? <div className="text-xs text-red-600 mt-1">{errors.flat}</div> : null}
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
+                                <label className="sr-only" htmlFor="intercom">
+                                    Домофон
+                                </label>
                                 <input
-                                    inputMode="numeric"
-                                    pattern="\d*"
+                                    id="intercom"
+                                    name="intercom"
                                     type="text"
                                     value={addr.intercom ?? ""}
-                                    onChange={(e) => update({intercom: e.target.value.replace(/[^\d]/g, "")})}
-                                    placeholder="Подъезд / домофон"
-                                    className={`input ${errors.intercom ? "border-red-300" : ""}`}
+                                    onChange={(e) => update({intercom: e.target.value})}
+                                    onBlur={() => onBlurValidate("intercom")}
+                                    placeholder='Домофон (цифра или "нет")'
+                                    className={`input text-sm sm:text-base ${errors.intercom ? "border-red-300" : ""}`}
                                     aria-invalid={!!errors.intercom}
                                 />
-                                <FieldError field="intercom"/>
+                                {errors.intercom ? <div className="text-xs text-red-600 mt-1">{errors.intercom}</div> : null}
                             </div>
 
                             <div>
+                                <label className="sr-only" htmlFor="floor">
+                                    Этаж
+                                </label>
                                 <input
+                                    id="floor"
+                                    name="floor"
                                     inputMode="numeric"
                                     pattern="\d*"
                                     type="text"
                                     value={addr.floor ?? ""}
                                     onChange={(e) => update({floor: e.target.value.replace(/[^\d]/g, "")})}
+                                    onBlur={() => onBlurValidate("floor")}
                                     placeholder="Этаж"
-                                    className={`input ${errors.floor ? "border-red-300" : ""}`}
+                                    className={`input text-sm sm:text-base ${errors.floor ? "border-red-300" : ""}`}
                                     aria-invalid={!!errors.floor}
                                 />
-                                <FieldError field="floor"/>
+                                {errors.floor ? <div className="text-xs text-red-600 mt-1">{errors.floor}</div> : null}
                             </div>
-
                         </div>
 
-                        <input
-                            type="text"
-                            value={addr.comment ?? ""}
-                            onChange={(e) => update({comment: e.target.value})}
-                            placeholder="Комментарий для курьера"
-                            className="input min-h-30"
-                        />
+                        <div>
+                            <label className="sr-only" htmlFor="comment">
+                                Комментарий
+                            </label>
+                            <input
+                                id="comment"
+                                name="comment"
+                                type="text"
+                                value={addr.comment ?? ""}
+                                onChange={(e) => update({comment: e.target.value})}
+                                placeholder="Комментарий для курьера"
+                                className="input text-sm sm:text-base min-h-30"
+                            />
+                        </div>
 
                         <ToggleSwitch
                             checked={!!addr.leaveAtDoor}
@@ -246,27 +439,26 @@ export const DeliveryForm: React.FC<Props> = ({
                             label="Оставить у двери"
                         />
 
-                        <div className="flex flex-col gap-3">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={`big__button btn__circle ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
-                            >
-                                Далее
-                            </button>
+                        <div className="h-24 md:h-28" aria-hidden/>
+                    </div>
 
-                            <BackButton onBack={() => setStep("cart")}/>
-                        </div>
+                    <div className="sticky bottom-0 bg-white p-2 sm:p-4 flex flex-col gap-3">
+                        <button
+                            type="submit"
+                            disabled={loadingSubmit}
+                            className={`big__button btn__circle w-full ${loadingSubmit ? "opacity-60 cursor-not-allowed" : ""}`}
+                        >
+                            Далее
+                        </button>
+
+                        <BackButton onBack={() => setStep("cart")}/>
                     </div>
                 </form>
             ) : (
-                <PaymentForm
-                    addr={addr}
-                    onSubmit={onSubmit}
-                    submitLabel={submitLabel}
-                    onBack={() => setStep("address")}
-                />
+                <PaymentForm addr={addr} onSubmit={onSubmit} submitLabel={submitLabel} onBack={() => setStep("address")}/>
             )}
+
+            {loadingFetch && (<Loader/>)}
         </div>
     );
 };

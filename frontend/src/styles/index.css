@@ -178,11 +178,11 @@ body {
     }
 
     .input {
-        @apply w-full rounded-lg border px-3 py-6 text-base border-gray-200 rounded-full focus:outline-none
+        @apply w-full rounded-lg border px-3 py-3 md:py-6 text-base border-gray-200 rounded-full focus:outline-none
     }
 
     .btn__gray {
-        @apply w-full sm:w-auto px-5 py-3 rounded-lg border border-gray-200 bg-white text-sm
+        @apply w-full sm:w-auto px-6 py-3 rounded-lg border border-gray-200 bg-white text-sm
     }
 
     .btn__circle {
