@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import Loader from "../components/Loaders/Loader";
+import config from "../../config.ts";
+import ToggleSwitch from "../components/Ui/ToggleSwitch.tsx";
 
-// Компактная страница регистрации с валидацией и POST-запросом на /api/register
 export default function Register() {
+    const [isConfirmData, setConfirmData] = useState(false)
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
@@ -16,14 +19,14 @@ export default function Register() {
     const [success, setSuccess] = useState(null);
     const [serverError, setServerError] = useState(null);
 
-    // Небольшие утилиты валидации
     const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        return /^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/.test(
+            String(email)
+        );
     };
 
     const isStrongPassword = (pw) => {
-        // Минимум 8 символов, хотя бы одна цифра и одна буква
-        return /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(pw);
+        return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{8,32}$/.test(pw);
     };
 
     const validate = (values) => {
@@ -34,13 +37,11 @@ export default function Register() {
         else if (!isValidEmail(values.email.trim())) e.email = "Некорректный email";
 
         if (!values.password) e.password = "Укажите пароль";
-        else if (!isStrongPassword(values.password))
-            e.password = "Пароль должен быть минимум 8 символов и содержать буквы и цифры";
+        else if (!isStrongPassword(values.password)) e.password = "Пароль должен быть 8–32 символа, содержать буквы и цифры";
 
         if (!values.confirmPassword) e.confirmPassword = "Подтвердите пароль";
         else if (values.password !== values.confirmPassword) e.confirmPassword = "Пароли не совпадают";
 
-        // birthdate опционально, но если указан — проверим формат даты
         if (values.birthdate) {
             const d = new Date(values.birthdate);
             if (Number.isNaN(d.getTime())) e.birthdate = "Некорректная дата";
@@ -61,19 +62,20 @@ export default function Register() {
         setServerError(null);
         const v = validate(form);
         setErrors(v);
-        if (Object.keys(v).length) return; // есть ошибки
+        if (Object.keys(v).length) return;
 
         setLoading(true);
         try {
             const payload = {
-                firstName: form.firstName.trim(),
-                lastName: form.lastName.trim(),
-                birthdate: form.birthdate || null,
+                first_name: form.firstName.trim(),
+                last_name: form.lastName.trim(),
                 email: form.email.trim().toLowerCase(),
                 password: form.password,
+                birthday: form.birthdate ? form.birthdate : null,
+                is_super_user: false,
             };
 
-            const res = await fetch("/api/register", {
+            const res = await fetch(config.API_URL + "/api/auth/register/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -81,8 +83,18 @@ export default function Register() {
 
             const json = await res.json().catch(() => null);
 
+            if (json && typeof json === "object" && "detail" in json && json.detail) {
+                setServerError(json.detail);
+                setLoading(false);
+                return;
+            }
+
+            if (json && json.msg && String(json.msg) === "Register succesfull") {
+                window.location.assign("/");
+                return;
+            }
+
             if (!res.ok) {
-                // Предпочитаем показать сообщение от сервера, иначе универсальное
                 const msg = (json && (json.error || json.message)) || `Ошибка: ${res.status}`;
                 setServerError(msg);
                 setLoading(false);
@@ -99,13 +111,13 @@ export default function Register() {
     };
 
     return (
-        <div className="flex items-center justify-center bg-gray-50 p-4">
+        <div className="flex items-center justify-center p-4">
             <form
                 onSubmit={handleSubmit}
                 className="w-full max-w-md bg-white shadow-md rounded-2xl p-6 gap-5 flex flex-col"
                 aria-label="Форма регистрации"
             >
-                <h2 className="text-lg font-semibold text-center">Регистрация</h2>
+                <h2 className="p-3 text-xl font-semibold text-center">Регистрация</h2>
 
                 <div className="grid grid-cols-2 gap-2">
                     <label className="flex flex-col text-sm">
@@ -115,7 +127,7 @@ export default function Register() {
                             name="firstName"
                             value={form.firstName}
                             onChange={onChange}
-                            className={`input p-2 text-sm rounded-md border ${errors.firstName ? "border-red-400" : "border-gray-200"}`}
+                            className={`input border ${errors.firstName ? "border-red-400" : "border-gray-200"}`}
                             aria-invalid={!!errors.firstName}
                         />
                         {errors.firstName && <small className="text-red-500 mt-1">{errors.firstName}</small>}
@@ -128,7 +140,7 @@ export default function Register() {
                             name="lastName"
                             value={form.lastName}
                             onChange={onChange}
-                            className={`input p-2 text-sm rounded-md border ${errors.lastName ? "border-red-400" : "border-gray-200"}`}
+                            className={`input rounded-md border ${errors.lastName ? "border-red-400" : "border-gray-200"}`}
                             aria-invalid={!!errors.lastName}
                         />
                         {errors.lastName && <small className="text-red-500 mt-1">{errors.lastName}</small>}
@@ -136,14 +148,14 @@ export default function Register() {
                 </div>
 
                 <label className="flex flex-col text-sm">
-                    <span className="mb-1">Дата рождения (не обязательно)</span>
+                    <span className="mb-1">Дата рождения</span>
                     <input
                         id="birthdate"
                         name="birthdate"
                         value={form.birthdate}
                         onChange={onChange}
                         type="date"
-                        className={`p-2 text-sm rounded-md border ${errors.birthdate ? "border-red-400" : "border-gray-200"}`}
+                        className={`input border ${errors.birthdate ? "border-red-400" : "border-gray-200"}`}
                         aria-invalid={!!errors.birthdate}
                     />
                     {errors.birthdate && <small className="text-red-500 mt-1">{errors.birthdate}</small>}
@@ -157,7 +169,7 @@ export default function Register() {
                         value={form.email}
                         onChange={onChange}
                         type="email"
-                        className={`p-2 text-sm rounded-md border ${errors.email ? "border-red-400" : "border-gray-200"}`}
+                        className={`input border ${errors.email ? "border-red-400" : "border-gray-200"}`}
                         aria-invalid={!!errors.email}
                         autoComplete="email"
                     />
@@ -173,7 +185,7 @@ export default function Register() {
                             value={form.password}
                             onChange={onChange}
                             type="password"
-                            className={`p-2 text-sm rounded-md border ${errors.password ? "border-red-400" : "border-gray-200"}`}
+                            className={`input border ${errors.password ? "border-red-400" : "border-gray-200"}`}
                             aria-invalid={!!errors.password}
                             autoComplete="new-password"
                         />
@@ -188,7 +200,7 @@ export default function Register() {
                             value={form.confirmPassword}
                             onChange={onChange}
                             type="password"
-                            className={`p-2 text-sm rounded-md border ${errors.confirmPassword ? "border-red-400" : "border-gray-200"}`}
+                            className={`input border ${errors.confirmPassword ? "border-red-400" : "border-gray-200"}`}
                             aria-invalid={!!errors.confirmPassword}
                             autoComplete="new-password"
                         />
@@ -199,15 +211,19 @@ export default function Register() {
                 {serverError && <div className="text-red-600 text-sm">{serverError}</div>}
                 {success && <div className="text-green-600 text-sm">{success}</div>}
 
+                <ToggleSwitch
+                    checked={isConfirmData}
+                    onCheckedChange={() => setConfirmData(!isConfirmData)}
+                    label={"Подтверждаю обработку персональных данных"}/>
+
                 <button
                     type="submit"
-                    className="btn__circle big__button  bg-blue-600"
-                    disabled={loading}
+                    className={`btn__circle bg-blue-600 hover:bg-blue-600/90 active:bg-blue-600/80`}
+                    disabled={!isConfirmData}
                     aria-busy={loading}
                 >
-                    {loading ? "Отправка..." : "Зарегистрироваться"}
+                    {loading ? <Loader /> : "Зарегистрироваться"}
                 </button>
-
             </form>
         </div>
     );

@@ -124,7 +124,6 @@ const DeliveryForm: React.FC<Props> = ({
                 return next;
             });
 
-            // validate changed fields
             for (const k of Object.keys(patch) as (keyof DeliveryAddress)[]) {
                 const v = (patch as any)[k];
                 const err = validateField(k, v ?? (addr as any)[k]);
@@ -454,7 +453,10 @@ const DeliveryForm: React.FC<Props> = ({
                     </div>
                 </form>
             ) : (
-                <PaymentForm addr={addr} onSubmit={onSubmit} submitLabel={submitLabel} onBack={() => setStep("address")}/>
+                <PaymentForm addr={addr}
+                             onSubmit={onSubmit}
+                             submitLabel={submitLabel}
+                             onBack={() => setStep("address")}/>
             )}
 
             {loadingFetch && (<Loader/>)}

@@ -2,9 +2,9 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from contextlib import asynccontextmanager
-
 from starlette.staticfiles import StaticFiles
 
 from src.addresses.presentation.api import addresses_api_router
@@ -26,6 +26,7 @@ from src.core.config import settings
 
 BASE_DIR = Path(__file__).resolve().parent
 static_dir = BASE_DIR / "static"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,6 +55,13 @@ async def app_exception_handler(request: Request, exc: AppException):
 Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 
 # middlewares
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.add_middleware(SecurityMiddleware)
 app.add_middleware(AuthenticationMiddleware)
 app.add_middleware(JWTRefreshMiddleware)

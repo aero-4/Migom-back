@@ -1,8 +1,8 @@
 import React, {JSX} from "react"
-import Categories from "../../components/Widgets/Categories.tsx";
-import Products from "../../components/Widgets/Products.tsx";
-import {CartWidget} from "../../components/Widgets/Cart.tsx";
-import {CartProvider} from "../../context/CartContext";
+import Categories from "../components/Widgets/Categories";
+import Products from "../components/Widgets/Products";
+import {CartWidget} from "../components/Widgets/Cart";
+import {CartProvider} from "../context/CartContext";
 
 export default function Home(): JSX.Element {
     return (
@@ -18,6 +18,7 @@ export default function Home(): JSX.Element {
                 <Products/>
 
                 <CartWidget/>
+
             </CartProvider>
         </>
     );

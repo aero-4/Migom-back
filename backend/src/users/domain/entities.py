@@ -7,17 +7,17 @@ class User(CustomModel):
     id: int
     first_name: str
     last_name: str
-    birthday: datetime.date
     email: str
     hashed_password: str
     is_super_user: bool
+    birthday: datetime.date | None = None
 
 
 class UserInfo(CustomModel):
     first_name: str
     last_name: str
-    birthday: datetime.date
     email: str
+    birthday: datetime.date | None = None
 
 
 class UserCreate(CustomModel):

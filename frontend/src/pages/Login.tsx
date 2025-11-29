@@ -1,8 +1,9 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+// src/pages/Login.jsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {useAuth} from "../../context/AuthContext.tsx";
+import { useAuth } from "../context/AuthContext";
 
-function Login() {
+export default function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -24,6 +25,11 @@ function Login() {
             return;
         }
 
+        if (form.password.length < 8) {
+            setError("Пароль должен быть минимум 8 символов");
+            return;
+        }
+
         setLoading(true);
         const res = await login({ email: form.email.trim(), password: form.password });
         setLoading(false);
@@ -33,14 +39,13 @@ function Login() {
             return;
         }
 
-        // Успешный вход — редирект на главную
         navigate("/");
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-            <form onSubmit={handleSubmit} className="w-full max-w-md bg-white shadow-md rounded-2xl p-4 gap-4 flex flex-col">
-                <h2 className="text-lg font-semibold text-center">Вход</h2>
+        <div className="flex items-center justify-center p-4">
+            <form onSubmit={handleSubmit} className="w-full max-w-md bg-white shadow-md rounded-2xl p-6 gap-4 flex flex-col">
+                <h2 className="text-xl font-semibold text-center">Вход</h2>
 
                 <label className="flex flex-col text-sm">
                     <span className="mb-1">Email</span>
@@ -49,7 +54,7 @@ function Login() {
                         value={form.email}
                         onChange={onChange}
                         type="email"
-                        className="p-2 text-sm rounded-md border border-gray-200"
+                        className="input"
                         autoComplete="email"
                     />
                 </label>
@@ -61,7 +66,7 @@ function Login() {
                         value={form.password}
                         onChange={onChange}
                         type="password"
-                        className="p-2 text-sm rounded-md border border-gray-200"
+                        className="input"
                         autoComplete="current-password"
                     />
                 </label>
@@ -69,17 +74,21 @@ function Login() {
                 {error && <div className="text-red-600 text-sm">{error}</div>}
 
                 <div className="flex flex-col gap-3">
-                    <button type="submit" className="w-full py-2 text-sm rounded-xl bg-blue-600 text-white font-medium disabled:opacity-60" disabled={loading}>
+                    <button
+                        type="submit"
+                        className="btn__circle bg-blue-600 hover:bg-blue-600/90 active:bg-blue-600/80"
+                        disabled={loading}
+                    >
                         {loading ? "Вход..." : "Войти"}
                     </button>
                 </div>
 
-                <div className="text-center mt-2 text-sm">
-                    <button type="button" className="underline" onClick={() => navigate("/register")}>Зарегистрироваться</button>
+                <div className="text-center mt-3 text-sm">
+                    <button type="button" className="w-full" onClick={() => navigate("/register")}>
+                        Зарегистрироваться
+                    </button>
                 </div>
             </form>
         </div>
     );
 }
-
-export default Login;
