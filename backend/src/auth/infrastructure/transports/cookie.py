@@ -12,7 +12,7 @@ class CookieTransport(IAuthTransport):
             cookie_max_age: int | None = None,
             cookie_path: str = "/",
             cookie_domain: str | None = None,
-            cookie_secure: bool = False,
+            cookie_secure: bool = True,
             cookie_httponly: bool = False,
             cookie_samesite: Literal["lax", "strict", "none"] = "none",
     ):
@@ -36,9 +36,9 @@ class CookieTransport(IAuthTransport):
             value=token,
             max_age=self.cookie_max_age,
             path=self.cookie_path,
-            # domain=self.cookie_domain,
+            domain=self.cookie_domain,
             secure=self.cookie_secure,
-            # httponly=self.cookie_httponly,
+            httponly=self.cookie_httponly,
             samesite=self.cookie_samesite,
         )
 

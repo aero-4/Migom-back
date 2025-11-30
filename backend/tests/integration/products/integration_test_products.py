@@ -212,7 +212,7 @@ async def test_success_get_all_by_name_filters(clear_db, user_factory):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_add_some_products_and_categories(clear_db, user_factory, count=25):
+async def test_add_some_products_and_categories(clear_db, user_factory, count: int = 25):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         await user_factory(client, TEST_SUPER_USER)
 

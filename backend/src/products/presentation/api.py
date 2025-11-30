@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from src.auth.presentation.permissions import access_control
 from src.products.application.use_cases.collect_product import collect_products, collect_product, collect_products_by_filters
 from src.products.application.use_cases.create_product import create_product
 from src.products.application.use_cases.delete_product import delete_product
@@ -21,21 +22,24 @@ async def get(product_id: int, uow: ProductUoWDep):
     return await collect_product(product_id, uow)
 
 
-@products_api_router.post("/")
-async def add(product_data: ProductCreateDTO, uow: ProductUoWDep):
-    return await create_product(product_data, uow)
-
-
 @products_api_router.post("/search")
 async def search(search_data: SearchDataDTO, uow: ProductUoWDep):
     return await collect_products_by_filters(search_data, uow)
 
 
+@access_control(superuser=True)
+@products_api_router.post("/")
+async def add(product_data: ProductCreateDTO, uow: ProductUoWDep):
+    return await create_product(product_data, uow)
+
+
+@access_control(superuser=True)
 @products_api_router.patch("/{product_id}")
 async def patch(product_id: int, product_data: ProductUpdateDTO, uow: ProductUoWDep):
     return await update_product(product_id, product_data, uow)
 
 
+@access_control(superuser=True)
 @products_api_router.delete("/{product_id}")
 async def delete(product_id: int, uow: ProductUoWDep):
     return await delete_product(product_id, uow)
