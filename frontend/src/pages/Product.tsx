@@ -53,7 +53,7 @@ const Product: React.FC = () => {
         };
 
         fetchProduct();
-    }, [product_id]); // <-- зависимость product_id
+    }, [product_id]);
 
     if (loading) return <div>Загрузка...</div>;
     if (error) return <div>Ошибка: {error}</div>;

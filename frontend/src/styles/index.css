@@ -113,11 +113,15 @@ body {
         bg-white
         rounded-xl
         min-w-0
-        gap-2
+        gap-3
         p-3
-        md:p-4
+        md:p-6
         overflow-hidden
         max-w-150
+    }
+
+    .badge__covered {
+        @apply absolute text-center px-2 text-[11px] md:text-[13px] bg-lime-300 rounded-xl text-gray-600
     }
 
     .img {
@@ -125,15 +129,15 @@ body {
     }
 
     .cat__img {
-        @apply max-w-32 max-h-32 md:max-h-48 md:max-w-48 w-full aspect-square rounded-xl object-cover bg-gray-100 transition-transform transform;
+        @apply items-center mx-auto max-w-32 max-h-32 md:max-h-40 md:max-w-48 w-full aspect-square rounded-xl object-cover bg-gray-100 transition-transform transform;
     }
 
     .product__img {
-        @apply w-full min-w-25 min-h-25 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform hover:scale-101;
+        @apply w-full min-w-25 min-h-25 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform;
     }
 
     .product__name {
-        @apply text-xs font-bold text-gray-700 truncate max-w-50 mt-2
+        @apply min-w-0 text-[13px] font-medium text-gray-700 truncate line-clamp-2
     }
 
     .product__name--2lines {
@@ -148,6 +152,9 @@ body {
         @apply w-full rounded-lg border px-3 py-2 text-base border-gray-200 bg-white
     }
 
+    .cat__name {
+        @apply text-sm md:text-lg text-gray-900 text-center justify-center truncate p-2
+    }
     .form__field:focus {
         outline: none;
         box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);

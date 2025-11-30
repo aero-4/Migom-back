@@ -147,14 +147,15 @@ export const CartWidget: React.FC = () => {
                                     <ul className="space-y-5 w-full p-2">
                                         {items.map((item) => (
                                             <li key={item.id}
-                                                className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100"
-                                                onClick={() => useNavigate()}>
+                                                className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100">
                                                 <div
                                                     className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
                                                     {item.image ? (
                                                         <img src={item.image}
                                                              alt={item.name}
-                                                             className="w-full h-full object-cover"/>
+                                                             className="w-full h-full object-cover cursor-pointer"
+                                                             onClick={()=> document.location.href = "/product/" + item.id}
+                                                        />
                                                     ) : (
                                                         <div className="text-xs text-gray-400">
                                                             WITHOUT PHOTO

@@ -83,7 +83,6 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         fetchCurrentUser();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -162,8 +161,6 @@ export function AuthProvider({ children }) {
         }
         setUser(null);
         setIsAuthenticated(false);
-        setCookie("access_token", "", { maxAge: 0, path: "/" });
-        setCookie("refresh_token", "", { maxAge: 0, path: "/" });
     };
 
     return (

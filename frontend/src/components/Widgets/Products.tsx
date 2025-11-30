@@ -1,11 +1,7 @@
-import React, {JSX, useEffect, useState} from "react";
-
-import fishJpeg from "../../assets/image_test.jpg";
+import {JSX, useEffect, useState} from "react";
 import AddInCartBtn from "../Ui/AddInCartButton.tsx";
-import chickenPng from "../../assets/chicken.jpg";
-import breadPng from "../../assets/bread.jpg";
 
-type RawProduct = {
+type Product = {
     id?: string;
     name?: string;
     slug?: string;
@@ -17,7 +13,7 @@ type RawProduct = {
 };
 
 export default function Products(): JSX.Element {
-    const [products, setProducts] = useState<RawProduct[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
 
     const genUuid = (): string => {
         if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
@@ -25,41 +21,7 @@ export default function Products(): JSX.Element {
         }
         return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
     };
-
-    const mock = [
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-        {name: "Мясо цыпленка бройлера", slug: "chicken", photo: chickenPng, count: 34, price: 199, gramme: 400},
-        {name: "Хлеб русский черный", slug: "bread-1", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Хлеб русский", slug: "bread-2", photo: breadPng, count: 19, price: 199, gramme: 400},
-        {name: "Рыба соленая здравушка с икрой", slug: "fish-1", photo: fishJpeg, count: 19, price: 199, gramme: 400},
-
-    ];
-
-    // Нормализуем и добавляем id если нет
-    const normalize = (arr: RawProduct[]) =>
+    const normalize = (arr: Product[]) =>
         arr.map((p) => ({
             ...p,
             id: p.id && String(p.id).trim() ? String(p.id) : genUuid(),
@@ -81,11 +43,11 @@ export default function Products(): JSX.Element {
                 const data = await res.json();
                 if (!cancelled) {
                     const normalized = normalize(Array.isArray(data) ? data : []);
-                    setProducts(normalized.length ? normalized : normalize(mock));
+                    setProducts(normalized);
                 }
             } catch {
                 if (!cancelled) {
-                    setProducts(normalize(mock));
+                    setProducts(normalized);
                 }
             }
         };
@@ -103,7 +65,6 @@ export default function Products(): JSX.Element {
                             sm:grid-cols-2
                             md:grid-cols-3
                             lg:grid-cols-4
-                            xl:grid-cols-5
                             gap-2">
 
 
@@ -112,18 +73,49 @@ export default function Products(): JSX.Element {
                         key={product.id ?? product.slug}
                         className="product__card"
                     >
-                        <a href={`/product/${product.slug}`}>
-                            <img src={product.photo} alt={product.slug} className="product__img"/>
+                        <a href={`/product/${product.id}`}>
+
+                            <img src={product.photo}
+                                 alt="Фото продукта"
+                                 className="product__img"/>
+
                         </a>
 
-                        <p className="product__name">{product.name}</p>
+                        <p className="product__name product__name--2lines">{product.name} daeqwe qwads eqw wqeadsadasd eqwewqewqeads eqwads</p>
 
-                        <div className="flex items-center mt-2">
-                            <div className="min-w-0">
-                                <span className="text-gray-500 text-xs block">{product.gramme} г</span>
-                                <p className="text-[18px] lg:text-lg font-bold">{product.price} ₽</p>
+                        <div className="flex items-center">
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-xs block">
+                                    {product.gramme} г
+                                </span>
+
+                                {product.discount_price ? (
+                                    <div className="flex flex-col">
+                                        <p className="font-bold text-gray-500 line-through">
+                                            {product.price} ₽
+                                        </p>
+
+                                        <p className="text-xl md:text-2xl font-bold">
+                                            {product.discount_price} ₽
+                                        </p>
+
+                                        <p className="badge__covered ml-11">
+                                            -{product.discount}%
+                                        </p>
+
+                                    </div>
+                                ) : (
+                                    <div>
+                                    <p className="text-xl md:text-2xl font-bold">
+                                            {product.price} ₽
+                                        </p>
+                                    </div>
+                                )}
+
+
                             </div>
-                            <div className="ml-auto mt-2">
+
+                            <div className="ml-auto mt-7">
                                 <AddInCartBtn product={product}/>
                             </div>
                         </div>
