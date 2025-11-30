@@ -13,7 +13,8 @@ class PaymentCreate(CustomModel):
     order_id: int
     amount: int
     payment_method: str
-
+    label: str
+    url: str | None = None
 
 
 class PaymentUpdate(CustomModel):

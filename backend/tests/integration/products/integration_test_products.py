@@ -44,10 +44,12 @@ async def create_product(client, product=None):
     resp = await client.post("/api/files/", files={"file": open(random.choice(TEST_PHOTOS), "rb")})
     url = resp.json()["url"]
 
-    TEST_CATEGORY_DTO.name = "Бургеры " + str(random.randint(1, 1000))
-    TEST_CATEGORY_DTO.photo = url
+    category = CategoryCreateDTO(
+        name=f"Бургеры №{random.randint(1, 1000)}",
+        photo=url
+    )
 
-    response1 = await client.post("/api/categories/", json=TEST_CATEGORY_DTO.model_dump(mode="json"))
+    response1 = await client.post("/api/categories/", json=category.model_dump(mode="json"))
     category = Category(**response1.json())
     product = product or ProductCreateDTO(
         name=f"Бургер - Бургерный №{random.randint(1, 2000)} ",

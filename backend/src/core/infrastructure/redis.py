@@ -1,6 +1,6 @@
 import logging
-from functools import lru_cache
 
+from functools import lru_cache
 from redis.asyncio import Redis
 
 from src.core.config import settings

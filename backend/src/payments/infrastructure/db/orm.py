@@ -21,4 +21,5 @@ class PaymentsOrm:
     amount: Mapped[int] = mapped_column(nullable=False)
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     payment_method: Mapped[str] = mapped_column(nullable=False)
+    url: str | None = None
     status: Mapped[str] = mapped_column(nullable=False, default=PaymentsStatus.created)
