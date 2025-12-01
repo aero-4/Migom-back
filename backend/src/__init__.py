@@ -20,6 +20,7 @@ from src.auth.presentation.middlewares.jwtrefresh import JWTRefreshMiddleware
 from src.auth.presentation.api import auth_api_router
 from src.files.presentation.api import files_api_router
 from src.orders.presentation.api import orders_api_router
+from src.payments.presentation.api import payments_api_router
 from src.products.presentation.api import products_api_router
 from src.users.presentation.api import users_api_router
 from src.core.config import settings
@@ -75,6 +76,7 @@ app.include_router(products_api_router, prefix='/api/products', tags=["Products"
 app.include_router(files_api_router, prefix='/api/files', tags=["Files"])
 app.include_router(orders_api_router, prefix='/api/orders', tags=["Orders"])
 app.include_router(addresses_api_router, prefix='/api/addresses', tags=["Addresses"])
+app.include_router(payments_api_router, prefix='/api/payments', tags=["Payments"])
 
 # static
 app.mount("/static", StaticFiles(directory=static_dir), name="static")

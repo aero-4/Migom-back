@@ -5,14 +5,14 @@ class Payment(CustomModel):
     id: int
     amount: int
     order_id: int
-    payment_method: str
+    method: str
     status: str
 
 
 class PaymentCreate(CustomModel):
     order_id: int
     amount: int
-    payment_method: str
+    method: str
     label: str
     url: str | None = None
 
@@ -22,3 +22,5 @@ class PaymentUpdate(CustomModel):
     order_id: int | None = None
     amount: int | None = None
     payment_method: str | None = None
+
+

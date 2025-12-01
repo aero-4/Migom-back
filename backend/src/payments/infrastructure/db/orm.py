@@ -20,6 +20,6 @@ class PaymentsOrm:
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), onupdate=get_timezone_now, default=get_timezone_now)
     amount: Mapped[int] = mapped_column(nullable=False)
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
-    payment_method: Mapped[str] = mapped_column(nullable=False)
-    url: str | None = None
+    method: Mapped[str] = mapped_column(nullable=False)
     status: Mapped[str] = mapped_column(nullable=False, default=PaymentsStatus.created)
+    url: Mapped[str] = mapped_column(nullable=False)

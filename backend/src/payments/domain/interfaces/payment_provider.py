@@ -1,6 +1,6 @@
 import abc
 
-from src.payments.domain.entities import PaymentCreate
+from src.payments.domain.entities import PaymentCreate, Payment
 
 
 class IPaymentProvider:
@@ -9,4 +9,4 @@ class IPaymentProvider:
     async def create(self, payment_data: PaymentCreate) -> str: ...
 
     @abc.abstractmethod
-    async def process(self, payment_id: str) -> dict: ...
+    async def process(self, label: str) -> bool: ...

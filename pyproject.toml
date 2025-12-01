@@ -35,5 +35,6 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "aiofiles",
     "aiobotocore>=2.25.2",
+    "aiomoney>=3.0.2",
 ]
 

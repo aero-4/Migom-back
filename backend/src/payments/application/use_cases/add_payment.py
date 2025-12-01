@@ -5,12 +5,11 @@ from src.payments.domain.interfaces.payment_provider import IPaymentProvider
 from src.payments.presentation.dependenscies import PaymentUoWDeps
 
 
-async def add_payment(order: Order, uow: PaymentUoWDeps, method: str, provider: IPaymentProvider):
-    label = f"Оплата заказа: {order.id}"
+async def add_payment(order: Order, uow: PaymentUoWDeps, provider: IPaymentProvider, method: str = "yoomoney"):
     payment = PaymentCreate(amount=order.amount,
                             order_id=order.id,
                             payment_method=method,
-                            label=label)
+                            label=f"Оплата заказа: {order.id}")
 
     async with uow:
         payment_url: str = await provider.create(payment)

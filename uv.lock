@@ -97,6 +97,19 @@ wheels = [
 ]
 
 [[package]]
+name = "aiomoney"
+version = "3.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6f/81/5a5390ad5eab0b6df121fe54652fde31388c6a431e567b81e5b7143574c1/aiomoney-3.0.2.tar.gz", hash = "sha256:eb2e23cfd7e1a942aac57f4fe970631c9db806ffedbed55cbd0e87a436193af0", size = 6247, upload-time = "2024-12-22T11:12:07.973Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/ec/65d5b7de2e805fd26d3a49f877f5db785bfa9c0e19fc16bc54ee8066d09e/aiomoney-3.0.2-py3-none-any.whl", hash = "sha256:8a0a731d4e29f1ffd30fbfcd5a785d96a6633e71a233f3c0d8c89b21ac068d9b", size = 8072, upload-time = "2024-12-22T11:12:05.304Z" },
+]
+
+[[package]]
 name = "aiosignal"
 version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -870,6 +883,7 @@ dependencies = [
     { name = "aiobotocore" },
     { name = "aiofiles" },
     { name = "aiohttp" },
+    { name = "aiomoney" },
     { name = "aiosqlite" },
     { name = "alembic" },
     { name = "asgiref" },
@@ -904,6 +918,7 @@ requires-dist = [
     { name = "aiobotocore", specifier = ">=2.25.2" },
     { name = "aiofiles" },
     { name = "aiohttp", specifier = "==3.11.14" },
+    { name = "aiomoney", specifier = ">=3.0.2" },
     { name = "aiosqlite", specifier = "==0.21.0" },
     { name = "alembic", specifier = "==1.15.1" },
     { name = "asgiref", specifier = "==3.8.1" },

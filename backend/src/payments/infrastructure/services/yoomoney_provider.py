@@ -1,11 +1,8 @@
-import asyncio
 import logging
-
 import httpx
+import aiohttp
+from yarl import URL
 
-from aiomoney.aiomoney import authorize_app, YooMoney
-from aiomoney.aiomoney.schemas import InvoiceSource
-from src import settings
 from src.payments.config import payment_settings
 from src.payments.domain.entities import PaymentCreate
 from src.payments.domain.interfaces.payment_provider import IPaymentProvider
@@ -16,35 +13,57 @@ class YoomoneyProvider(IPaymentProvider):
         self.client_id: str = payment_settings.YOOMONEY_CLIENT_ID
         self.secret_key: str = payment_settings.YOOMONEY_SECRET_KEY
         self.redirect_uri: str = payment_settings.YOOMONEY_REDIRECT_URI
-
-        self.wallet = YooMoney(access_token=payment_settings.YOOMONEY_ACCESS_TOKEN)
-
-    async def create(self, payment: PaymentCreate) -> str:
-        # async with httpx.AsyncClient(base_url="https://yoomoney.ru/api/") as session:
-        #     response = await session.post(
-        #         "/request-payment",
-        #         json=payment.model_dump(exclude={"order_id", "payment_method"}),
-        #     )
-
-        payment_form = await self.wallet.create_invoice(
-            amount_rub=payment.amount,
-            label=payment.label,
-            payment_source=InvoiceSource.YOOMONEY_WALLET,
+        self.session = aiohttp.ClientSession(
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": f"Bearer {payment_settings.YOOMONEY_ACCESS_TOKEN}"
+            }
         )
-        return payment_form.url
 
-    async def process(self, payment_id: str) -> dict:
-        return {}
+    async def create(self, payment: PaymentCreate) -> URL | None:
+        async with self._get_client() as session:
+            account = await self._get_account_info()
+
+            params = {
+                "receiver": account,
+                "sum": payment.amount,
+                "successURL": self.redirect_uri,
+                "label": payment.label,
+                "quickpay-form": "button",
+                "paymentType": "AC",
+
+            }
+            response = await session.post(
+                url="https://yoomoney.ru/quickpay/confirm.xml?",
+                params=params,
+            )
+        return response.url if response.url else None
+
+    async def process(self, label: str) -> bool:
+        async with self._get_client() as session:
+            response = await session.post(
+                url=f"https://yoomoney.ru/api/operation-history",
+            )
+            response.raise_for_status()
+
+            data = await response.json()
+            operations = data.get("operations", [])
+
+            print(f"Operations: {operations}")
+
+            if not operations:
+                return False
+
+        for operation in operations:
+            if operation.get("label") == label:
+                return True
+
+        return False
 
     async def _authorize(self) -> str | None:
-        """
-        Get code authorization from Yoomoney
-        Returns: str
-        """
-        async with httpx.AsyncClient() as session:
+        async with self._get_client() as session:
             response = await session.post(
                 f"https://yoomoney.ru/api/oauth/authorize",
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
                 params={
                     "client_id": self.client_id,
                     "response_type": "code",
@@ -56,19 +75,13 @@ class YoomoneyProvider(IPaymentProvider):
             response.raise_for_status()
 
         logging.info(response.url)
-        code = response.url.params.get("code")
-
+        code = response.url.query.get("code")
         return code
 
     async def _get_access_token(self):
-        """
-        Get access token from Yoomoney
-        Returns: str
-        """
-        async with httpx.AsyncClient(base_url="https://yoomoney.ru/api/") as session:
+        async with self._get_client() as session:
             response = await session.post(
-                f"/oauth/token",
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                f"https://yoomoney.ru/api/oauth/token",
                 data={
                     "client_id": self.client_id,
                     "code": "authorization code",
@@ -78,11 +91,27 @@ class YoomoneyProvider(IPaymentProvider):
                 follow_redirects=True
             )
             response.raise_for_status()
-
-        data = response.json()
+            data = await response.json()
 
         if data.get("error"):
             logging.error("Not get access token: %s", data.get("error"))
             return None
 
         return data.get("access_token", None)
+
+    async def _get_account_info(self) -> str | None:
+        response = await self.session.post(
+            url="https://yoomoney.ru/api/account-info",
+        )
+        response.raise_for_status()
+        data = await response.json()
+
+        return data.get("account")
+
+    def _get_client(self) -> aiohttp.ClientSession:
+        return aiohttp.ClientSession(
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": f"Bearer {payment_settings.YOOMONEY_ACCESS_TOKEN}"
+            }
+        )

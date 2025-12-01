@@ -3,17 +3,16 @@ from starlette.requests import Request
 
 from src.auth.presentation.dependencies import TokenAuthDep
 from src.orders.domain.entities import Order
-from src.orders.presentation.dtos import OrderCreateDTO
 from src.payments.application.use_cases.add_payment import add_payment
 from src.payments.application.use_cases.get_callback import get_payment_callback
 from src.payments.infrastructure.services.yoomoney_provider import YoomoneyProvider
-from src.payments.presentation.dependenscies import PaymentUoWDeps
+from src.payments.presentation.dependenscies import PaymentUoWDeps, PaymentProviderDeps
 
 payments_api_router = APIRouter()
 
 
-@payments_api_router.post("/yoomoney")
-async def add(order: Order, auth: TokenAuthDep, payment: PaymentUoWDeps, provider: YoomoneyProvider):
+@payments_api_router.post("/")
+async def add(order: Order, auth: TokenAuthDep, payment: PaymentUoWDeps, provider: PaymentProviderDeps):
     return await add_payment(order, payment, provider)
 
 
