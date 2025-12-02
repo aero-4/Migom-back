@@ -12,9 +12,8 @@ def get_payment_uow() -> IPaymentUnitOfWork:
     return PGPaymentUnitOfWork()
 
 
-def get_payment_provider(method: str) -> IPaymentProvider:
-    if method == "yoomoney":
-        return YoomoneyProvider()
+def get_payment_provider() -> IPaymentProvider:
+    return YoomoneyProvider()
 
 
 PaymentUoWDeps = Annotated[IPaymentUnitOfWork, Depends(get_payment_uow)]

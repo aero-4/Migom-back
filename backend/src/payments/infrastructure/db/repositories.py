@@ -19,7 +19,7 @@ class PGPaymentRepository(IPaymentRepository):
         self.session = session
 
     async def add(self, payment: PaymentCreate) -> Payment:
-        obj: PaymentsOrm = PaymentsOrm(**payment.model_dump())
+        obj: PaymentsOrm = PaymentsOrm(**payment.model_dump(mode="python"))
         self.session.add(obj)
 
         try:
@@ -64,6 +64,7 @@ class PGPaymentRepository(IPaymentRepository):
     def _to_domain(obj: PaymentsOrm) -> Payment:
         return Payment(
             id=obj.id,
+            label=obj.label,
             amount=obj.amount,
             order_id=obj.order_id,
             method=obj.method,

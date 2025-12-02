@@ -14,8 +14,8 @@ class YoomoneyProvider(IPaymentProvider):
         self.secret_key: str = payment_settings.YOOMONEY_SECRET_KEY
         self.redirect_uri: str = payment_settings.YOOMONEY_REDIRECT_URI
 
-    async def create(self, payment: PaymentCreate) -> URL | None:
-        async with self._get_client() as session:
+    async def create(self, payment: PaymentCreate) -> str | None:
+        async with self._get_client() as client:
             account = await self._get_account_info()
 
             params = {
@@ -27,15 +27,15 @@ class YoomoneyProvider(IPaymentProvider):
                 "paymentType": "AC",
 
             }
-            response = await session.post(
+            response = await client.post(
                 url="https://yoomoney.ru/quickpay/confirm.xml?",
                 params=params,
             )
-        return response.url if response.url else None
+        return str(response.url) if response.url else None
 
     async def check_status(self, label: str) -> bool:
-        async with self._get_client() as session:
-            response = await session.post(
+        async with self._get_client() as client:
+            response = await client.post(
                 url=f"https://yoomoney.ru/api/operation-history",
             )
             response.raise_for_status()
@@ -53,8 +53,8 @@ class YoomoneyProvider(IPaymentProvider):
         return False
 
     async def _authorize(self) -> str | None:
-        async with self._get_client() as session:
-            response = await session.post(
+        async with self._get_client() as client:
+            response = await client.post(
                 f"https://yoomoney.ru/api/oauth/authorize",
                 params={
                     "client_id": self.client_id,
@@ -71,8 +71,8 @@ class YoomoneyProvider(IPaymentProvider):
         return code
 
     async def _get_access_token(self):
-        async with self._get_client() as session:
-            response = await session.post(
+        async with self._get_client() as client:
+            response = await client.post(
                 f"https://yoomoney.ru/api/oauth/token",
                 data={
                     "client_id": self.client_id,
@@ -92,11 +92,12 @@ class YoomoneyProvider(IPaymentProvider):
         return data.get("access_token", None)
 
     async def _get_account_info(self) -> str | None:
-        response = await self.session.post(
-            url="https://yoomoney.ru/api/account-info",
-        )
-        response.raise_for_status()
-        data = await response.json()
+        async with self._get_client() as client:
+            response = await client.post(
+                url="https://yoomoney.ru/api/account-info",
+            )
+            response.raise_for_status()
+            data = await response.json()
 
         return data.get("account")
 
