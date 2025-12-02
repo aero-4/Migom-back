@@ -105,12 +105,43 @@ async def create_order(client, user_factory) -> Order:
 async def test_success_create_payment(clear_db, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         order = await create_order(client, user_factory)
-        print(order, order.id)
         payment_dto = PaymentCreateDTO(order_id=order.id, amount=order.amount, method="yoomoney")
-        print(payment_dto)
         response = await client.post("/api/payments/", json=payment_dto.model_dump())
-        print(response.text)
         payment = Payment(**response.json())
 
         assert payment.order_id == order.id
         assert payment.label == f"Оплата заказа: {order.id}"
+
+
+@pytest.mark.asyncio
+async def test_success_get_one(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        order1 = await create_order(client, user_factory)
+        payment_dto = PaymentCreateDTO(order_id=order1.id, amount=order1.amount, method="yoomoney")
+        response = await client.post("/api/payments/", json=payment_dto.model_dump())
+
+        assert response.status_code == 200
+
+        response = await client.get(f"/api/payments/{order1.id}")
+        payment = Payment(**response.json())
+
+        assert response.status_code == 200
+        assert payment.amount == payment_dto.amount
+        assert payment.method == payment_dto.method
+
+
+@pytest.mark.asyncio
+async def test_success_get_all(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        order1 = await create_order(client, user_factory)
+        payment_dto = PaymentCreateDTO(order_id=order1.id, amount=order1.amount, method="yoomoney")
+        response = await client.post("/api/payments/", json=payment_dto.model_dump())
+
+        assert response.status_code == 200
+
+        response = await client.get(f"/api/payments/")
+        payments = [Payment(**i) for i in response.json()]
+
+        assert response.status_code == 200
+        assert payments[0].amount == payment_dto.amount
+

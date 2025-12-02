@@ -6,11 +6,13 @@ class Payment(CustomModel):
     amount: int
     label: str
     order_id: int
+    user_id: int
     method: str
     status: str
 
 
 class PaymentCreate(CustomModel):
+    user_id: int
     order_id: int
     amount: int
     method: str

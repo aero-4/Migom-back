@@ -10,7 +10,7 @@ class IPaymentRepository(abc.ABC):
         ...
 
     @abc.abstractmethod
-    async def get(self, payment_id: int) -> Payment:
+    async def get(self, payment_id: int, user_id: int) -> Payment:
         ...
 
     @abc.abstractmethod

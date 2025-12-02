@@ -7,7 +7,3 @@ class PaymentCreateDTO(BaseModel):
     method: str | None = None
 
 
-class PaymentUpdateDTO(BaseModel):
-    order_id: int
-    amount: int | None = None
-    method: str | None = None

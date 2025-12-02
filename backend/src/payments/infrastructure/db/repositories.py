@@ -30,8 +30,10 @@ class PGPaymentRepository(IPaymentRepository):
 
         return self._to_domain(obj)
 
-    async def get(self, payment_id: int) -> Payment:
-        obj: PaymentsOrm | None = await self.session.get(payment_id, PaymentsOrm)
+    async def get(self, payment_id: int, user_id: int) -> Payment:
+        stmt = select(PaymentsOrm).where(PaymentsOrm.id == payment_id and PaymentsOrm.user_id == user_id)
+        result = await self.session.execute(stmt)
+        obj = result.scalar_one_or_none()
 
         if not obj:
             raise NotFound()
@@ -67,6 +69,7 @@ class PGPaymentRepository(IPaymentRepository):
             label=obj.label,
             amount=obj.amount,
             order_id=obj.order_id,
+            user_id=obj.user_id,
             method=obj.method,
             status=obj.status
         )
