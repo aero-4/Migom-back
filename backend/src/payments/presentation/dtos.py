@@ -1,12 +1,13 @@
+from pydantic import BaseModel
 
 
-class PaymentCreateDTO:
+class PaymentCreateDTO(BaseModel):
     order_id: int
     amount: int
-    method: str
+    method: str | None = None
 
 
-class PaymentUpdateDTO:
+class PaymentUpdateDTO(BaseModel):
     order_id: int
     amount: int | None = None
     method: str | None = None

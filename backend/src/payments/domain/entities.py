@@ -4,6 +4,7 @@ from src.core.domain.entities import CustomModel
 class Payment(CustomModel):
     id: int
     amount: int
+    label: str
     order_id: int
     method: str
     status: str
@@ -19,8 +20,7 @@ class PaymentCreate(CustomModel):
 
 class PaymentUpdate(CustomModel):
     id: int
-    order_id: int | None = None
     amount: int | None = None
-    payment_method: str | None = None
+    status: str | None = None
 
 

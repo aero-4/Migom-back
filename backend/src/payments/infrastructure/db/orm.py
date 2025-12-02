@@ -23,3 +23,4 @@ class PaymentsOrm:
     method: Mapped[str] = mapped_column(nullable=False)
     status: Mapped[str] = mapped_column(nullable=False, default=PaymentsStatus.created)
     url: Mapped[str] = mapped_column(nullable=False)
+    label: Mapped[str] = mapped_column(nullable=False)

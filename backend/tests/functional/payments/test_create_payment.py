@@ -24,7 +24,7 @@ async def test_create_payment_yoomoney():
     for _ in range(50):
         print(f"ID: {random_label} / URL: {payment_url} / Check payment status...")
 
-        check_payment = await provider.process(payment.label)
+        check_payment = await provider.check_status(payment.label)
 
         if check_payment:
             print(f"Payment {payment.label} is paid")

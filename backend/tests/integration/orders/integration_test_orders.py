@@ -62,6 +62,7 @@ async def create_order(client, user_factory) -> Order:
                                      grams=1,
                                      protein=1,
                                      fats=1,
+                                     kilokalorie=12,
                                      carbohydrates=1,
                                      photo="test photo",
                                      category_id=category.id)

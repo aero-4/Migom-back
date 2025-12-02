@@ -32,7 +32,7 @@ class FakePaymentsRepository(IPaymentRepository):
         order = Order(id=self._get_id(),
                       created_at=datetime.datetime.now(),
                       update_at=datetime.datetime.now(),
-                      status="created", amount=0,
+                      status="created",
                       products=[i.product_id for i in order.products],
                       creator_id=order.creator_id,
                       delivery_address=order.delivery_address)
@@ -40,3 +40,6 @@ class FakePaymentsRepository(IPaymentRepository):
         self._payments.append(order)
         return order
 
+    async def _get_id(self):
+        self._last_id = self._last_id + 1
+        return self._last_id

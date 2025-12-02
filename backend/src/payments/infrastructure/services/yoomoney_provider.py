@@ -13,12 +13,6 @@ class YoomoneyProvider(IPaymentProvider):
         self.client_id: str = payment_settings.YOOMONEY_CLIENT_ID
         self.secret_key: str = payment_settings.YOOMONEY_SECRET_KEY
         self.redirect_uri: str = payment_settings.YOOMONEY_REDIRECT_URI
-        self.session = aiohttp.ClientSession(
-            headers={
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Authorization": f"Bearer {payment_settings.YOOMONEY_ACCESS_TOKEN}"
-            }
-        )
 
     async def create(self, payment: PaymentCreate) -> URL | None:
         async with self._get_client() as session:
@@ -39,7 +33,7 @@ class YoomoneyProvider(IPaymentProvider):
             )
         return response.url if response.url else None
 
-    async def process(self, label: str) -> bool:
+    async def check_status(self, label: str) -> bool:
         async with self._get_client() as session:
             response = await session.post(
                 url=f"https://yoomoney.ru/api/operation-history",
@@ -48,8 +42,6 @@ class YoomoneyProvider(IPaymentProvider):
 
             data = await response.json()
             operations = data.get("operations", [])
-
-            print(f"Operations: {operations}")
 
             if not operations:
                 return False
