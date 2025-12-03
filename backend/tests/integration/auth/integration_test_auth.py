@@ -2,7 +2,7 @@ import datetime
 import pytest
 import httpx
 
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 
 TEST_USER_DTO = UserCreateDTO(
     email="olegtinkov@gmail.com",
