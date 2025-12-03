@@ -20,3 +20,10 @@ class RedisTokenStorage(ITokenStorage):
 
     async def is_token_active(self, jti: str) -> bool:
         return await self.redis.exists(f"tokens:{jti}") == 1
+
+
+    async def revoke_tokens_by_user(self, user_id: str) -> None:
+        token_keys = await self.redis.smembers(f"user_tokens:{user_id}")
+        for jti in token_keys:
+            await self.redis.delete(f"tokens:{jti}")
+        await self.redis.delete(f"user_tokens:{user_id}")

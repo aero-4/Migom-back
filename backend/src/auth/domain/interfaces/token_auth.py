@@ -27,3 +27,9 @@ class ITokenAuth(abc.ABC):
     @abc.abstractmethod
     async def read_token(self, token_type: TokenType) -> TokenData | None:
         ...
+
+    @abc.abstractmethod
+    async def unset_tokens(self) -> None:
+        ...
+
+

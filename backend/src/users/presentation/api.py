@@ -1,9 +1,11 @@
 from fastapi import APIRouter
 from starlette.requests import Request
 
-from src.auth.presentation.dependencies import TokenAuthDep
+from src.auth.presentation.dependencies import TokenAuthDep, PasswordHasherDep
 from src.users.application.use_cases.information import information
+from src.users.application.use_cases.update_password import update_password
 from src.users.presentation.dependencies import UserUoWDep
+from src.users.presentation.dtos import UserPasswordUpdateDTO
 
 users_api_router = APIRouter()
 
@@ -12,3 +14,12 @@ users_api_router = APIRouter()
 async def get_user_info(uow: UserUoWDep,
                         auth: TokenAuthDep):
     return await information(uow, auth)
+
+
+@users_api_router.patch("/change/password")
+async def update_user_password(request: Request,
+                               password_data: UserPasswordUpdateDTO,
+                               pwd_hasher: PasswordHasherDep,
+                               uow: UserUoWDep,
+                               auth: TokenAuthDep):
+    return await update_password(password_data, request.state.user, auth, pwd_hasher, uow)

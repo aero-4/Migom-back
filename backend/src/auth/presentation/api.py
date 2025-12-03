@@ -31,3 +31,9 @@ async def register(credentials: RegisterUserDTO,
 async def refresh(auth: TokenAuthDep):
     await auth.refresh_access_token()
     return {"msg": "Token refreshed"}
+
+
+@auth_api_router.post("/logout")
+async def logout(auth: TokenAuthDep):
+    await auth.unset_tokens()
+    return {"msg": "Logout successful"}

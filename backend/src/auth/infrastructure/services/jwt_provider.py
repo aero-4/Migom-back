@@ -118,6 +118,18 @@ class JWTAuth(ITokenAuth):
 
             await self.set_token(access_token, TokenType.ACCESS)
 
+
+    async def unset_tokens(self) -> None:
+        """
+        Revoke all tokens of the current user and remove them from the response.
+        """
+        if self.token_storage:
+            await self.token_storage.revoke_tokens_by_user(self.request.state.user.id)
+
+        for token_type, transports in self.transports.items():
+            for transport in transports:
+                transport.delete_token(self.response)
+
     async def _validate_token_or_none(self, token_data: TokenData) -> TokenData | None:
         if not token_data:
             return None
