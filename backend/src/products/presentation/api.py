@@ -5,7 +5,6 @@ from src.products.application.use_cases.collect_product import collect_products,
 from src.products.application.use_cases.create_product import create_product
 from src.products.application.use_cases.delete_product import delete_product
 from src.products.application.use_cases.update_product import update_product
-from src.products.domain.entities import SearchData
 from src.products.presentation.dependencies import ProductUoWDep
 from src.products.presentation.dtos import ProductCreateDTO, ProductUpdateDTO, SearchDataDTO
 

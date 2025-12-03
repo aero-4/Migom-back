@@ -41,7 +41,9 @@ async def create_product(client, product=None):
                    "test (6).jpeg",
                    "test (7).jpeg",
                    "test (8).jpeg"]
-    resp = await client.post("/api/files/", files={"file": open(random.choice(TEST_PHOTOS), "rb")})
+    resp = await client.post("/api/files/",
+                             files={"file": open(random.choice(TEST_PHOTOS), "rb")}
+                             )
     url = resp.json()["url"]
 
     category = CategoryCreateDTO(
