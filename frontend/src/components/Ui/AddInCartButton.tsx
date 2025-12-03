@@ -37,7 +37,7 @@ export default function AddInCartBtn({product, className="", label=""}): JSX.Ele
                         aria-label="Добавить"
                     >
                         <img src={plusPng} className={`w-3 lg:w-4`} alt="Добавить"/>
-                        {label && <span className="text-sm md:text-lg text-gray-600 my-2 px-3">{label}</span>}
+                        {label && <span className="text-sm  my-3 px-3 text-black">{label}</span>}
                     </button>
                 </div>
             ) : (
@@ -50,10 +50,10 @@ export default function AddInCartBtn({product, className="", label=""}): JSX.Ele
                     >
                         <img src={minusPng} className={`w-3 lg:w-5`} alt="Уменьшить"/>
 
-                        {label && <span className="text-sm md:text-lg text-gray-600 my-2 px-3">Убрать</span>}
+                        {label && <span className="text-sm my-3 px-3 text-black">Убрать</span>}
                     </button>
 
-                    <span className="text-center text-xs md:text-lg">{count}</span>
+                    <span className="text-center text-xs ">{count}</span>
 
                     <button
                         name="plus"
@@ -63,7 +63,7 @@ export default function AddInCartBtn({product, className="", label=""}): JSX.Ele
                     >
                         <img src={plusPng} className={`w-3 lg:w-5`} alt="Добавить"/>
 
-                        {label && <span className="text-sm md:text-lg text-gray-600 my-2 px-3">Добавить</span>}
+                        {label && <span className="text-sm my-3 px-3 text-black">Добавить</span>}
                     </button>
                 </div>
             )}

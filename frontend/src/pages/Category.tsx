@@ -1,6 +1,7 @@
 import {JSX, useEffect, useState} from "react";
-import AddInCartBtn from "../Ui/AddInCartButton.tsx";
-import config from "../../../config.ts";
+import AddInCartBtn from "../components/Ui/AddInCartButton.tsx";
+import config from "../../config.ts";
+import {useParams} from "react-router-dom";
 
 type Product = {
     id?: string;
@@ -13,7 +14,8 @@ type Product = {
     [k: string]: any;
 };
 
-export default function Products(): JSX.Element {
+export default function Category(): JSX.Element {
+    const {id} = useParams();
     const [products, setProducts] = useState<Product[]>([]);
 
     const genUuid = (): string => {
@@ -39,7 +41,15 @@ export default function Products(): JSX.Element {
 
         const load = async () => {
             try {
-                const res = await fetch(`${config.API_URL}/api/products`, { signal: controller.signal });
+                const res = await fetch(
+                    `${config.API_URL}/api/products/search`,
+                    {
+                        method: "POST",
+                        signal: controller.signal,
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({"category_id": Number.parseInt(id)})
+                    }
+                );
                 if (!res.ok)
                     throw new Error("No products");
                 const data = await res.json();
@@ -115,7 +125,7 @@ export default function Products(): JSX.Element {
                                     </div>
                                 ) : (
                                     <div>
-                                    <p className="text-xl md:text-2xl font-bold">
+                                        <p className="text-xl md:text-2xl font-bold">
                                             {product.price} ₽
                                         </p>
                                     </div>

@@ -1,45 +1,39 @@
 import React, {JSX, useEffect, useState} from "react";
-import teaPng from "../../assets/tea.png";
-import fruitsPng from "../../assets/fruits_orange.png";
-import meatPng from "../../assets/meat.png";
+import config from "../../../config.ts";
 
-
-type Category = {
-    id?: string;
-    name?: string;
-    slug?: string;
-    photo?: string;
-};
 
 export default function Categories(): JSX.Element {
     const [cats, setCats] = useState([])
 
     useEffect(() => {
-        let cancelled = false;
+        const controller = new AbortController();
+        let mounted = true;
 
         const load = async () => {
             try {
-                const res = await fetch("/api/products");
+                const res = await fetch(`${config.API_URL}/api/categories`, { signal: controller.signal });
                 if (!res.ok)
-                    throw new Error("no products");
+                    throw new Error("No categories");
+                const data = await res.json();
 
-                const resp_data = await res.json();
-
-                if (!cancelled) {
-                    setCats(resp_data);
+                setCats(data)
+            } catch (err: any) {
+                if (!mounted) return;
+                if (err.name === "AbortError") {
+                    return;
                 }
-            } catch {
-                if (!cancelled) {
-                    setCats(resp_data);
-                }
+                console.error("Failed loading categories:", err);
+                setCats([]);
             }
         };
 
         load();
+
         return () => {
-            cancelled = true;
+            mounted = false;
+            controller.abort();
         };
-    }, [cats]);
+    }, []);
 
     return (
         <>

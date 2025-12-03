@@ -60,15 +60,15 @@ const Product: React.FC = () => {
     if (!product) return <div>Продукт не найден</div>;
 
     return (
-        <div className="card gap-9">
-            <div className="flex flex-col md:flex-row gap-6">
+        <div className="card p-9 gap-12">
+            <div className="flex flex-col md:flex-row gap-12">
                 {product.photo && (
                     <img src={product.photo}
                          alt={product.name}
                          className="img max-w-lg"/>
                 )}
 
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-12">
                     <div className="flex flex-col gap-9 my-auto">
                         <h1 className="text-2xl md:text-4xl font-bold">{product.name}</h1>
 
@@ -103,26 +103,26 @@ const Product: React.FC = () => {
 
             </div>
 
-            <div className="flex flex-row my-6">
-                <div className="min-w-xs border-gray-100 p-3 rounded-xl">
+            <div className="flex flex-row gap-20 border-gray-400 ">
+                <div className="min-w-1/3 rounded-xl">
                     <h3 className="text-sm text-gray-500 font-medium">Состав:</h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-700">
                         {product.composition}
                     </p>
                 </div>
 
-                <div className="min-w-xs flex flex-col gap-1 border-gray-100 p-3 rounded-xl">
+                <div className="min-w-1/3 flex flex-col rounded-xl">
                     <h3 className="text-sm text-gray-500 font-medium">В 100 граммах:</h3>
-                    <p className="text-sm text-gray-800">
-                        ккал: {product.kilocalorie} г,
+                    <p className="text-sm text-gray-700">
+                        ккал: {product.kilocalorie} г
                     </p>
-                    <p className="text-sm text-gray-800">
-                        белки: {product.protein} г,
+                    <p className="text-sm text-gray-700">
+                        белки: {product.protein} г
                     </p>
-                    <p className="text-sm text-gray-800">
-                        жиры: {product.fats} г,
+                    <p className="text-sm text-gray-700">
+                        жиры: {product.fats} г
                     </p>
-                    <p className="text-sm text-gray-800">
+                    <p className="text-sm text-gray-700">
                         углеводы: {product.carbohydrates} г
                     </p>
                 </div>

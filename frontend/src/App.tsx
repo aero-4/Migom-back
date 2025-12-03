@@ -1,6 +1,8 @@
 import {Suspense, lazy, JSX} from 'react';
 import {Routes, Route} from 'react-router-dom';
 import Product from "./pages/Product.tsx";
+import Category from "./pages/Category.tsx";
+import Profile from "./pages/Profile.tsx";
 
 const Home = lazy(() => import('./pages/Home.tsx'));
 const Login = lazy(() => import('./pages/Login.tsx'));
@@ -15,7 +17,9 @@ function App(): JSX.Element {
             <Routes>
                 <Route path="/" element={<Layout/>}>
                     <Route index element={<Home/>}/>
+                    <Route path="profile" element={<Profile/>}/>
                     <Route path="product/:id" element={<Product/>}/>
+                    <Route path="category/:id" element={<Category/>}/>
                     <Route path="register" element={<Register/>}/>
                     <Route path="login" element={<Login/>}/>
                     <Route path="*" element={<NotFound/>}/>
