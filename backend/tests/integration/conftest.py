@@ -3,19 +3,18 @@ import httpx
 import pytest_asyncio
 
 from sqlalchemy import text
-
-from src.auth.application.use_cases.registration import registrate
-from src.auth.domain.entities import TokenType
-from src.auth.presentation.dependencies import get_token_auth, get_password_hasher, TokenAuthDep
 from src.db.engine import engine
 from src.addresses.domain.entities import Address
 from src.addresses.presentation.dtos import AddressCreateDTO
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 from src.users.domain.entities import User
-from src.users.presentation.dependencies import get_user_uow
 
 TABLES_TO_TRUNCATE = [
-    "users", "categories", "products", "addresses", "orders"
+    "users",
+    "categories",
+    "products",
+    "addresses",
+    "orders"
 ]
 
 

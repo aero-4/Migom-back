@@ -16,10 +16,11 @@ async def get_user_info(uow: UserUoWDep,
     return await information(uow, auth)
 
 
-@users_api_router.patch("/change/password")
+@users_api_router.post("/password")
 async def update_user_password(request: Request,
                                password_data: UserPasswordUpdateDTO,
                                pwd_hasher: PasswordHasherDep,
                                uow: UserUoWDep,
                                auth: TokenAuthDep):
-    return await update_password(password_data, request.state.user, auth, pwd_hasher, uow)
+    await update_password(password_data, request.state.user, auth, pwd_hasher, uow)
+    return {"msg": "Password changed"}

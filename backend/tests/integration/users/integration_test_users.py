@@ -3,7 +3,7 @@ import pytest
 import httpx
 from httpx import Response
 
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 
 TEST_USER_DTO = UserCreateDTO(
     email="olegtinkov@gmail.com",
@@ -45,7 +45,6 @@ async def test_allowed_paths_user(clear_db, user_factory):
         assert response2.json() == TEST_USER_DTO.model_dump(exclude={"password", "is_super_user"}, mode="json")
 
 
-
 @pytest.mark.asyncio(loop_scope="session")
 async def test_forbidden_paths_user(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
@@ -62,3 +61,23 @@ async def test_forbidden_paths_user(clear_db, user_factory):
 
         response6 = await client.get("/api/orders")
         assert response6.status_code == 403
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_change_password(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        user = await user_factory(client, TEST_USER_DTO)
+        response = await client.post("/api/users/password", json={"password": "newpass1234"})
+
+        assert response.status_code == 200
+        assert response.json() == {"msg": "Password changed"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_fail_change_password(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        user = await user_factory(client, TEST_USER_DTO)
+        response = await client.post("/api/users/password", json={"password": "newpas"})
+
+        assert response.status_code == 422
+        assert response.json()["detail"][0]["msg"] == "String should have at least 8 characters"

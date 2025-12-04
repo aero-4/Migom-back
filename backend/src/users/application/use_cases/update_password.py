@@ -10,7 +10,7 @@ async def update_password(password_data: UserPasswordUpdateDTO,
                           pwd_hasher: PasswordHasherDep,
                           uow: UserUoWDep) -> None:
     async with uow:
-        user = await uow.get_by_id(user.id)
-        user.hashed_password = await pwd_hasher.hash(password_data.password)
+        user = await uow.users.get_by_id(user.id)
+        user.hashed_password = pwd_hasher.hash(password_data.password)
         await auth.set_tokens(user)
         await uow.commit()
