@@ -1,6 +1,6 @@
 from src.auth.domain.entities import TokenType, TokenData
 from src.auth.presentation.dependencies import TokenAuthDep
-from src.core.domain.exceptions import PermissionDenied
+from src.core.domain.exceptions import PermissionDenied, NotAuthenticated
 from src.users.domain.entities import UserInfo, User
 from src.users.domain.exceptions import UserNotFound
 from src.users.domain.interfaces.user_repo import IUserRepository
@@ -11,7 +11,7 @@ async def information(uow: IUserUnitOfWork, auth: TokenAuthDep) -> UserInfo:
     async with uow:
         user_data: TokenData = await auth.read_token(TokenType.ACCESS)
         if not user_data:
-            raise PermissionDenied()
+            raise NotAuthenticated()
 
         user: User = await uow.users.get_by_id(user_data.user_id)
 

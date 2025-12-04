@@ -95,3 +95,42 @@ async def test_without_access_refresh_token(clear_db, user_factory):
         response1.cookies.pop("access_token")
 
         assert response1.json() == {"msg": "Token refreshed"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_logout_user(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_USER_DTO)
+
+        response1 = await client.get("/api/users/me")
+
+        assert response1.json()["first_name"] == TEST_USER_DTO.first_name
+
+        response = await client.post("/api/auth/logout")
+
+        assert response.status_code == 200
+        assert response.json() == {"msg": "Logout successful"}
+
+
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_failed_logout_user(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+            await user_factory(client, TEST_USER_DTO)
+
+            response1 = await client.get("/api/users/me")
+            assert response1.json()["first_name"] == TEST_USER_DTO.first_name
+
+            response2 = await client.post("/api/auth/logout")
+
+            assert response2.status_code == 200
+            assert response2.json() == {"msg": "Logout successful"}
+
+            response3 = await client.get("/api/users/me")
+
+            assert response3.status_code == 401
+            assert response3.json() == {"detail": "User not authenticated"}
+
+

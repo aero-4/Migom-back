@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from starlette.requests import Request
 
 from src.auth.presentation.dependencies import TokenAuthDep, PasswordHasherDep
+from src.auth.presentation.permissions import access_control
 from src.users.application.use_cases.information import information
 from src.users.application.use_cases.update_password import update_password
 from src.users.presentation.dependencies import UserUoWDep
@@ -16,6 +17,8 @@ async def get_user_info(uow: UserUoWDep,
     return await information(uow, auth)
 
 
+
+@access_control(open=False)
 @users_api_router.post("/password")
 async def update_user_password(request: Request,
                                password_data: UserPasswordUpdateDTO,

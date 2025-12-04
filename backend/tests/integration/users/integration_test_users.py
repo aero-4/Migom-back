@@ -29,8 +29,8 @@ async def test_user_permission_denied(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         response2 = await client.get("/api/users/me")
 
-        assert response2.status_code == 403
-        assert response2.json() == {"detail": "Permission denied"}
+        assert response2.status_code == 401
+        assert response2.json() == {"detail": "User not authenticated"}
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -81,3 +81,13 @@ async def test_fail_change_password(clear_db, user_factory):
 
         assert response.status_code == 422
         assert response.json()["detail"][0]["msg"] == "String should have at least 8 characters"
+
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_not_found_user_change_password(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        response = await client.post("/api/users/password", json={"password": "newpas12345"})
+
+        assert response.status_code == 403
+        assert response.json() == {"detail": "Permission denied"}
