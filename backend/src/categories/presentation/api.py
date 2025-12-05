@@ -16,6 +16,7 @@ async def get_all(uow: CategoryUoWDep):
     return await collect_categories(uow)
 
 
+@access_control(superuser=True)
 @categories_api_router.post("/")
 async def new(category: CategoryCreateDTO, uow: CategoryUoWDep):
     return await add_category(category, uow)

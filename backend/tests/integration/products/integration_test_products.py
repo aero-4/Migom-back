@@ -8,7 +8,7 @@ from src.categories.domain.entities import Category
 from src.categories.presentation.dtos import CategoryCreateDTO
 from src.products.domain.entities import Product
 from src.products.presentation.dtos import ProductCreateDTO, SearchDataDTO
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 
 TEST_CATEGORY_DTO = CategoryCreateDTO(
     name="Бургеры",
@@ -26,6 +26,7 @@ TEST_PRODUCT_DTO = ProductCreateDTO(
     protein=10,
     fats=10,
     carbohydrates=10,
+    kilocalorie=11,
     photo="src/photo1.jpg",
     category_id=1
 )
@@ -66,8 +67,8 @@ async def create_product(client, product=None):
         fats=random.randint(1, 100),
         carbohydrates=random.randint(1, 100),
         kilocalorie=random.randint(1, 100),
+        category_id=category.id,
         photo=url,
-        category_id=category.id
     )
 
     response2 = await client.post("/api/products/", json=product.model_dump())
@@ -84,8 +85,8 @@ async def test_success_collect_products(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         await user_factory(client, TEST_SUPER_USER)
 
-        category_created = await client.post("/api/categories/", json=TEST_CATEGORY_DTO.model_dump(mode="json"))
-        product_created = await client.post("/api/products/", json=TEST_PRODUCT_DTO.model_dump(mode="json"))
+        await client.post("/api/categories/", json=TEST_CATEGORY_DTO.model_dump(mode="json"))
+        await client.post("/api/products/", json=TEST_PRODUCT_DTO.model_dump(mode="json"))
 
         response = await client.get("/api/products/")
         products = response.json()
@@ -216,7 +217,7 @@ async def test_success_get_all_by_name_filters(clear_db, user_factory):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_add_some_products_and_categories(clear_db, user_factory, count: int = 25):
+async def add_some_products_and_categories(clear_db, user_factory, count: int = 25):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         await user_factory(client, TEST_SUPER_USER)
 

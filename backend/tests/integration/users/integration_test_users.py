@@ -30,7 +30,7 @@ async def test_user_permission_denied(clear_db, user_factory):
         response2 = await client.get("/api/users/me")
 
         assert response2.status_code == 401
-        assert response2.json() == {"detail": "User not authenticated"}
+        assert response2.json() == {"detail": "Authentication required"}
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -48,19 +48,14 @@ async def test_allowed_paths_user(clear_db, user_factory):
 @pytest.mark.asyncio(loop_scope="session")
 async def test_forbidden_paths_user(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
-        user = await user_factory(client, TEST_USER_DTO)
+        response3 = await client.get("/api/orders/")
+        assert response3.status_code == 401
 
-        response3 = await client.get("/api/orders")
-        assert response3.status_code == 403
+        response4 = await client.get("/api/addresses/")
+        assert response4.status_code == 401
 
-        response4 = await client.get("/api/addresses")
-        assert response4.status_code == 403
-
-        response5 = await client.get("/api/products")
-        assert response5.status_code == 403
-
-        response6 = await client.get("/api/orders")
-        assert response6.status_code == 403
+        response5 = await client.get("/api/payments/")
+        assert response5.status_code == 401
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -89,5 +84,5 @@ async def test_not_found_user_change_password(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         response = await client.post("/api/users/password", json={"password": "newpas12345"})
 
-        assert response.status_code == 403
-        assert response.json() == {"detail": "Permission denied"}
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Authentication required"}

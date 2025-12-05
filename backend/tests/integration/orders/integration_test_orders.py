@@ -309,7 +309,6 @@ async def test_success_search_orders_for_delivering(clear_db, user_factory):
         orders = []
         order = await create_order(client, user_factory)
         order.status = OrderStatus.PENDING
-        print(client.cookies)
         order = await client.patch(f"/api/orders/{order.id}", json=order.model_dump(mode="json"))
         orders.append(
             Order(**order.json())

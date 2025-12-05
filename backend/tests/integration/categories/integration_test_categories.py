@@ -7,7 +7,7 @@ from httpx import Response
 
 from src.categories.domain.entities import CategoryUpdate, Category
 from src.categories.presentation.dtos import CategoryCreateDTO
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 
 TEST_CATEGORY_DTO = CategoryCreateDTO(
     name="Пицца",

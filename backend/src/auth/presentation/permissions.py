@@ -41,10 +41,11 @@ class access_control:
         return None
 
     async def verify_request(self, *args, **kwargs) -> bool:
-        if self.superuser and not self.current_user.is_super_user:
-            print(self.superuser, self.current_user)
-            raise PermissionDenied()
-
         if isinstance(self.current_user, AnonymousUser) and not self.open:
             raise AuthRequired()
+
+        if self.superuser and not self.current_user.is_super_user:
+            raise PermissionDenied()
+
+
         return True

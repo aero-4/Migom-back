@@ -21,6 +21,8 @@ async def get(product_id: int, uow: ProductUoWDep):
     return await collect_product(product_id, uow)
 
 
+
+@access_control(superuser=True)
 @products_api_router.post("/search")
 async def search(search_data: SearchDataDTO, uow: ProductUoWDep):
     return await collect_products_by_filters(search_data, uow)

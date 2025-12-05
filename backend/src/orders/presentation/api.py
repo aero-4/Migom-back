@@ -14,11 +14,13 @@ orders_api_router = APIRouter()
 
 
 @orders_api_router.post("/")
+@access_control(open=False)
 async def create(request: Request, order: OrderCreateDTO, uow: OrderUoWDeps):
     return await new_order(order, uow, request.state.user)
 
 
 @orders_api_router.get("/")
+@access_control(open=False)
 async def get_all(request: Request, uow: OrderUoWDeps):
     return await collect_orders(uow, request.state.user)
 

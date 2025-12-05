@@ -12,13 +12,14 @@ users_api_router = APIRouter()
 
 
 @users_api_router.get("/me")
+@access_control(open=False)
 async def get_user_info(uow: UserUoWDep,
                         auth: TokenAuthDep):
     return await information(uow, auth)
 
 
-
 @users_api_router.post("/password")
+@access_control(open=False)
 async def update_user_password(request: Request,
                                password_data: UserPasswordUpdateDTO,
                                pwd_hasher: PasswordHasherDep,
