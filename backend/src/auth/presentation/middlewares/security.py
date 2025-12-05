@@ -28,7 +28,8 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             "/api/orders",
             "/api/products",
             "/api/categories",
-            "/api/users"
+            "/api/users",
+            "/api/payments"
         ]
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:

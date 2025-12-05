@@ -18,7 +18,7 @@ from src.payments.presentation.dependenscies import PaymentUoWDeps
 from src.payments.config import payment_settings
 from src.payments.presentation.dtos import PaymentCreateDTO
 from src.products.domain.entities import Product, ProductCreate
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 from src.utils.strings import generate_random_alphanum
 
 TEST_USER_DTO = UserCreateDTO(
@@ -27,7 +27,7 @@ TEST_USER_DTO = UserCreateDTO(
     first_name="Oleg",
     last_name="Tinkov",
     birthday=datetime.date(2025, 1, 1),
-    is_super_user=True
+    is_super_user=False
 )
 
 
@@ -114,6 +114,17 @@ async def test_success_create_payment(clear_db, user_factory):
 
 
 @pytest.mark.asyncio
+async def test_not_auth_user_create_payment(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        order = OrderCreateDTO(order_id=1, amount=123, address_id=1, products=[CartItemDTO(product_id=1, quantity=1)])
+        payment_dto = PaymentCreateDTO(order_id=123, amount=123, method="yoomoney")
+        response = await client.post("/api/payments/", json=payment_dto.model_dump())
+
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Authentication required"}
+
+
+@pytest.mark.asyncio
 async def test_success_get_one(clear_db, user_factory):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         order1 = await create_order(client, user_factory)
@@ -144,4 +155,3 @@ async def test_success_get_all(clear_db, user_factory):
 
         assert response.status_code == 200
         assert payments[0].amount == payment_dto.amount
-

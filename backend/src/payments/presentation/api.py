@@ -12,16 +12,18 @@ payments_api_router = APIRouter()
 
 
 @payments_api_router.post("/")
-async def add(request: Request, payment_data: PaymentCreateDTO, payment: PaymentUoWDeps, provider: PaymentProviderDeps, auth: TokenAuthDep):
+@access_control(open=False)
+async def add(request: Request, payment_data: PaymentCreateDTO, payment: PaymentUoWDeps, provider: PaymentProviderDeps):
     return await add_payment(request.state.user, payment_data, payment, provider)
 
 
 @payments_api_router.get("/{payment_id}")
-async def get(request: Request, payment_id: int, payment: PaymentUoWDeps, provider: PaymentProviderDeps, auth: TokenAuthDep):
+@access_control(open=False)
+async def get(request: Request, payment_id: int, payment: PaymentUoWDeps, provider: PaymentProviderDeps):
     return await get_payment(payment_id, request.state.user, payment, provider)
 
 
-@access_control(superuser=True)
 @payments_api_router.get("/")
+@access_control(superuser=True)
 async def get_all(payment: PaymentUoWDeps, auth: TokenAuthDep):
     return await collect_payments(payment)
