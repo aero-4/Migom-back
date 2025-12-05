@@ -77,11 +77,11 @@ body {
     }
 
     .big__button:hover {
-        @apply bg-red-500/90
+        @apply opacity-80
     }
 
     .big__button:active {
-        @apply bg-red-500/80
+        @apply opacity-70
     }
 
     .add__button-responsive {
@@ -93,11 +93,11 @@ body {
     }
 
     .full__button:hover {
-        @apply bg-gray-100/90
+        @apply opacity-90
     }
 
     .full__button:active {
-        @apply bg-gray-50/80
+        @apply opacity-80
     }
 
     @screen md {
