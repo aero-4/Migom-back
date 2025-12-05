@@ -24,11 +24,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         self.secure_paths: list[str] = secure_paths or ["/api", "/admin", "/docs", "/redoc"]
         self.allowed_paths: list[str] = allowed_paths or [
             "/api/auth",
-            "/api/users",
             "/api/addresses",
             "/api/orders",
             "/api/products",
             "/api/categories",
+            "/api/users"
         ]
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:

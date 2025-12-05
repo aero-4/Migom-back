@@ -1,5 +1,6 @@
 from fastapi import status
 
+
 class AppException(Exception):
     """
     Base application exception.
@@ -26,10 +27,10 @@ class AppException(Exception):
     extra: dict | None = None
 
     def __init__(
-        self,
-        status_code: int | None = None,
-        detail: str | None = None,
-        **kwargs
+            self,
+            status_code: int | None = None,
+            detail: str | None = None,
+            **kwargs
     ) -> None:
         self.status_code = self.status_code if not status_code else status_code
         self.detail = self.detail if not detail else detail
@@ -60,3 +61,8 @@ class BadRequest(AppException):
 class NotAuthenticated(AppException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "User not authenticated"
+
+
+class AuthRequired(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Authentication required"

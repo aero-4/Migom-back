@@ -3,12 +3,12 @@ from starlette.requests import Request
 
 from src.auth.presentation.dependencies import TokenAuthDep
 from src.auth.presentation.permissions import access_control
-from src.orders.application.use_cases.collect_orders import collect_order, collect_orders
+from src.orders.application.use_cases.collect_orders import collect_order, collect_orders, search_orders
 from src.orders.application.use_cases.delete_order import delete_order
 from src.orders.application.use_cases.new_order import new_order
 from src.orders.application.use_cases.update_order import update_order
 from src.orders.presentation.dependencies import OrderUoWDeps
-from src.orders.presentation.dtos import OrderCreateDTO, OrderUpdateDTO
+from src.orders.presentation.dtos import OrderCreateDTO, OrderUpdateDTO, OrderSearchDTO
 
 orders_api_router = APIRouter()
 
@@ -23,19 +23,25 @@ async def get_all(request: Request, uow: OrderUoWDeps):
     return await collect_orders(uow, request.state.user)
 
 
+@orders_api_router.post("/search")
 @access_control(superuser=True)
+async def search(order_data: OrderSearchDTO, uow: OrderUoWDeps, auth: TokenAuthDep):
+    return await search_orders(order_data.status, uow)
+
+
 @orders_api_router.patch("/{id}")
-async def update(id: int, order: OrderUpdateDTO, uow: OrderUoWDeps):
+@access_control(superuser=True)
+async def update(id: int, order: OrderUpdateDTO, uow: OrderUoWDeps, auth: TokenAuthDep):
     return await update_order(id, order, uow)
 
 
-@access_control(superuser=True)
 @orders_api_router.delete("/{id}")
-async def delete(id: int, uow: OrderUoWDeps):
+@access_control(superuser=True)
+async def delete(id: int, uow: OrderUoWDeps, auth: TokenAuthDep):
     return await delete_order(id, uow)
 
 
-@access_control(superuser=True)
 @orders_api_router.get("/{id}")
-async def get_one(id: int, uow: OrderUoWDeps):
+@access_control(superuser=True)
+async def get_one(id: int, uow: OrderUoWDeps, auth: TokenAuthDep):
     return await collect_order(id, uow)

@@ -18,7 +18,6 @@ async def get_user_info(uow: UserUoWDep,
 
 
 
-@access_control(open=False)
 @users_api_router.post("/password")
 async def update_user_password(request: Request,
                                password_data: UserPasswordUpdateDTO,

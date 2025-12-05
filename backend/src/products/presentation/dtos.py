@@ -31,6 +31,7 @@ class ProductUpdateDTO(BaseModel):
     grams: int | None = None
     protein: int | None = None
     fats: int | None = None
+    kilocalorie: int | None = None
     carbohydrates: int | None = None
     photo: str | None = None
     category_id: int | None = None

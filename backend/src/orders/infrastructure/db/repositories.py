@@ -117,6 +117,14 @@ class PGOrdersRepository(IOrderRepository):
 
         return self._to_entity(obj)
 
+    async def filter(self, status: str) -> List[Order]:
+        status = OrderStatus(status)
+        stmt = select(OrdersOrm).where(OrdersOrm.status == status)
+        result = await self.session.execute(stmt)
+        objs: List[OrdersOrm] = result.scalars().all()
+
+        return [self._to_entity(o) for o in objs]
+
     @staticmethod
     def _to_entity(order_data: OrdersOrm) -> Order:
         return Order(

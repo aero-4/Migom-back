@@ -1,7 +1,7 @@
 import abc
 from typing import List
 
-from src.orders.domain.entities import OrderCreate, Order, OrderUpdate
+from src.orders.domain.entities import OrderCreate, Order, OrderUpdate, OrderStatus
 
 
 class IOrderRepository(abc.ABC):
@@ -24,4 +24,9 @@ class IOrderRepository(abc.ABC):
 
     @abc.abstractmethod
     async def update(self, order_data: OrderUpdate) -> Order:
+        ...
+
+
+    @abc.abstractmethod
+    async def filter(self, status: OrderStatus) -> List[Order]:
         ...
