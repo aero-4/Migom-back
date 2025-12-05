@@ -16,7 +16,7 @@ export default function Menu({ onClose }: Props): JSX.Element {
             <NavLink
                 to="/profile"
                 onClick={handleClick}
-                className="big__button  text-sm bg-blue-400"
+                className="big__button text-sm bg-blue-400"
             >
                 Профиль
             </NavLink>
@@ -24,7 +24,7 @@ export default function Menu({ onClose }: Props): JSX.Element {
             <NavLink
                 to="/login"
                 onClick={handleClick}
-                className="big__button text-sm bg-blue-500"
+                className="big__button text-sm bg-blue-50 text-blue-600"
             >
                 Войти
             </NavLink>
@@ -32,7 +32,7 @@ export default function Menu({ onClose }: Props): JSX.Element {
             <NavLink
                 to="/register"
                 onClick={handleClick}
-                className="big__button text-sm"
+                className="big__button bg-orange-50 text-orange-500"
             >
                 Регистрация
             </NavLink>
@@ -40,10 +40,14 @@ export default function Menu({ onClose }: Props): JSX.Element {
             <NavLink
                 to="/logout"
                 onClick={handleClick}
-                className=" big__button text-sm"
+                className="big__button bg-red-50 text-red-500"
             >
                 Выйти
             </NavLink>
+
+            <button  className="big__button bg-black text-black-500">
+                Темная тема
+            </button>
         </div>
     );
 }
