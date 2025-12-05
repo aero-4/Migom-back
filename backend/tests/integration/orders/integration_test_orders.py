@@ -9,9 +9,9 @@ from src.auth.presentation.dtos import RegisterUserDTO
 from src.categories.domain.entities import Category
 from src.categories.presentation.dtos import CategoryCreateDTO
 from src.orders.domain.entities import Order, OrderStatus
-from src.orders.presentation.dtos import OrderCreateDTO, CartItemDTO, OrderUpdateDTO
+from src.orders.presentation.dtos import OrderCreateDTO, CartItemDTO, OrderUpdateDTO, OrderSearchDTO
 from src.products.domain.entities import ProductCreate, Product
-from src.users.domain.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO
 from src.users.domain.entities import User
 from src.utils.strings import generate_random_alphanum
 
@@ -54,7 +54,7 @@ async def create_order(client, user_factory) -> Order:
     # create products
     products = []
     for i in range(3):
-        product_data = ProductCreate(name=f"product {random.randint(100, 999)}",
+        product_data = ProductCreate(name=f"Product {random.randint(1, 99999)}",
                                      content="test content",
                                      composition="test composition",
                                      price=100,
@@ -62,7 +62,7 @@ async def create_order(client, user_factory) -> Order:
                                      grams=1,
                                      protein=1,
                                      fats=1,
-                                     kilokalorie=12,
+                                     kilocalorie=12,
                                      carbohydrates=1,
                                      photo="test photo",
                                      category_id=category.id)
@@ -126,6 +126,7 @@ async def test_not_found_products_new_order(clear_db, user_factory):
                                          grams=1,
                                          protein=1,
                                          fats=1,
+                                         kilocalorie=123,
                                          carbohydrates=1,
                                          photo="test photo",
                                          category_id=category.id)
@@ -169,8 +170,8 @@ async def test_not_found_delete_order(clear_db, user_factory):
         random_id = 123
         response = await client.delete(f"/api/orders/{random_id}")
 
-        assert response.status_code == 404
-        assert response.json() == {'detail': 'Not found'}
+        assert response.status_code == 403
+        assert response.json() == {'detail': 'Permission denied'}
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -190,8 +191,8 @@ async def test_not_found_get_one_order(clear_db, user_factory):
         random_id = 1234
         response = await client.get(f"/api/orders/{random_id}")
 
-        assert response.status_code == 404
-        assert response.json() == {"detail": "Not found"}
+        assert response.status_code == 403
+        assert response.json() == {"detail": "Permission denied"}
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -300,3 +301,34 @@ async def test_not_found_update_order(clear_db, user_factory):
 
         assert response.status_code == 404
         assert response.json() == {"detail": "Not found"}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_success_search_orders_for_delivering(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        orders = []
+        order = await create_order(client, user_factory)
+        order.status = OrderStatus.PENDING
+        print(client.cookies)
+        order = await client.patch(f"/api/orders/{order.id}", json=order.model_dump(mode="json"))
+        orders.append(
+            Order(**order.json())
+        )
+
+
+        order_data = OrderSearchDTO(status=OrderStatus.PENDING)
+        response = await client.post(f"/api/orders/search", json=order_data.model_dump(mode="json"))
+
+        assert response.status_code == 200
+        assert response.json() == [i.model_dump(mode="json") for i in orders]
+
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_failed_search_orders_not_rights(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        order_data = OrderSearchDTO(status=OrderStatus.PENDING)
+        response = await client.post(f"/api/orders/search", json=order_data.model_dump(mode="json"))
+
+        assert response.status_code == 403
+        assert response.json() == {"detail": "Permission denied"}
