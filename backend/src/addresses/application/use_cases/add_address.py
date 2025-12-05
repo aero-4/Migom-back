@@ -8,9 +8,6 @@ from src.users.domain.entities import User
 
 
 async def add_address(address_data: AddressCreateDTO, uow: IAddressUnitOfWork, user: User) -> Address:
-    if not user or not user.id:
-        raise NotAuthenticated()
-
     address = AddressCreate(user_id=user.id, **address_data.model_dump())
 
     async with uow:
