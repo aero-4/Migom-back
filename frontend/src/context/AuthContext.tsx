@@ -126,6 +126,9 @@ export function AuthProvider({ children }) {
                 body: JSON.stringify({ email, password }),
             });
 
+
+            console.log(res.headers)
+
             const json = await res.json().catch(() => null);
 
 

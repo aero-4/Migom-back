@@ -81,6 +81,8 @@ export default function Register() {
                 body: JSON.stringify(payload),
             });
 
+
+
             const json = await res.json().catch(() => null);
 
             if (json && typeof json === "object" && "detail" in json && json.detail) {

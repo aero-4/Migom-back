@@ -11,11 +11,14 @@ const Layout: React.FC = () => {
                 <div className="mx-auto w-full max-w-screen-lg">
                     <main className="flex-1 flex overflow-auto justify-center items-center">
                         <div className="w-full">
-                            <Navbar />
                             <CartProvider>
+                                <Navbar />
+
                                 <Outlet/>
+
+                                <Footer/>
+
                             </CartProvider>
-                            <Footer/>
                         </div>
                     </main>
                 </div>

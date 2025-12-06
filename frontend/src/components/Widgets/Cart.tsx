@@ -4,7 +4,6 @@ import DeliveryForm from "../Forms/DeliveryForm";
 import closeSvg from "../../assets/close.svg";
 import QuantityInput from "../Ui/QuantityInput.tsx";
 import CloseButton from "../Ui/CloseButton.tsx";
-import {useNavigate} from "react-router-dom";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -82,7 +81,7 @@ export const CartWidget: React.FC = () => {
                 ref={triggerRef}
                 aria-label="Открыть корзину"
                 onClick={toggle}
-                className="rounded-full focus:outline-none fixed right-6 bottom-6 z-50 inline-flex items-center justify-center big__button"
+                className="rounded-full focus:outline-none md:fixed md:right-6 md:bottom-6 z-50 inline-flex items-center justify-center big__button"
             >
 
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden>

@@ -22,8 +22,7 @@ function Profile() {
                 <p>{myData.email}</p>
 
                 <div className="flex flex-row gap-2">
-                    <button className="big__button bg-black/80 hover:opacity-90 active:opacity-80">Поменять пароль</button>
-                    <button className="big__button">Удалить профиль</button>
+                    <button className="big__button">Поменять пароль</button>
 
                 </div>
 

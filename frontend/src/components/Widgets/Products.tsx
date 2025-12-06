@@ -39,7 +39,7 @@ export default function Products(): JSX.Element {
 
         const load = async () => {
             try {
-                const res = await fetch(`${config.API_URL}/api/products`, { signal: controller.signal });
+                const res = await fetch(`${config.API_URL}/api/products`, {signal: controller.signal});
                 if (!res.ok)
                     throw new Error("No products");
                 const data = await res.json();
@@ -115,7 +115,7 @@ export default function Products(): JSX.Element {
                                     </div>
                                 ) : (
                                     <div>
-                                    <p className="text-xl md:text-2xl font-bold">
+                                        <p className="text-xl md:text-2xl font-bold">
                                             {product.price} ₽
                                         </p>
                                     </div>
