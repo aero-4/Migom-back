@@ -74,10 +74,50 @@ async def create_product(client, product=None):
     response2 = await client.post("/api/products/", json=product.model_dump())
     product_created = Product(**response2.json())
 
-    print(product_created)
-
     assert product_created.name == product.name
     return product_created
+
+
+async def create_normal_product(client):
+    TEST_PHOTOS = [os.path.join("normal", i) for i in os.listdir("normal")]
+    PRICES = [999, 1999, 2199, 499, 899, 1399, 2599, 3499, 5999]
+    NAME_CATS = ["Выбор пользователей", "Острее киберугроз", "Только здесь", "Новинки", "Только в доставке", "Комбо и ланчи", "Баскеты", "Бургеры"]
+    NAMES = ["Комбо \"Курица в квадрате\" оригинальное", "Острое комбо от Kaspersky «Против звонков с неизвестного»", "Шефбургер оригинальный", "Комбо с Биг Маэстро", "Веджи Чиз Ролл классический", "8 Острых Крылышек", "Большое комбо \"Курица в квадрате\" оригинальное"]
+
+    resp = await client.post("/api/files/",
+                             files={"file": open(random.choice(TEST_PHOTOS), "rb")})
+    url = resp.json()["url"]
+
+    category_data = CategoryCreateDTO(
+        name=random.choice(NAME_CATS),
+        photo=url
+    )
+
+    response1 = await client.post("/api/categories/", json=category_data.model_dump(mode="json"))
+    category = Category(**response1.json())
+
+    for name in NAMES:
+        product = ProductCreateDTO(
+            name=name,
+            content=f"Пирожок с манго-маракуйей и крем-чизом - это сочетание хрустящего теста с начинкой из спелого манго, свежей кислинкой маракуйи и лёгким сливочным кремом. *Продукция содержит или может содержать ракообразных или их следы, а также другие аллергены. Кроме ресторанов-исключений, указанных на сайте – https://rostics.ru/promo/noshrimps",
+            composition="Филе куриное оригинальное; Томаты свежие; Салат Айсберг; Булочка бриошь; Сырная котлета; Соус на основе растительных масел со вкусом \"Блю Чиз\"",
+            price=random.choice(PRICES),
+            discount_price=random.randint(1, 200),
+            discount=random.randint(1, 200),
+            count=random.randint(1, 200),
+            grams=random.randint(1, 200),
+            protein=random.randint(1, 200),
+            fats=random.randint(1, 200),
+            carbohydrates=random.randint(1, 200),
+            kilocalorie=random.randint(1, 200),
+            category_id=category.id,
+            photo=url,
+        )
+
+        response2 = await client.post("/api/products/", json=product.model_dump())
+        product_created = Product(**response2.json())
+
+        assert product_created.name == product.name
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -217,7 +257,7 @@ async def test_success_get_all_by_name_filters(clear_db, user_factory):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def add_some_products_and_categories(clear_db, user_factory, count: int = 25):
+async def test_add_some_test_products_and_categories(clear_db, user_factory, count: int = 25):
     async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
         await user_factory(client, TEST_SUPER_USER)
 
@@ -229,3 +269,16 @@ async def add_some_products_and_categories(clear_db, user_factory, count: int = 
 
         assert response.status_code == 200
         assert len(products) == count
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_add_some_normal_products_and_categories(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url="http://localhost:8000") as client:
+        await user_factory(client, TEST_SUPER_USER)
+
+        await create_normal_product(client)
+
+        response = await client.get("/api/products/")
+        products = response.json()
+
+        assert response.status_code == 200

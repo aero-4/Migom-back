@@ -32,7 +32,7 @@ static_dir = BASE_DIR / "static"
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await check_redis_connection()
-    await create_and_delete_tables_db()
+    # await create_and_delete_tables_db()
     yield
 
 
@@ -58,7 +58,7 @@ Instrumentator().instrument(app).expose(app, endpoint='/__internal_metrics__')
 # middlewares
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

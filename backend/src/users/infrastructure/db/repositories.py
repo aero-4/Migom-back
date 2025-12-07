@@ -43,6 +43,14 @@ class PGUserRepository(IUserRepository):
 
         return self._to_domain(obj)
 
+    async def get_all(self):
+        stmt = select(UsersOrm)
+
+        result = await self.session.execute(stmt)
+        objs = [self._to_domain(i) for i in result.scalars().all()]
+
+        return objs
+
     async def delete(self, user: User):
         stmt = select(UsersOrm).where(UsersOrm.id == user.id)
         result = await self.session.execute(stmt)

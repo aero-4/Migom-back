@@ -23,5 +23,6 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
                 if user := await uow.users.get_by_id(token_data.user_id):
                     request.state.user = user or AnonymousUser()
 
+
         response = await call_next(request)
         return response
