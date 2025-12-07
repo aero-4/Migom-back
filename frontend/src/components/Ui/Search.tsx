@@ -3,7 +3,7 @@ import searchSvg from "../../assets/search.svg";
 
 const Search: React.FC = () => {
     return (
-        <div className="flex flex-1 border-gray-200 border-1 border rounded-full max-w-xl shadow">
+        <div className="justify-center text-center flex flex-1 border-gray-200 border-1 border rounded-full max-w-xl shadow">
             <input type="text"
                    placeholder="Поиск..."
                    className="search__input"

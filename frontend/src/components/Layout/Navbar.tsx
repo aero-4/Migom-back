@@ -2,9 +2,9 @@ import React, { useRef, useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import profileSvg from "../../assets/profile.svg";
 import homeSvg from "../../assets/fire-32.png";
-import profileMobileSvg from "../../assets/profile.svg"; // другой svg для мобильного
-import searchMobileSvg from "../../assets/search.svg";   // другой svg для мобильного
-import homeMobileSvg from "../../assets/fire-32.png";       // другой svg для мобильного
+import profileMobileSvg from "../../assets/profile.svg";
+import searchMobileSvg from "../../assets/search.svg";
+import homeMobileSvg from "../../assets/fire-32.png";
 import Search from "../Ui/Search.tsx";
 import Menu from "../Widgets/Menu.tsx";
 import CartWidget from "../Widgets/Cart.tsx";
@@ -44,8 +44,7 @@ const Navbar: React.FC = () => {
 
     return (
         <>
-            {/* --- Desktop / tablet navbar (md and up) --- */}
-            <nav className="hidden md:flex flex-row gap-6 bg-white rounded-b-3xl p-3 mb-3 w-full relative">
+            <nav className="hidden md:flex flex-row gap-6 bg-white rounded-b-3xl p-3 mb-3 w-full relative items-center">
                 <NavLink to="/" className="flex gap-1 justify-center items-center">
                     <img src={homeSvg} alt="Лого"/>
                     <h1>Мигом</h1>
@@ -55,7 +54,7 @@ const Navbar: React.FC = () => {
 
                 <div
                     ref={containerRef}
-                    className="ml-auto relative"
+                    className="ml-auto relative flex items-center gap-2"
                     onMouseEnter={() => setMenuOpen(true)}
                     onFocus={() => setMenuOpen(true)}
                 >
@@ -73,59 +72,58 @@ const Navbar: React.FC = () => {
                     </button>
 
                     {isMenuOpen && (
-                        <div className="absolute right-0 mt-2 z-50">
-                            <Menu onClose={() => setMenuOpen(false)} />
-                        </div>
+                        <Menu onClose={() => setMenuOpen(false)} />
                     )}
                 </div>
             </nav>
 
             <div
-                className="fixed bottom-0 left-0 right-0 bg-white rounded-full md:hidden"
-                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+                className="fixed z-100 bottom-0 left-0 right-0 bg-gray-50 rounded-t-3xl"
+                style={{paddingBottom: 'env(safe-area-inset-bottom)'}}
                 role="navigation"
                 aria-label="Нижнее меню"
             >
-                <div className="max-w-4xl mx-auto flex justify-around items-center p-2">
+                <div className="max-w-4xl mx-auto flex justify-around items-center p-6">
                     <button
                         aria-label="Домой"
-                        className="flex flex-col items-center text-xs focus:outline-none"
+                        className="menu__button"
                         onClick={() => navigate('/')}
                     >
-                        <img src={homeMobileSvg} alt="Домой" className="w-6 h-6" />
+                        <img src={homeMobileSvg} alt="Домой" className="w-6 h-6"/>
                         <span className="mt-1">Домой</span>
                     </button>
 
                     <button
                         aria-label="Поиск"
-                        className="flex flex-col items-center text-xs focus:outline-none"
+                        className="menu__button"
                         onClick={() => setMobileSearchOpen(true)}
                     >
-                        <img src={searchMobileSvg} alt="Поиск" className="w-6 h-6" />
+                        <img src={searchMobileSvg} alt="Поиск" className="w-6 h-6"/>
                         <span className="mt-1">Поиск</span>
                     </button>
 
+                    <CartWidget/>
+
+
                     <button
                         aria-label="Профиль"
-                        className="flex flex-col items-center text-xs focus:outline-none"
+                        className="menu__button"
                         onClick={() => navigate('/profile')}
                     >
                         <img src={profileMobileSvg} alt="Профиль" className="w-6 h-6" />
                         <span className="mt-1">Профиль</span>
                     </button>
 
-                    <CartWidget/>
                 </div>
             </div>
 
-            {/* --- Mobile search overlay/modal --- */}
             {isMobileSearchOpen && (
                 <div
-                    className="fixed inset-0 z-60 bg-black/50 flex items-start justify-center p-4 md:hidden"
+                    className="fixed inset-0 z-60 bg-black/50 flex items-start justify-center p-7"
                     onClick={() => setMobileSearchOpen(false)}
                 >
                     <div
-                        className="w-full max-w-3xl bg-white rounded-xl p-4 mt-12"
+                        className="shadow w-full max-w-3xl bg-white rounded-xl p-6 mt-12"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-end">

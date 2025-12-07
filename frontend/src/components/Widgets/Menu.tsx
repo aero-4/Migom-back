@@ -11,7 +11,7 @@ export default function Menu({ onClose }: Props): JSX.Element {
     };
 
     return (
-        <div className="card flex flex-col gap-1 rounded-md bg-white shadow px-9">
+        <div className="absolute right-0 z-50 mt-50 card flex flex-col gap-1 rounded-md bg-white shadow px-9">
 
             <NavLink
                 to="/profile"

@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useCart} from "../../context/CartContext";
 import DeliveryForm from "../Forms/DeliveryForm";
-import closeSvg from "../../assets/close.svg";
 import QuantityInput from "../Ui/QuantityInput.tsx";
 import CloseButton from "../Ui/CloseButton.tsx";
 
@@ -81,8 +80,17 @@ export const CartWidget: React.FC = () => {
                 ref={triggerRef}
                 aria-label="Открыть корзину"
                 onClick={toggle}
-                className="rounded-full focus:outline-none md:fixed md:right-6 md:bottom-6 z-50 inline-flex items-center justify-center big__button"
+                className="menu__button"
             >
+
+                {totalItems > 0 && (
+                    <span
+                        className="absolute justify-center px-1 py-1 text-[9px] font-semibold leading-none text-white bg-red-500 rounded-full shadow"
+                        aria-live="polite"
+                    >
+                        {totalItems}
+                    </span>
+                )}
 
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path
@@ -94,16 +102,8 @@ export const CartWidget: React.FC = () => {
                     />
                 </svg>
 
-                <p className="px-2" >Корзина</p>
+                <p>Корзина</p>
 
-                {totalItems > 0 && (
-                    <span
-                        className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-semibold leading-none text-white bg-orange-500 rounded-full shadow"
-                        aria-live="polite"
-                    >
-                        {totalItems}
-                    </span>
-                )}
             </button>
 
             <div
@@ -157,27 +157,17 @@ export const CartWidget: React.FC = () => {
                                                         />
                                                     ) : (
                                                         <div className="text-xs text-gray-400">
-                                                            WITHOUT PHOTO
+                                                            PHOTO
                                                         </div>
                                                     )}
                                                 </div>
 
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-start justify-between gap-3">
-                                                        <div>
-                                                            <div className="font-medium text-gray-800 truncate">{item.name}</div>
+                                                        <div className="font-medium text-gray-800 truncate">
+                                                            {item.name}
                                                         </div>
 
-                                                        <div className="text-right">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeItem(item.id)}
-                                                                className="text-sm text-red-600 hover:underline"
-                                                                aria-label={`Удалить ${item.name}`}
-                                                            >
-                                                                <img className="w-4 h-4" src={closeSvg} alt=""/>
-                                                            </button>
-                                                        </div>
                                                     </div>
 
                                                     <div className="mt-4 flex items-center gap-3">
@@ -202,7 +192,7 @@ export const CartWidget: React.FC = () => {
                                 <div className="mb-6 flex flex-row items-center justify-center w-full">
                                     <div className="text-gray-600 p-3">К оплате:</div>
 
-                                    <div className="justify-center text-2xl md:text-3xl text-gray-900">
+                                    <div className="justify-center font-bold text-2xl md:text-3xl text-gray-900">
                                         {totalPrice.toLocaleString()} ₽
                                     </div>
 

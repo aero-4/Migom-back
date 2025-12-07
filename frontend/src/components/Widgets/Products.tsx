@@ -69,14 +69,14 @@ export default function Products(): JSX.Element {
 
     return (
         <>
-            <div className="grid
+            <div className="min-h-screen
+                            grid
+                            gap-2
                             grid-cols-2
                             sm:grid-cols-2
                             md:grid-cols-3
                             lg:grid-cols-4
-                            gap-2">
-
-
+                            ">
                 {products.map(product => (
                     <div
                         key={product.id ?? product.slug}

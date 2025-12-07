@@ -121,7 +121,7 @@ body {
     }
 
     .badge__covered {
-        @apply absolute text-center px-2 text-[11px] md:text-[13px] bg-lime-300 rounded-xl text-gray-600
+        @apply absolute z-1 text-center px-2 text-[11px] md:text-[13px] bg-lime-300 rounded-xl text-gray-600
     }
 
     .img {
@@ -238,10 +238,14 @@ body {
     }
 
     .search__input {
-        @apply w-full h-full px-6 p-2 rounded-full focus:outline-none
+        @apply w-full h-full px-6 p-2 justify-center items-center rounded-full focus:outline-none
     }
 
     .title {
         @apply p-3 my-6 text-3xl font-bold
+    }
+
+    .menu__button {
+        @apply flex flex-col items-center text-xs md:text-lg focus:outline-none hover:opacity-80 active:opacity-70 focus:outline-none
     }
 }
