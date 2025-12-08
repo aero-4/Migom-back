@@ -13,7 +13,6 @@ class AddressCreateDTO(CustomModel):
 
 
 class AddressUpdateDTO(CustomModel):
-    id: int | None = None
     city: str | None = None
     street: str | None = None
     house_number: int | None = None

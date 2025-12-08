@@ -10,7 +10,7 @@ class CookieTransport(IAuthTransport):
             cookie_name: str,
             cookie_max_age: int | None = None,
             cookie_path: str = "/",
-            cookie_secure: bool = False,
+            cookie_secure: bool = True,
             cookie_httponly: bool = True,
             cookie_samesite: Literal["lax", "strict", "none"] = "none",
     ):
@@ -22,12 +22,6 @@ class CookieTransport(IAuthTransport):
         self.cookie_samesite = cookie_samesite
 
     def set_token(self, response: Response, token: str) -> None:
-        """
-        Set the token in a cookie within the HTTP response.
-
-        :param response: The outgoing HTTP response.
-        :param token: The token to be set.
-        """
         response.set_cookie(
             key=self.cookie_name,
             value=token,
@@ -39,21 +33,10 @@ class CookieTransport(IAuthTransport):
         )
 
     def delete_token(self, response: Response) -> None:
-        """
-        Delete the token cookie from the HTTP response.
-
-        :param response: The outgoing HTTP response.
-        """
         response.delete_cookie(
             key=self.cookie_name,
             path=self.cookie_path,
         )
 
     def get_token(self, request: Request) -> str | None:
-        """
-        Retrieve the token from the incoming request's cookies.
-
-        :param request: The incoming HTTP request.
-        :return: Token string or None.
-        """
         return request.cookies.get(self.cookie_name, None)
