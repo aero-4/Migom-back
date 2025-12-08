@@ -3,7 +3,8 @@ import pytest
 import httpx
 from httpx import Response
 
-from src.users.presentation.dtos import UserCreateDTO
+from src.users.presentation.dtos import UserCreateDTO, UserPasswordUpdateDTO
+from src.utils.strings import generate_random_alphanum
 
 TEST_USER_DTO = UserCreateDTO(
     email="olegtinkov@gmail.com",
@@ -62,10 +63,23 @@ async def test_forbidden_paths_user(clear_db, user_factory):
 async def test_success_change_password(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         user = await user_factory(client, TEST_USER_DTO)
-        response = await client.post("/api/users/password", json={"password": "newpass1234"})
+        password = UserPasswordUpdateDTO(password=TEST_USER_DTO.password, new_password=generate_random_alphanum())
+        response = await client.post("/api/users/password", json=password.model_dump())
 
         assert response.status_code == 200
         assert response.json() == {"msg": "Password changed"}
+
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_not_valid_old_password_change_password(clear_db, user_factory):
+    async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
+        user = await user_factory(client, TEST_USER_DTO)
+        password = UserPasswordUpdateDTO(password=TEST_USER_DTO.password + "1", new_password=generate_random_alphanum())
+        response = await client.post("/api/users/password", json=password.model_dump())
+
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Old password is invalid"}
 
 
 @pytest.mark.asyncio(loop_scope="session")
