@@ -69,7 +69,7 @@ export default function Products(): JSX.Element {
 
     return (
         <>
-            <div className="min-h-screen
+            <div className="
                             grid
                             gap-2
                             grid-cols-2

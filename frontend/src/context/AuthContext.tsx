@@ -1,39 +1,35 @@
-import { useState, useEffect, useRef, createContext, useContext } from "react";
+import React, { useState, useEffect, useRef, createContext, useContext } from "react";
 import config from "../../config";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext<any | null>(null);
 
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [user, setUser] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const refreshIntervalRef = useRef(null);
-
-    const hasTokensInCookies = () =>
-        typeof document !== "undefined" &&
-        (/(\b|;)access_token=/.test(document.cookie) || /(\b|;)refresh_token=/.test(document.cookie));
+    const refreshIntervalRef = useRef<number | null>(null);
 
     const handleNotAuthenticated = () => {
         setUser(null);
         setIsAuthenticated(false);
-        window.alert("Вам нужно заново авторизоваться");
-        window.location.assign("/login");
     };
 
     const fetchCurrentUser = async () => {
         setLoading(true);
         try {
-            if (!hasTokensInCookies()) {
-                setUser(null);
-                setIsAuthenticated(false);
-                setLoading(false);
-                return;
-            }
-            const res = await fetch(config.API_URL + "/api/users/me", { credentials: "include" });
+            const res = await fetch(config.API_URL + "/api/users/me", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json",
+                }
+            });
+
             const json = await res.json().catch(() => null);
 
             if (!res.ok) {
-                if (json && json.detail === "Not authenticated") {
+                if (json && (json.detail === "Not authenticated" || res.status === 401)) {
+                    // можно редиректить или просто очистить состояние
                     handleNotAuthenticated();
                 } else {
                     setUser(null);
@@ -44,6 +40,7 @@ export function AuthProvider({ children }) {
                 setIsAuthenticated(true);
             }
         } catch (err) {
+            console.error("fetchCurrentUser error", err);
             setUser(null);
             setIsAuthenticated(false);
         } finally {
@@ -53,19 +50,15 @@ export function AuthProvider({ children }) {
 
     const refreshToken = async () => {
         try {
-            if (!hasTokensInCookies()) {
-                setIsAuthenticated(false);
-                setUser(null);
-                return;
-            }
             const res = await fetch(config.API_URL + "/api/auth/refresh", {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
                 credentials: "include",
             });
             const json = await res.json().catch(() => null);
 
             if (!res.ok) {
-                if (json && json.detail === "Not authenticated") {
+                if (json && (json.detail === "Not authenticated" || res.status === 401)) {
                     handleNotAuthenticated();
                 } else {
                     setIsAuthenticated(false);
@@ -76,19 +69,23 @@ export function AuthProvider({ children }) {
 
             await fetchCurrentUser();
         } catch (err) {
+            console.error("refreshToken error", err);
             setIsAuthenticated(false);
             setUser(null);
         }
     };
 
+    // Вызовим проверку сразу при монтировании (важно для page reload)
     useEffect(() => {
         fetchCurrentUser();
     }, []);
 
+    // Управление авто-рефрешем токена когда пользователь аутентифицирован
     useEffect(() => {
         if (isAuthenticated) {
+            // немедленный рефреш + интервальный
             refreshToken();
-            refreshIntervalRef.current = setInterval(() => {
+            refreshIntervalRef.current = window.setInterval(() => {
                 refreshToken();
             }, 15 * 60 * 1000);
         } else {
@@ -105,19 +102,7 @@ export function AuthProvider({ children }) {
         };
     }, [isAuthenticated]);
 
-    const setCookie = (name, value, opts = {}) => {
-        if (typeof document === "undefined") return;
-        let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
-        if (opts.maxAge) cookie += `; max-age=${opts.maxAge}`;
-        if (opts.expires) cookie += `; expires=${opts.expires.toUTCString()}`;
-        if (opts.path) cookie += `; path=${opts.path}`;
-        else cookie += `; path=/`;
-        if (opts.sameSite) cookie += `; SameSite=${opts.sameSite}`;
-        if (opts.secure) cookie += `; Secure`;
-        document.cookie = cookie;
-    };
-
-    const login = async ({ email, password }) => {
+    const login = async ({ email, password }: { email: string; password: string }) => {
         try {
             const res = await fetch(config.API_URL + "/api/auth/login", {
                 method: "POST",
@@ -126,30 +111,18 @@ export function AuthProvider({ children }) {
                 body: JSON.stringify({ email, password }),
             });
 
-
-            console.log(res.headers)
-
             const json = await res.json().catch(() => null);
 
-
             if (!res.ok) {
-                console.log(json.detail)
-                if (json && json.detail)
-                    return { ok: false, message: json.detail };
-                return { ok: false, message: (json && (json.error || json.message)) || `Ошибка: ${res.status}` };
-            }
-
-            if (json && json.msg && String(json.msg).toLowerCase().includes("login success")) {
-                setIsAuthenticated(true);
-                await fetchCurrentUser();
-                return { ok: true };
+                const msg = (json && (json.detail || json.error || json.message)) || `Ошибка: ${res.status}`;
+                return { ok: false, message: msg };
             }
 
             setIsAuthenticated(true);
             await fetchCurrentUser();
             return { ok: true };
-        } catch (err) {
-            return { ok: false, message: err.message || "Ошибка при входе" };
+        } catch (err: any) {
+            return { ok: false, message: err?.message || "Ошибка при входе" };
         }
     };
 
@@ -160,10 +133,11 @@ export function AuthProvider({ children }) {
                 credentials: "include",
             });
         } catch (e) {
-
+            console.warn("logout error", e);
         }
         setUser(null);
         setIsAuthenticated(false);
+        window.location.assign("/")
     };
 
     return (
@@ -185,6 +159,7 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
     const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+    if (!ctx)
+        throw new Error("useAuth must be used within AuthProvider");
     return ctx;
 }

@@ -2,12 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import profileSvg from "../../assets/profile.svg";
 import homeSvg from "../../assets/fire-32.png";
-import profileMobileSvg from "../../assets/profile.svg";
 import searchMobileSvg from "../../assets/search.svg";
 import homeMobileSvg from "../../assets/fire-32.png";
 import Search from "../Ui/Search.tsx";
 import Menu from "../Widgets/Menu.tsx";
 import CartWidget from "../Widgets/Cart.tsx";
+import CloseButton from "../Ui/CloseButton.tsx";
 
 const Navbar: React.FC = () => {
     const [isMenuOpen, setMenuOpen] = useState(false);
@@ -53,13 +53,14 @@ const Navbar: React.FC = () => {
                 <Search/>
 
                 <div
+                    key={2}
                     ref={containerRef}
                     className="ml-auto relative flex items-center gap-2"
                     onMouseEnter={() => setMenuOpen(true)}
                     onFocus={() => setMenuOpen(true)}
                 >
                     <button
-                        className="p-3 my-auto justify-center items-center"
+                        className="menu__button p-3"
                         aria-haspopup="menu"
                         aria-expanded={isMenuOpen}
                         onClick={() => setMenuOpen(prev => !prev)}
@@ -78,12 +79,11 @@ const Navbar: React.FC = () => {
             </nav>
 
             <div
-                className="fixed z-100 bottom-0 left-0 right-0 bg-gray-50 rounded-t-3xl"
-                style={{paddingBottom: 'env(safe-area-inset-bottom)'}}
+                className="mx-auto items-center justify-center p-6 max-w-screen-lg w-full fixed z-100 bottom-0 left-0 right-0 bg-white rounded-t-3xl"
                 role="navigation"
                 aria-label="Нижнее меню"
             >
-                <div className="max-w-4xl mx-auto flex justify-around items-center p-6">
+                <div className="flex flex-row justify-around items-center">
                     <button
                         aria-label="Домой"
                         className="menu__button"
@@ -105,17 +105,21 @@ const Navbar: React.FC = () => {
                     <CartWidget/>
 
 
-                    <button
-                        aria-label="Профиль"
-                        className="menu__button"
-                        onClick={() => navigate('/profile')}
-                    >
-                        <img src={profileMobileSvg} alt="Профиль" className="w-6 h-6" />
-                        <span className="mt-1">Профиль</span>
-                    </button>
+                    <NavLink to="/profile"
+                             className="menu__button">
+                        <img
+                            className="w-6 h-6 hover:opacity-80"
+                            src={profileSvg}
+                            alt="Профиль"
+                        />
+                        Профиль
+                    </NavLink>
+
+
 
                 </div>
             </div>
+
 
             {isMobileSearchOpen && (
                 <div
@@ -127,16 +131,10 @@ const Navbar: React.FC = () => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-end">
-                            <button
-                                aria-label="Закрыть поиск"
-                                className="p-2"
-                                onClick={() => setMobileSearchOpen(false)}
-                            >
-                                ✕
-                            </button>
+                            <CloseButton close={() => setMobileSearchOpen(false)}/>
                         </div>
 
-                        <Search />
+                        <Search/>
                     </div>
                 </div>
             )}

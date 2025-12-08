@@ -144,7 +144,11 @@ const DeliveryForm: React.FC<Props> = ({
                 return null;
             }
 
-            case "house":
+            case "house": {
+                if (!raw) return null;
+                if (!numericRegex.test(String(raw))) return "Только цифры";
+                return null;
+            }
             case "flat":
             case "floor": {
                 if (!raw) return null;

@@ -6,7 +6,6 @@ import {CartProvider} from "../../context/CartContext.tsx";
 const Layout: React.FC = () => {
     return (
         <div className="flex flex-col min-h-screen">
-
             <div className="w-full">
                 <div className="mx-auto w-full max-w-screen-lg">
                     <main className="flex-1 flex overflow-auto justify-center items-center">
@@ -23,7 +22,6 @@ const Layout: React.FC = () => {
                     </main>
                 </div>
             </div>
-
         </div>
     );
 };

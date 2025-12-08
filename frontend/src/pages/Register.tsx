@@ -72,12 +72,12 @@ export default function Register() {
                 email: form.email.trim().toLowerCase(),
                 password: form.password,
                 birthday: form.birthdate ? form.birthdate : null,
-                is_super_user: false,
             };
 
             const res = await fetch(config.API_URL + "/api/auth/register/", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
+                credentials: "include",
                 body: JSON.stringify(payload),
             });
 
