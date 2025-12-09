@@ -5,30 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f860411-ead3-41ca-9280-aa1a784d7646" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/auth/presentation/permissions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/addresses/application/use_cases/delete_address.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/addresses/application/use_cases/delete_address.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/addresses/domain/interfaces/address_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/addresses/domain/interfaces/address_repo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/addresses/infrastructure/db/repositories.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/addresses/infrastructure/db/repositories.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/addresses/presentation/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/addresses/presentation/api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/application/use_cases/registration.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/application/use_cases/registration.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/domain/entities.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/domain/entities.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/presentation/dtos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/presentation/dtos.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/auth/presentation/middlewares/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/presentation/middlewares/security.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/orders/domain/entities.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/orders/domain/entities.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/orders/infrastructure/db/orm.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/orders/infrastructure/db/orm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/orders/infrastructure/db/repositories.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/orders/infrastructure/db/repositories.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/orders/presentation/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/orders/presentation/api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/orders/presentation/dtos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/orders/presentation/dtos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/users/application/use_cases/information.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/users/application/use_cases/information.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/users/domain/dtos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/users/domain/dtos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/auth/presentation/permissions.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/presentation/permissions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/core/domain/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/core/domain/exceptions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/users/presentation/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/users/presentation/api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/integration/addresses/integration_test_addresses.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/integration/addresses/integration_test_addresses.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/integration/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/integration/conftest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/integration/orders/integration_test_orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/integration/orders/integration_test_orders.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/integration/users/integration_test_information.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/integration/users/integration_test_information.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -391,6 +371,7 @@
       <workItem from="1763661770984" duration="159000" />
       <workItem from="1763843689208" duration="2000" />
       <workItem from="1764077265872" duration="7000" />
+      <workItem from="1764869173979" duration="3000" />
     </task>
     <servers />
   </component>

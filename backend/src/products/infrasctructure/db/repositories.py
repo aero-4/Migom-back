@@ -87,7 +87,7 @@ class PGProductsRepository(IProductRepository):
         if not obj:
             raise NotFound()
 
-        for key, value in product_data.model_dump(mode="python").items():
+        for key, value in product_data.model_dump(mode="python", exclude_none=True).items():
             setattr(obj, key, value)
 
         await self.session.flush()

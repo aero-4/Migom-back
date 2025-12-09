@@ -62,6 +62,21 @@ class PGUserRepository(IUserRepository):
         await self.session.delete(obj)
         await self.session.flush()
 
+    async def update(self, user_data: UserUpdate) -> User:
+        stmt = select(UsersOrm).where(UsersOrm.id == user_data.id)
+        result = await self.session.execute(stmt)
+        obj: UsersOrm = result.scalar_one_or_none()
+
+        if not obj:
+            raise UserNotFound(detail=f"User with id {user_data.id} not found")
+
+        for field, value in user_data.model_dump(exclude_none=True).items():
+            setattr(obj, field, value)
+
+        await self.session.flush()
+
+        return self._to_domain(obj)
+
     @staticmethod
     def _to_domain(obj: UsersOrm) -> User:
         return User(

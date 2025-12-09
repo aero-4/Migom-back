@@ -100,12 +100,6 @@ body {
         @apply opacity-80
     }
 
-    @screen md {
-        .add__button-responsive {
-            @apply p-3 text-base
-        }
-    }
-
     .product__card {
         @apply
         flex
@@ -156,12 +150,6 @@ body {
         @apply text-sm md:text-lg text-gray-900 text-center justify-center truncate p-2
     }
 
-    .form__field:focus {
-        outline: none;
-        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
-        border-color: var(--primary-500)
-    }
-
     .form__label {
         @apply block text-sm font-medium text-gray-700 mb-1
     }
@@ -170,11 +158,6 @@ body {
         @apply grid grid-cols-1 gap-3
     }
 
-    @screen sm {
-        .form__row {
-            @apply grid-cols-2
-        }
-    }
     .form__textarea {
         @apply w-full rounded-lg border px-3 py-2 text-base border-gray-200 bg-white resize-none
     }
@@ -183,11 +166,6 @@ body {
         @apply flex flex-col gap-3
     }
 
-    @screen sm {
-        .form__actions {
-            @apply flex-row
-        }
-    }
 
     .input {
         @apply w-full rounded-lg border px-3 py-2 md:py-4 text-base border-gray-200 rounded-full focus:outline-none
@@ -242,7 +220,7 @@ body {
     }
 
     .title {
-        @apply p-3 my-6 text-3xl font-bold
+        @apply my-6 text-3xl font-bold
     }
 
     .menu__button {

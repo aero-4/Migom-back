@@ -79,14 +79,14 @@ async def test_not_valid_old_password_change_password(clear_db, user_factory):
         response = await client.post("/api/users/password", json=password.model_dump())
 
         assert response.status_code == 400
-        assert response.json() == {"detail": "Old password is invalid"}
+        assert response.json() == {"detail": "Current password is invalid"}
 
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_fail_change_password(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
         user = await user_factory(client, TEST_USER_DTO)
-        response = await client.post("/api/users/password", json={"password": "newpas"})
+        response = await client.post("/api/users/password", json={"password": "newpas", "new_password": "alex2131231"})
 
         assert response.status_code == 422
         assert response.json()["detail"][0]["msg"] == "String should have at least 8 characters"
@@ -96,7 +96,7 @@ async def test_fail_change_password(clear_db, user_factory):
 @pytest.mark.asyncio(loop_scope="session")
 async def test_not_found_user_change_password(clear_db, user_factory):
     async with httpx.AsyncClient(base_url='http://localhost:8000') as client:
-        response = await client.post("/api/users/password", json={"password": "newpas12345"})
+        response = await client.post("/api/users/password", json={"password": "newpas12345", "new_password": "alex2131231"})
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Authentication required"}
