@@ -3,6 +3,7 @@ import {useCart} from "../../context/CartContext";
 import DeliveryForm from "../Forms/DeliveryForm";
 import QuantityInput from "../Ui/QuantityInput.tsx";
 import CloseButton from "../Ui/CloseButton.tsx";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 export const CartWidget: React.FC = () => {
     const {
@@ -17,7 +18,7 @@ export const CartWidget: React.FC = () => {
         clear,
         createOrder,
     } = useCart();
-
+    const {isAuthenticated} = useAuth();
     const [loading, setLoading] = useState(false);
     const [isDeliveringForm, setDeliveringForm] = useState(false);
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -212,16 +213,30 @@ export const CartWidget: React.FC = () => {
                                         Очистить корзину
                                     </button>
 
-                                    <button
-                                        type="button"
-                                        onClick={handleSwitchToDeliveringForm}
-                                        disabled={loading || items.length === 0}
-                                        className={`w-full flex items-center justify-center text-white btn__circle ${
-                                            loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
-                                        } focus:outline-none`}
-                                    >
-                                        Оформить заказ
-                                    </button>
+
+                                    {isAuthenticated ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleSwitchToDeliveringForm}
+                                            disabled={loading || items.length === 0}
+                                            className={`w-full flex items-center justify-center text-white btn__circle ${
+                                                loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                                            } focus:outline-none`}
+                                        >
+                                            Оформить заказ
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => window.location.assign("/login")}
+                                            disabled={loading || items.length === 0}
+                                            className={`w-full flex items-center justify-center text-white btn__circle ${
+                                                loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                                            } focus:outline-none`}
+                                        >
+                                            Оформить заказ и войти
+                                        </button>
+                                    )}
 
 
                                 </div>

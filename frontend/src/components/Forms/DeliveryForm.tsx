@@ -72,49 +72,78 @@ const DeliveryForm: React.FC<Props> = ({
     const [loadingFetch, setLoadingFetch] = useState(false);
     const [errors, setErrors] = useState<Errors>({});
 
+    // NEW: список адресов и статусы
+    const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
+    const [loadingAddresses, setLoadingAddresses] = useState(false);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
     const alphaRegex = /^[\p{L}\s\-]+$/u;
     const numericRegex = /^\d+$/;
 
-    useEffect(() => {
-        const ctrl = new AbortController();
-        const load = async () => {
-            setLoadingFetch(true);
-            try {
-                const res = await fetch("/api/addresses/", {signal: ctrl.signal});
-                if (!res.ok) {
-                    return;
-                }
-                const list = await res.json();
-                if (!Array.isArray(list) || list.length === 0) return;
-
-                const last = list[list.length - 1];
-
-                const mapped: DeliveryAddress = {
-                    id: last.id,
-                    addressLine: last.city ?? "",
-                    street: last.street ?? "",
-                    house: last.house_number != null ? String(last.house_number) : "",
-                    flat: last.apartment_number != null ? String(last.apartment_number) : "",
-                    floor: last.floor != null ? String(last.floor) : "",
-                    intercom: last.entrance != null ? String(last.entrance) : "",
-                    comment: last.comment ?? "",
-                    leaveAtDoor: !!last.is_leave_at_door,
-                };
-
-                setAddr(mapped);
-                onChange?.(mapped);
-            } catch (e) {
-                if ((e as any)?.name === "AbortError") return;
-                console.error("Failed to fetch addresses", e);
-            } finally {
-                setLoadingFetch(false);
+    // Fetch addresses helper (used on mount and after create/update/delete)
+    const fetchAddresses = useCallback(async (signal?: AbortSignal) => {
+        setLoadingAddresses(true);
+        try {
+            const res = await fetch("/api/addresses/", {signal});
+            if (!res.ok) {
+                setAddresses([]);
+                return;
             }
-        };
-
-        load();
-        return () => ctrl.abort();
+            const list = await res.json();
+            if (!Array.isArray(list)) {
+                setAddresses([]);
+                return;
+            }
+            const mapped: DeliveryAddress[] = list.map((last: any) => ({
+                id: last.id,
+                addressLine: last.city ?? "",
+                street: last.street ?? "",
+                house: last.house_number != null ? String(last.house_number) : "",
+                flat: last.apartment_number != null ? String(last.apartment_number) : "",
+                floor: last.floor != null ? String(last.floor) : "",
+                intercom: last.entrance != null ? String(last.entrance) : "",
+                comment: last.comment ?? "",
+                leaveAtDoor: !!last.is_leave_at_door,
+            }));
+            setAddresses(mapped);
+        } catch (e) {
+            if ((e as any)?.name === "AbortError") return;
+            console.error("Failed to fetch addresses", e);
+            setAddresses([]);
+        } finally {
+            setLoadingAddresses(false);
+        }
     }, []);
 
+    useEffect(() => {
+        const ctrl = new AbortController();
+        fetchAddresses(ctrl.signal);
+        return () => ctrl.abort();
+    }, [fetchAddresses]);
+
+    // If parent passed value, reflect it
+    useEffect(() => {
+        if (value) {
+            setAddr(value);
+        }
+    }, [value]);
+
+    const genUuid = (): string => {
+        if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
+            return (crypto as any).randomUUID();
+        }
+        return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+    };
+    const normalize = (arr: any[]) =>
+        arr.map((p) => ({
+            ...p,
+            id: p.id && String(p.id).trim() ? p.id : genUuid(),
+            name: p.name ?? p.slug ?? "Без имени",
+            photo: p.photo ?? p.image ?? "",
+            count: typeof p.count === "number" ? p.count : Number(p.count ?? 0),
+            price: typeof p.price === "number" ? p.price : Number(p.price ?? 0),
+            gramme: typeof p.gramme === "number" ? p.gramme : Number(p.gramme ?? 0),
+        }));
 
     const update = useCallback(
         (patch: Partial<DeliveryAddress>) => {
@@ -130,7 +159,7 @@ const DeliveryForm: React.FC<Props> = ({
                 setErrors((prev) => ({...prev, [k]: err}));
             }
         },
-        [onChange]
+        [onChange, addr]
     );
 
     const validateField = (field: keyof DeliveryAddress, value?: any): string | null => {
@@ -251,6 +280,8 @@ const DeliveryForm: React.FC<Props> = ({
                 }
                 const created = await res.json();
                 setAddr((prev) => ({...prev, id: created.id}));
+                // refresh addresses and select created
+                await fetchAddresses();
             } else {
                 const body = buildUpdateDTO(addr);
                 const res = await fetch(`/api/addresses/${addr.id}`, {
@@ -268,6 +299,8 @@ const DeliveryForm: React.FC<Props> = ({
                     }
                     throw new Error(message);
                 }
+                // refresh addresses
+                await fetchAddresses();
             }
 
             setStep("payment");
@@ -284,6 +317,44 @@ const DeliveryForm: React.FC<Props> = ({
         setErrors((prev) => ({...prev, [field]: err}));
     };
 
+    // NEW: select an address from list (checkbox behaviour but only one selected)
+    const selectAddress = (a: DeliveryAddress) => {
+        setAddr(a);
+        onChange?.(a);
+    };
+
+    const startEdit = (a: DeliveryAddress) => {
+        setAddr(a);
+        onChange?.(a);
+    };
+
+    const startCreate = () => {
+        setAddr({leaveAtDoor: false});
+        onChange?.({leaveAtDoor: false});
+    };
+
+    const handleDeleteAddress = async (id?: number) => {
+        if (!id) return;
+        if (!confirm("Удалить этот адрес?")) return;
+        setDeletingId(id);
+        try {
+            const res = await fetch(`/api/addresses/${id}`, {method: "DELETE"});
+            if (!res.ok) {
+                throw new Error(`Ошибка удаления: ${res.status}`);
+            }
+            // если удалили выбранный адрес — очистим addr
+            if (addr.id === id) {
+                setAddr({leaveAtDoor: false});
+                onChange?.({leaveAtDoor: false});
+            }
+            await fetchAddresses();
+        } catch (e) {
+            console.error(e);
+            alert("Не удалось удалить адрес");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     return (
         <div className={`w-full h-full ${className}`}>
@@ -298,6 +369,75 @@ const DeliveryForm: React.FC<Props> = ({
                     </div>
 
                     <div className="flex-1 min-h-0 overflow-auto p-4 sm:p-6 space-y-3">
+                        {/* --- NEW: Addresses list with checkbox-like selection --- */}
+                        <div className="bg-gray-50 p-3 rounded-md">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="font-medium">Выберите адрес</div>
+                                {/* TOP "Добавить новый" big__button */}
+                                <button
+                                    type="button"
+                                    onClick={startCreate}
+                                    className="big__button text-sm"
+                                >
+                                    + Добавить новый
+                                </button>
+                            </div>
+
+                            {loadingAddresses ? (
+                                <div className="text-sm text-gray-500">Загрузка адресов...</div>
+                            ) : addresses.length === 0 ? (
+                                <div className="text-sm text-gray-500">Адресов нет</div>
+                            ) : (
+                                <div className="grid gap-2">
+                                    {addresses.map((a) => (
+                                        <label key={String(a.id)} className="flex items-start gap-3 p-2 border rounded">
+                                            <input
+                                                type="checkbox"
+                                                checked={addr.id === a.id}
+                                                onChange={() => selectAddress(a)} /* поведение: сделать выбранным (единственным) */
+                                                className="mt-1"
+                                            />
+                                            <div className="flex-1 text-sm">
+                                                <div className="font-medium">
+                                                    {a.addressLine} {a.street ? `, ${a.street}` : ""} {a.house ? `д. ${a.house}` : ""}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {a.flat ? `Кв. ${a.flat}` : ""} {a.floor ? `, этаж ${a.floor}` : ""} {a.intercom ? `, домофон ${a.intercom}` : ""}
+                                                </div>
+                                                {a.comment ? <div className="text-xs text-gray-400 mt-1">{a.comment}</div> : null}
+                                            </div>
+
+                                            <div className="flex flex-col items-end gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => startEdit(a)}
+                                                    className="text-xs text-blue-600"
+                                                >
+                                                    Ред.
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    disabled={deletingId === a.id}
+                                                    onClick={() => handleDeleteAddress(a.id)}
+                                                    className="text-xs text-red-600"
+                                                >
+                                                    {deletingId === a.id ? "Удаление..." : "Удалить"}
+                                                </button>
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* --- BOTTOM "Добавить новый" big__button (над формой полей) --- */}
+                        <div className="flex justify-center">
+                            <button type="button" onClick={startCreate} className="big__button w-full max-w-xs">
+                                + Добавить новый
+                            </button>
+                        </div>
+
+                        {/* --- Existing inline form fields (you already had these) --- */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
                                 <label className="sr-only" htmlFor="city">
@@ -463,7 +603,7 @@ const DeliveryForm: React.FC<Props> = ({
                              onBack={() => setStep("address")}/>
             )}
 
-            {loadingFetch && (<Loader/>)}
+            { (loadingFetch || loadingAddresses) && (<Loader/>)}
         </div>
     );
 };
