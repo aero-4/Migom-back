@@ -143,17 +143,17 @@ export const CartWidget: React.FC = () => {
                                         <div className="text-sm mt-2">Добавьте товары и они появятся тут.</div>
                                     </div>
                                 ) : (
-                                    <ul className="space-y-5 w-full p-2">
+                                    <ul className="space-y-5 w-full p-3">
                                         {items.map((item) => (
                                             <li key={item.id}
-                                                className="flex gap-3 items-start p-1 md:p-6 rounded-lg border border-gray-100">
+                                                className="flex gap-3 items-start p-2 md:p-6 rounded-lg border border-gray-100">
                                                 <div
                                                     className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
                                                     {item.image ? (
                                                         <img src={item.image}
                                                              alt={item.name}
                                                              className="w-full h-full object-cover cursor-pointer"
-                                                             onClick={()=> document.location.href = "/product/" + item.id}
+                                                             onClick={() => document.location.href = "/product/" + item.id}
                                                         />
                                                     ) : (
                                                         <div className="text-xs text-gray-400">
@@ -172,10 +172,15 @@ export const CartWidget: React.FC = () => {
 
                                                     <div className="mt-4 flex items-center gap-3">
 
-                                                        <QuantityInput item={item} setQty={setQty} max={item.qty}/>
+                                                        <QuantityInput item={item}
+                                                                       setQty={setQty}
+                                                                       max={item.qty}/>
 
-                                                        <div className="ml-auto text-lg text-gray-600"><span
-                                                            className="font-semibold text-gray-800">{(item.price * item.qty).toLocaleString()} ₽</span>
+                                                        <div className="ml-auto text-lg text-gray-600">
+                                                            <span
+                                                                className="font-semibold text-gray-800">
+                                                                {item.discount_price ? item.discount_price : item.price} ₽
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -215,7 +220,7 @@ export const CartWidget: React.FC = () => {
                                         disabled={loading || items.length === 0}
                                         className={`w-full flex items-center justify-center text-white btn__circle ${
                                             loading || items.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
-                                        } focus:outline-none focus:ring-4 focus:ring-red-300`}
+                                        } focus:outline-none`}
                                     >
                                         Оформить заказ
                                     </button>

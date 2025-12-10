@@ -220,7 +220,7 @@ body {
     }
 
     .title {
-        @apply my-6 text-3xl font-bold
+        @apply px-2 my-6 text-3xl font-bold
     }
 
     .menu__button {
