@@ -15,6 +15,14 @@ export default function Home(): JSX.Element {
 
             <Products/>
 
+            <h1 className="title">C новым годом!</h1>
+
+            <Products/>
+
+            <h1 className="title">Самое выгодное!</h1>
+
+            <Products/>
+
         </>
     );
 }

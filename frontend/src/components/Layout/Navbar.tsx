@@ -52,13 +52,16 @@ const Navbar: React.FC = () => {
 
                 <Search/>
 
+                <CartWidget/>
+
+
                 <div
-                    key={2}
                     ref={containerRef}
-                    className="ml-auto relative flex items-center gap-2"
+                    className="ml-auto relative flex flex-row gap-6 items-center"
                     onMouseEnter={() => setMenuOpen(true)}
                     onFocus={() => setMenuOpen(true)}
                 >
+
                     <button
                         className="menu__button p-3"
                         aria-haspopup="menu"
@@ -79,7 +82,7 @@ const Navbar: React.FC = () => {
             </nav>
 
             <div
-                className="mx-auto items-center justify-center p-6 max-w-screen-lg w-full fixed z-100 bottom-0 left-0 right-0 bg-white rounded-t-3xl"
+                className="md:hidden mx-auto items-center justify-center p-6 max-w-screen-lg w-full fixed z-100 bottom-0 left-0 right-0 bg-white rounded-t-4xl"
                 role="navigation"
                 aria-label="Нижнее меню"
             >
@@ -90,7 +93,6 @@ const Navbar: React.FC = () => {
                         onClick={() => navigate('/')}
                     >
                         <img src={homeMobileSvg} alt="Домой" className="w-6 h-6"/>
-                        <span className="mt-1">Домой</span>
                     </button>
 
                     <button
@@ -98,8 +100,7 @@ const Navbar: React.FC = () => {
                         className="menu__button"
                         onClick={() => setMobileSearchOpen(true)}
                     >
-                        <img src={searchMobileSvg} alt="Поиск" className="w-6 h-6"/>
-                        <span className="mt-1">Поиск</span>
+                        <img src={searchMobileSvg} alt="Поиск" className="w-7 h-7"/>
                     </button>
 
                     <CartWidget/>
@@ -112,7 +113,6 @@ const Navbar: React.FC = () => {
                             src={profileSvg}
                             alt="Профиль"
                         />
-                        Профиль
                     </NavLink>
 
 

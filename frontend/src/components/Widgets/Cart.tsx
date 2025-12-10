@@ -102,8 +102,6 @@ export const CartWidget: React.FC = () => {
                     />
                 </svg>
 
-                <p>Корзина</p>
-
             </button>
 
             <div
