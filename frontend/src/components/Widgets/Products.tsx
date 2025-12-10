@@ -90,9 +90,9 @@ export default function Products(): JSX.Element {
 
                         </a>
 
-                        <p className="product__name product__name--2lines">{product.name}</p>
+                        <p className="product__name">{product.name}</p>
 
-                        <div className="flex items-center">
+                        <div className="flex flex-row mt-auto">
                             <div className="flex flex-col">
                                 <span className="text-gray-500 text-xs block">
                                     {product.gramme} г
@@ -104,18 +104,20 @@ export default function Products(): JSX.Element {
                                             {product.price} ₽
                                         </p>
 
-                                        <p className="text-xl md:text-2xl font-bold">
-                                            {product.discount_price} ₽
-                                        </p>
+                                        <div className="flex flex-row">
+                                            <p className="text-xl md:text-2xl font-bold">
+                                                {product.discount_price} ₽
+                                            </p>
+                                            <p className="badge__covered px-3 ml-12 -mt-3">
+                                                -{product.discount}%
+                                            </p>
+                                        </div>
 
-                                        <p className="badge__covered ml-11">
-                                            -{product.discount}%
-                                        </p>
 
                                     </div>
                                 ) : (
                                     <div>
-                                        <p className="text-xl md:text-2xl font-bold">
+                                    <p className="text-xl md:text-2xl font-bold">
                                             {product.price} ₽
                                         </p>
                                     </div>
@@ -124,7 +126,7 @@ export default function Products(): JSX.Element {
 
                             </div>
 
-                            <div className="ml-auto mt-7">
+                            <div className="ml-auto h-full mt-8">
                                 <AddInCartBtn product={product}/>
                             </div>
                         </div>

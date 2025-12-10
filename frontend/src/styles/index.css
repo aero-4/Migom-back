@@ -109,9 +109,8 @@ body {
         min-w-0
         gap-3
         p-3
-        md:p-6
+        md:p-5
         overflow-hidden
-        max-w-150
     }
 
     .badge__covered {
@@ -131,12 +130,9 @@ body {
     }
 
     .product__name {
-        @apply min-w-0 text-[13px] font-medium text-gray-700 truncate line-clamp-2
+        @apply min-w-0 text-[14px] font-medium text-gray-700 truncate line-clamp-2 whitespace-normal
     }
 
-    .product__name--2lines {
-        @apply line-clamp-2 min-w-0
-    }
 
     .meta__row {
         @apply flex items-center justify-between gap-2

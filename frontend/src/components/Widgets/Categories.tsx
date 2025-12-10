@@ -40,7 +40,7 @@ export default function Categories(): JSX.Element {
             <div className="flex flex-wrap gap-6 justify-between items-center p-6 rounded-xl">
                 {cats.map((category, idx) => (
                     <a href={`/category/${category.id}`}
-                       className="flex flex-col"
+                       className="menu__button"
                        key={`cat-${idx}`}
                     >
                         <img
