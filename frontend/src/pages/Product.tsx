@@ -65,7 +65,7 @@ const Product: React.FC = () => {
                 {product.photo && (
                     <img src={product.photo}
                          alt={product.name}
-                         className="img max-w-lg"/>
+                         className="img"/>
                 )}
 
                 <div className="flex flex-col gap-12">

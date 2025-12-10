@@ -119,7 +119,7 @@ body {
     }
 
     .img {
-        @apply w-full aspect-square rounded-xl object-cover bg-gray-100 transition-transform transform;
+        @apply w-full h-full my-auto aspect-square rounded-xl object-cover bg-gray-100 transition-transform transform;
     }
 
     .cat__img {

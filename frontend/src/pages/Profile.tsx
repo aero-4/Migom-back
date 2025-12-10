@@ -107,11 +107,11 @@ const ChangePasswordModal: React.FC<{
         <div
             ref={modalRef}
             onClick={onBackdropClick}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
             role="dialog"
             aria-modal="true"
         >
-            <div className="relative w-full h-full bg-white md:h-auto md:rounded-lg shadow-lg p-6 md:mx-0 md:max-w-[600px] md:max-h-[80vh] overflow-auto">
+            <div className="rounded-3xl relative w-full h-full bg-white md:h-auto shadow-lg p-6 md:mx-0 md:max-w-[600px] md:max-h-[80vh] overflow-auto">
                 <div className="flex flex-row">
                     <h3 className="title">Смена пароля</h3>
 
@@ -150,7 +150,7 @@ const ChangePasswordModal: React.FC<{
 
                     <div className="flex items-center justify-center gap-3">
                         <button type="submit" className="big__button" disabled={loading} aria-busy={loading}>
-                            {loading ? "Отправляем..." : "Изменить"}
+                            {"Изменить"}
                         </button>
 
                     </div>

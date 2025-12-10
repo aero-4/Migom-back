@@ -55,7 +55,7 @@ export const CartWidget: React.FC = () => {
         setStep("address"); // открываем сразу на шаге адреса
     };
 
-    const handleCheckout = async (addr?: any) => { // addr передаётся из PaymentForm, если нужно
+    const handleCheckout = async (addr?: any) => {
         if (items.length === 0) {
             alert("Корзина пуста");
             return;
@@ -85,14 +85,14 @@ export const CartWidget: React.FC = () => {
 
                 {totalItems > 0 && (
                     <span
-                        className="absolute justify-center px-1 py-1 text-[9px] font-semibold leading-none text-white bg-red-500 rounded-full shadow"
+                        className="absolute justify-center px-1 text-[10px] font-semibold leading-none text-white bg-red-500 rounded-full shadow"
                         aria-live="polite"
                     >
                         {totalItems}
                     </span>
                 )}
 
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path
                         d="M15 11C15 12.6569 13.6569 14 12 14C10.3431 14 9 12.6569 9 11M4 7H20M4 7V13C4 19.3668 5.12797 20.5 12 20.5C18.872 20.5 20 19.3668 20 13V7M4 7L5.44721 4.10557C5.786 3.428 6.47852 3 7.23607 3H16.7639C17.5215 3 18.214 3.428 18.5528 4.10557L20 7"
                         stroke="currentColor"
