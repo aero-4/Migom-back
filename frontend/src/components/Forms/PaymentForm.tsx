@@ -24,11 +24,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     };
 
     return (
-        <div className="flex flex-col p-3">
+        <div className="flex flex-col min-h-screen p-3">
             <h3 className="text-3xl font-semibold my-6">Оплата</h3>
 
-            <div className="flex flex-col gap-4">
-
+            <div className="flex flex-col gap-2 mt-auto my-12">
                 <button
                     type="button"
                     onClick={handlePayment}
@@ -37,9 +36,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     {submitLabel}
                 </button>
 
-                {onBack && (
-                    <BackButton onBack={onBack}/>
-                )}
+                {onBack && <BackButton onBack={onBack} />}
             </div>
         </div>
     );

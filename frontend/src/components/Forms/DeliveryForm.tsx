@@ -252,6 +252,12 @@ const DeliveryForm: React.FC<Props> = ({
     const handleAddressSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
 
+        // If user isn't editing/creating a new address (form hidden), allow quick proceed to payment
+        if (!showForm) {
+            setStep("payment");
+            return;
+        }
+
         if (!validateAll()) return;
 
         setLoadingSubmit(true);
@@ -426,8 +432,7 @@ const DeliveryForm: React.FC<Props> = ({
                                                         selectAddress(a);
                                                     }
                                                 }}
-                                                className={`w-full p-4 rounded-2xl flex gap-4 ${String(addr.id) === String(a.id) ? 'border-blue-200 bg-blue-50' : ''}`}
-                                            >
+                                                className={`w-full p-4 rounded-2xl flex gap-4 ${String(addr.id) === String(a.id) ? 'border-blue-200 bg-blue-50' : ''}`}>
                                                 <input
                                                     type="radio"
                                                     name="saved-address"
@@ -537,37 +542,37 @@ const DeliveryForm: React.FC<Props> = ({
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2">
-                                        <label className="sr-only" htmlFor="house">Номер дома</label>
-                                        <input
-                                            id="house"
-                                            name="house"
-                                            inputMode="numeric"
-                                            pattern="\d*"
-                                            type="text"
-                                            value={addr.house ?? ""}
-                                            onChange={(e) => update({house: e.target.value.replace(/[^\d]/g, "")})}
-                                            onBlur={() => onBlurValidate("house")}
-                                            placeholder="Номер дома"
-                                            className={`input text-sm sm:text-base ${errors.house ? "border-red-300" : ""}`}
-                                            aria-invalid={!!errors.house}
-                                        />
-                                        {errors.house ? <div className="text-xs text-red-600 mt-1">{errors.house}</div> : null}
+                                    <label className="sr-only" htmlFor="house">Номер дома</label>
+                                    <input
+                                        id="house"
+                                        name="house"
+                                        inputMode="numeric"
+                                        pattern="\d*"
+                                        type="text"
+                                        value={addr.house ?? ""}
+                                        onChange={(e) => update({house: e.target.value.replace(/[^\d]/g, "")})}
+                                        onBlur={() => onBlurValidate("house")}
+                                        placeholder="Номер дома"
+                                        className={`input text-sm sm:text-base ${errors.house ? "border-red-300" : ""}`}
+                                        aria-invalid={!!errors.house}
+                                    />
+                                    {errors.house ? <div className="text-xs text-red-600 mt-1">{errors.house}</div> : null}
 
-                                        <label className="sr-only" htmlFor="flat">Номер квартиры</label>
-                                        <input
-                                            id="flat"
-                                            name="flat"
-                                            inputMode="numeric"
-                                            pattern="\d*"
-                                            type="text"
-                                            value={addr.flat ?? ""}
-                                            onChange={(e) => update({flat: e.target.value.replace(/[^\d]/g, "")})}
-                                            onBlur={() => onBlurValidate("flat")}
-                                            placeholder="Номер квартиры"
-                                            className={`input text-sm sm:text-base ${errors.flat ? "border-red-300" : ""}`}
-                                            aria-invalid={!!errors.flat}
-                                        />
-                                        {errors.flat ? <div className="text-xs text-red-600 mt-1">{errors.flat}</div> : null}
+                                    <label className="sr-only" htmlFor="flat">Номер квартиры</label>
+                                    <input
+                                        id="flat"
+                                        name="flat"
+                                        inputMode="numeric"
+                                        pattern="\d*"
+                                        type="text"
+                                        value={addr.flat ?? ""}
+                                        onChange={(e) => update({flat: e.target.value.replace(/[^\d]/g, "")})}
+                                        onBlur={() => onBlurValidate("flat")}
+                                        placeholder="Номер квартиры"
+                                        className={`input text-sm sm:text-base ${errors.flat ? "border-red-300" : ""}`}
+                                        aria-invalid={!!errors.flat}
+                                    />
+                                    {errors.flat ? <div className="text-xs text-red-600 mt-1">{errors.flat}</div> : null}
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -643,7 +648,7 @@ const DeliveryForm: React.FC<Props> = ({
                         <div className="flex gap-2">
                             <button
                                 type="submit"
-                                disabled={loadingSubmit || !showForm}
+                                disabled={loadingSubmit || !(showForm || (addr.addressLine && addr.street))}
                                 className={`big__button btn__circle flex-1 ${loadingSubmit ? "opacity-60 cursor-not-allowed" : ""}`}
                             >
                                 Далее

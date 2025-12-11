@@ -53,7 +53,7 @@ export const CartWidget: React.FC = () => {
 
     const handleSwitchToDeliveringForm = () => {
         setDeliveringForm(true);
-        setStep("address"); // открываем сразу на шаге адреса
+        setStep("address");
     };
 
     const handleCheckout = async (addr?: any) => {
@@ -61,16 +61,29 @@ export const CartWidget: React.FC = () => {
             alert("Корзина пуста");
             return;
         }
-        setLoading(true);
-        const result = await createOrder({source: "web", address: addr});
-        setLoading(false);
+
+        const addressId = addr?.id ?? addr?.address_id ?? null;
+        if (!addressId) {
+            alert("Пожалуйста, выберите или сохраните адрес доставки.");
+            return;
+        }
+
+        const payload = {
+            address_id: Number(addr.id), // обязательно число
+            products: items.map(it => ({ product_id: Number(it.id), quantity: Number(it.qty) }))
+        };
+
+        const result = await createOrder(payload);
 
         if (result.ok) {
-            clear();
-            close();
-            alert("Заказ отправлен успешно! Номер: " + (result.data?.orderId ?? "—"));
+            const orderId = result.data?.order?.id ?? result.data?.id ?? result.data?.orderId;
+            if (orderId) {
+                // успех
+            } else {
+                console.error("No order id in response:", result.data);
+            }
         } else {
-            alert("Ошибка при оформлении заказа: " + (result.error ?? "unknown"));
+            console.error("Order create error:", result.error);
         }
     };
 
@@ -86,7 +99,7 @@ export const CartWidget: React.FC = () => {
 
                 {totalItems > 0 && (
                     <span
-                        className="absolute justify-center px-1 text-[10px] font-semibold leading-none text-white bg-red-500 rounded-full shadow"
+                        className="absolute justify-center p-1 text-[10px] font-semibold leading-none text-white bg-red-500 rounded-full shadow"
                         aria-live="polite"
                     >
                         {totalItems}

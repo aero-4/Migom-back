@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 
 export type Product = {
     id: string | number;
-    name: string;       // <-- используем name (как в твоём CartWidget)
+    name: string;
     price: number;
     image?: string;
 };
@@ -21,7 +21,8 @@ type CartContextType = {
     removeItem: (id: Product["id"]) => void;
     setQty: (id: Product["id"], qty: number) => void;
     clear: () => void;
-    createOrder: (meta?: Record<string, any>) => Promise<{ ok: boolean; data?: any; error?: string }>;
+    // теперь принимает payload (например { address_id, products })
+    createOrder: (payload: Record<string, any>) => Promise<{ ok: boolean; data?: any; error?: string }>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -81,8 +82,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const totalItems = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
     const totalPrice = useMemo(() => items.reduce((s, i) => s + i.qty * i.price, 0), [items]);
 
-    const createOrder = async (meta: Record<string, any> = {}) => {
-        const payload = { items, meta, totalItems, totalPrice, createdAt: new Date().toISOString() };
+    const createOrder = async (payload: Record<string, any>) => {
         try {
             const res = await fetch("/api/orders", {
                 method: "POST",
@@ -91,7 +91,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
             if (!res.ok) {
                 const text = await res.text();
-                return { ok: false, error: text || `Status ${res.status}` };
+                let parsed: any = text;
+                try { parsed = JSON.parse(text); } catch { /* не JSON */ }
+                const errMsg = (parsed && parsed.detail) ? parsed.detail : (text || `Status ${res.status}`);
+                return { ok: false, error: errMsg };
             }
             const data = await res.json();
             return { ok: true, data };
