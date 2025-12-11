@@ -1,13 +1,15 @@
-import React, {useCallback, useEffect, useState} from "react";
-import closeSvg from "../../assets/close.svg";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import PaymentForm from "./PaymentForm.tsx";
 import BackButton from "../Ui/BackButton.tsx";
 import ToggleSwitch from "../Ui/ToggleSwitch.tsx";
 import Loader from "../Loaders/Loader.tsx";
 import CloseButton from "../Ui/CloseButton.tsx";
+import plusSvg from "../../assets/plus.svg";
+import deleteSvg from "../../assets/delete.svg";
+import editSvg from "../../assets/edit.png";
 
 export type DeliveryAddress = {
-    id?: number;
+    id?: number | string;
     addressLine?: string;
     street?: string;
     house?: string;
@@ -33,7 +35,6 @@ type Props = {
 
 type Errors = Partial<Record<keyof DeliveryAddress, string | null>>;
 
-
 const NO_VALUES = new Set([
     "нет",
     "no",
@@ -56,7 +57,6 @@ const onlyDigits = (s?: string) => {
     return /^\d+$/.test(s.trim());
 };
 
-
 const DeliveryForm: React.FC<Props> = ({
                                            value,
                                            onChange,
@@ -71,16 +71,18 @@ const DeliveryForm: React.FC<Props> = ({
     const [loadingSubmit, setLoadingSubmit] = useState(false);
     const [loadingFetch, setLoadingFetch] = useState(false);
     const [errors, setErrors] = useState<Errors>({});
-
-    // NEW: список адресов и статусы
     const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
-    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | string | null>(null);
 
-    const alphaRegex = /^[\p{L}\s\-]+$/u;
+    const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+    const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
+    const [showForm, setShowForm] = useState(false); // controls visibility of inputs
+
+    // simpler alpha regex compatible with older runtimes
+    const alphaRegex = /^[A-Za-zА-Яа-яЁё \-]+$/;
     const numericRegex = /^\d+$/;
 
-    // Fetch addresses helper (used on mount and after create/update/delete)
     const fetchAddresses = useCallback(async (signal?: AbortSignal) => {
         setLoadingAddresses(true);
         try {
@@ -121,12 +123,18 @@ const DeliveryForm: React.FC<Props> = ({
         return () => ctrl.abort();
     }, [fetchAddresses]);
 
-    // If parent passed value, reflect it
+    // reflect external value if passed
     useEffect(() => {
         if (value) {
             setAddr(value);
         }
     }, [value]);
+
+    useEffect(() => {
+        // reset focus state when addresses change
+        setFocusedIndex(-1);
+        optionRefs.current = [];
+    }, [addresses]);
 
     const genUuid = (): string => {
         if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
@@ -134,16 +142,6 @@ const DeliveryForm: React.FC<Props> = ({
         }
         return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
     };
-    const normalize = (arr: any[]) =>
-        arr.map((p) => ({
-            ...p,
-            id: p.id && String(p.id).trim() ? p.id : genUuid(),
-            name: p.name ?? p.slug ?? "Без имени",
-            photo: p.photo ?? p.image ?? "",
-            count: typeof p.count === "number" ? p.count : Number(p.count ?? 0),
-            price: typeof p.price === "number" ? p.price : Number(p.price ?? 0),
-            gramme: typeof p.gramme === "number" ? p.gramme : Number(p.gramme ?? 0),
-        }));
 
     const update = useCallback(
         (patch: Partial<DeliveryAddress>) => {
@@ -169,7 +167,7 @@ const DeliveryForm: React.FC<Props> = ({
             case "addressLine":
             case "street": {
                 if (!raw) return "Поле обязательно";
-                if (!alphaRegex.test(raw)) return "Только буквы, пробелы и дефис";
+                if (!alphaRegex.test(String(raw))) return "Только буквы, пробелы и дефис";
                 return null;
             }
 
@@ -220,10 +218,8 @@ const DeliveryForm: React.FC<Props> = ({
         return Object.keys(next).length === 0;
     };
 
-
     const buildCreateDTO = (a: DeliveryAddress) => {
-        const entrance =
-            !a.intercom || isNoValue(a.intercom) ? null : a.intercom ? Number(a.intercom) : null;
+        const entrance = !a.intercom || isNoValue(a.intercom) ? null : a.intercom ? Number(a.intercom) : null;
 
         return {
             city: a.addressLine ?? "",
@@ -238,8 +234,7 @@ const DeliveryForm: React.FC<Props> = ({
     };
 
     const buildUpdateDTO = (a: DeliveryAddress) => {
-        const entrance =
-            !a.intercom || isNoValue(a.intercom) ? null : a.intercom ? Number(a.intercom) : null;
+        const entrance = !a.intercom || isNoValue(a.intercom) ? null : a.intercom ? Number(a.intercom) : null;
 
         return {
             id: a.id ?? null,
@@ -280,7 +275,6 @@ const DeliveryForm: React.FC<Props> = ({
                 }
                 const created = await res.json();
                 setAddr((prev) => ({...prev, id: created.id}));
-                // refresh addresses and select created
                 await fetchAddresses();
             } else {
                 const body = buildUpdateDTO(addr);
@@ -295,14 +289,13 @@ const DeliveryForm: React.FC<Props> = ({
                         const json = await res.json();
                         message = json?.detail || json?.message || message;
                     } catch {
-                        // ignore
                     }
                     throw new Error(message);
                 }
-                // refresh addresses
                 await fetchAddresses();
             }
 
+            setShowForm(false);
             setStep("payment");
         } catch (err) {
             console.error(err);
@@ -311,39 +304,39 @@ const DeliveryForm: React.FC<Props> = ({
         }
     };
 
-
     const onBlurValidate = (field: keyof DeliveryAddress) => {
         const err = validateField(field, (addr as any)[field]);
         setErrors((prev) => ({...prev, [field]: err}));
     };
 
-    // NEW: select an address from list (checkbox behaviour but only one selected)
     const selectAddress = (a: DeliveryAddress) => {
         setAddr(a);
         onChange?.(a);
+        setShowForm(false);
     };
 
     const startEdit = (a: DeliveryAddress) => {
         setAddr(a);
         onChange?.(a);
+        setShowForm(true);
     };
 
     const startCreate = () => {
         setAddr({leaveAtDoor: false});
         onChange?.({leaveAtDoor: false});
+
+        setShowForm(!showForm);
     };
 
-    const handleDeleteAddress = async (id?: number) => {
+    const handleDeleteAddress = async (id?: number | string) => {
         if (!id) return;
-        if (!confirm("Удалить этот адрес?")) return;
         setDeletingId(id);
         try {
             const res = await fetch(`/api/addresses/${id}`, {method: "DELETE"});
             if (!res.ok) {
                 throw new Error(`Ошибка удаления: ${res.status}`);
             }
-            // если удалили выбранный адрес — очистим addr
-            if (addr.id === id) {
+            if (String(addr.id) === String(id)) {
                 setAddr({leaveAtDoor: false});
                 onChange?.({leaveAtDoor: false});
             }
@@ -353,6 +346,30 @@ const DeliveryForm: React.FC<Props> = ({
             alert("Не удалось удалить адрес");
         } finally {
             setDeletingId(null);
+        }
+    };
+
+    const handleListboxKeyDown = (e: React.KeyboardEvent) => {
+        if (!addresses || addresses.length === 0) return;
+        const last = addresses.length - 1;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = focusedIndex < last ? focusedIndex + 1 : 0;
+            setFocusedIndex(next);
+            optionRefs.current[next]?.focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prev = focusedIndex > 0 ? focusedIndex - 1 : last;
+            setFocusedIndex(prev);
+            optionRefs.current[prev]?.focus();
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            setFocusedIndex(0);
+            optionRefs.current[0]?.focus();
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            setFocusedIndex(last);
+            optionRefs.current[last]?.focus();
         }
     };
 
@@ -369,229 +386,270 @@ const DeliveryForm: React.FC<Props> = ({
                     </div>
 
                     <div className="flex-1 min-h-0 overflow-auto p-4 sm:p-6 space-y-3">
-                        {/* --- NEW: Addresses list with checkbox-like selection --- */}
                         <div className="bg-gray-50 p-3 rounded-md">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="font-medium">Выберите адрес</div>
-                                {/* TOP "Добавить новый" big__button */}
-                                <button
-                                    type="button"
-                                    onClick={startCreate}
-                                    className="big__button text-sm"
-                                >
-                                    + Добавить новый
-                                </button>
-                            </div>
-
                             {loadingAddresses ? (
-                                <div className="text-sm text-gray-500">Загрузка адресов...</div>
+                                <div className="text-center py-6">...</div>
                             ) : addresses.length === 0 ? (
-                                <div className="text-sm text-gray-500">Адресов нет</div>
+                                <div className="flex justify-center py-6">
+                                    <button
+                                        type="button"
+                                        onClick={startCreate}
+                                        className="big__button bg-gray-200"
+                                        aria-label="Добавить адрес"
+                                    >
+                                        <img src={plusSvg}
+                                             className="w-5"
+                                             alt="Добавить"/>
+                                    </button>
+                                </div>
                             ) : (
-                                <div className="grid gap-2">
-                                    {addresses.map((a) => (
-                                        <label key={String(a.id)} className="flex items-start gap-3 p-2 border rounded">
-                                            <input
-                                                type="checkbox"
-                                                checked={addr.id === a.id}
-                                                onChange={() => selectAddress(a)} /* поведение: сделать выбранным (единственным) */
-                                                className="mt-1"
-                                            />
-                                            <div className="flex-1 text-sm">
-                                                <div className="font-medium">
-                                                    {a.addressLine} {a.street ? `, ${a.street}` : ""} {a.house ? `д. ${a.house}` : ""}
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-                                                    {a.flat ? `Кв. ${a.flat}` : ""} {a.floor ? `, этаж ${a.floor}` : ""} {a.intercom ? `, домофон ${a.intercom}` : ""}
-                                                </div>
-                                                {a.comment ? <div className="text-xs text-gray-400 mt-1">{a.comment}</div> : null}
-                                            </div>
+                                <div className="flex flex-row gap-3">
+                                    <div
+                                        role="listbox"
+                                        tabIndex={0}
+                                        onKeyDown={handleListboxKeyDown}
+                                        aria-label="Сохранённые адреса"
+                                        className="flex flex-col flex-1"
+                                    >
 
-                                            <div className="flex flex-col items-end gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => startEdit(a)}
-                                                    className="text-xs text-blue-600"
-                                                >
-                                                    Ред.
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    disabled={deletingId === a.id}
-                                                    onClick={() => handleDeleteAddress(a.id)}
-                                                    className="text-xs text-red-600"
-                                                >
-                                                    {deletingId === a.id ? "Удаление..." : "Удалить"}
-                                                </button>
+                                        {addresses.map((a, idx) => (
+                                            <div
+                                                ref={(el) => (optionRefs.current[idx] = el)}
+                                                key={String(a.id)}
+                                                role="option"
+                                                aria-selected={String(addr.id) === String(a.id)}
+                                                tabIndex={0}
+                                                onClick={() => selectAddress(a)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        selectAddress(a);
+                                                    }
+                                                }}
+                                                className={`w-full p-4 rounded-2xl flex gap-4 ${String(addr.id) === String(a.id) ? 'border-blue-200 bg-blue-50' : ''}`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="saved-address"
+                                                    checked={String(addr.id) === String(a.id)}
+                                                    onChange={() => selectAddress(a)}
+                                                    className="items-center justify-center text-center my-auto my-24"
+                                                    aria-label={`Выбрать адрес ${a.addressLine || ''} ${a.street || ''}`}
+                                                />
+
+                                                <div className="flex-1">
+                                                    <div className="font-medium">
+                                                        {a.addressLine} {a.street ? ` ${a.street}` : ""} {a.house ? `д. ${a.house}` : ""}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {a.flat ? `Кв. ${a.flat}` : ""} {a.floor ? `этаж ${a.floor}` : ""} {a.intercom ? ` домофон ${a.intercom}` : ""}
+                                                    </div>
+                                                    {a.comment ? <div className="text-xs text-gray-400 mt-1">{a.comment}</div> : null}
+                                                </div>
+
+                                                <div className="flex flex-col items-end gap-3">
+                                                    <button
+                                                        type="button"
+                                                        disabled={String(deletingId) === String(a.id)}
+                                                        onClick={(ev) => {
+                                                            ev.stopPropagation();
+                                                            handleDeleteAddress(a.id);
+                                                        }}
+                                                        className="menu__button"
+                                                        aria-label={`Удалить адрес ${a.addressLine || ''}`}
+                                                    >
+                                                        {String(deletingId) === String(a.id) ?
+                                                            (<span aria-hidden>⏳</span>) :
+                                                            (<img src={deleteSvg}
+                                                                  className="w-5"
+                                                                  alt="Удалить"/>)
+                                                        }
+                                                        <span className="sr-only">Удалить</span>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={(ev) => {
+                                                            ev.stopPropagation();
+                                                            startEdit(a);
+                                                        }}
+                                                        className="menu__button"
+                                                        aria-label={`Редактировать адрес ${a.addressLine || ''}`}
+                                                    >
+                                                        <img src={editSvg}
+                                                             alt="Редактировать"
+                                                             className="w-5"/>
+                                                        <span className="sr-only">Редактировать</span>
+                                                    </button>
+
+                                                </div>
                                             </div>
-                                        </label>
-                                    ))}
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={startCreate}
+                                        className="big__button w-12 h-12 bg-gray-200 ml-auto"
+                                        aria-label="Добавить адрес"
+                                    >
+                                        <img src={plusSvg}
+                                             className="w-5"
+                                             alt="Добавить"/>
+                                    </button>
                                 </div>
                             )}
+
                         </div>
 
-                        {/* --- BOTTOM "Добавить новый" big__button (над формой полей) --- */}
-                        <div className="flex justify-center">
-                            <button type="button" onClick={startCreate} className="big__button w-full max-w-xs">
-                                + Добавить новый
-                            </button>
-                        </div>
+                        {showForm ? (
+                            <>
+                                <div>
+                                    <div className="flex flex-row gap-2">
+                                        <label className="sr-only" htmlFor="city">Город</label>
+                                        <input
+                                            id="city"
+                                            name="city"
+                                            type="text"
+                                            value={addr.addressLine ?? ""}
+                                            onChange={(e) => update({addressLine: e.target.value})}
+                                            onBlur={() => onBlurValidate("addressLine")}
+                                            placeholder="Город"
+                                            className={`input text-sm sm:text-base ${errors.addressLine ? "border-red-300" : ""}`}
+                                            aria-invalid={!!errors.addressLine}
+                                        />
+                                        {errors.addressLine ? <div className="text-xs text-red-600 mt-1">{errors.addressLine}</div> : null}
 
-                        {/* --- Existing inline form fields (you already had these) --- */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div>
-                                <label className="sr-only" htmlFor="city">
-                                    Город
-                                </label>
-                                <input
-                                    id="city"
-                                    name="city"
-                                    type="text"
-                                    value={addr.addressLine ?? ""}
-                                    onChange={(e) => update({addressLine: e.target.value})}
-                                    onBlur={() => onBlurValidate("addressLine")}
-                                    placeholder="Город"
-                                    className={`input text-sm sm:text-base ${errors.addressLine ? "border-red-300" : ""}`}
-                                    aria-invalid={!!errors.addressLine}
+                                        <label className="sr-only" htmlFor="street">Улица</label>
+                                        <input
+                                            id="street"
+                                            name="street"
+                                            type="text"
+                                            value={addr.street ?? ""}
+                                            onChange={(e) => update({street: e.target.value})}
+                                            onBlur={() => onBlurValidate("street")}
+                                            placeholder="Улица"
+                                            className={`input text-sm sm:text-base ${errors.street ? "border-red-300" : ""}`}
+                                            aria-invalid={!!errors.street}
+                                        />
+                                        {errors.street ? <div className="text-xs text-red-600 mt-1">{errors.street}</div> : null}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                        <label className="sr-only" htmlFor="house">Номер дома</label>
+                                        <input
+                                            id="house"
+                                            name="house"
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            type="text"
+                                            value={addr.house ?? ""}
+                                            onChange={(e) => update({house: e.target.value.replace(/[^\d]/g, "")})}
+                                            onBlur={() => onBlurValidate("house")}
+                                            placeholder="Номер дома"
+                                            className={`input text-sm sm:text-base ${errors.house ? "border-red-300" : ""}`}
+                                            aria-invalid={!!errors.house}
+                                        />
+                                        {errors.house ? <div className="text-xs text-red-600 mt-1">{errors.house}</div> : null}
+
+                                        <label className="sr-only" htmlFor="flat">Номер квартиры</label>
+                                        <input
+                                            id="flat"
+                                            name="flat"
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            type="text"
+                                            value={addr.flat ?? ""}
+                                            onChange={(e) => update({flat: e.target.value.replace(/[^\d]/g, "")})}
+                                            onBlur={() => onBlurValidate("flat")}
+                                            placeholder="Номер квартиры"
+                                            className={`input text-sm sm:text-base ${errors.flat ? "border-red-300" : ""}`}
+                                            aria-invalid={!!errors.flat}
+                                        />
+                                        {errors.flat ? <div className="text-xs text-red-600 mt-1">{errors.flat}</div> : null}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="sr-only" htmlFor="intercom">Домофон</label>
+                                        <input
+                                            id="intercom"
+                                            name="intercom"
+                                            type="text"
+                                            value={addr.intercom ?? ""}
+                                            onChange={(e) => update({intercom: e.target.value})}
+                                            onBlur={() => onBlurValidate("intercom")}
+                                            placeholder='Домофон (цифра или "нет")'
+                                            className={`input text-sm sm:text-base ${errors.intercom ? "border-red-300" : ""}`}
+                                            aria-invalid={!!errors.intercom}
+                                        />
+                                        {errors.intercom ? <div className="text-xs text-red-600 mt-1">{errors.intercom}</div> : null}
+                                    </div>
+
+                                    <div>
+                                        <label className="sr-only" htmlFor="floor">Этаж</label>
+                                        <input
+                                            id="floor"
+                                            name="floor"
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            type="text"
+                                            value={addr.floor ?? ""}
+                                            onChange={(e) => update({floor: e.target.value.replace(/[^\d]/g, "")})}
+                                            onBlur={() => onBlurValidate("floor")}
+                                            placeholder="Этаж"
+                                            className={`input text-sm sm:text-base ${errors.floor ? "border-red-300" : ""}`}
+                                            aria-invalid={!!errors.floor}
+                                        />
+                                        {errors.floor ? <div className="text-xs text-red-600 mt-1">{errors.floor}</div> : null}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="sr-only" htmlFor="comment">Комментарий</label>
+                                    <input
+                                        id="comment"
+                                        name="comment"
+                                        type="text"
+                                        value={addr.comment ?? ""}
+                                        onChange={(e) => update({comment: e.target.value})}
+                                        placeholder="Комментарий для курьера"
+                                        className="input text-sm sm:text-base min-h-30"
+                                    />
+                                </div>
+
+                                <ToggleSwitch
+                                    checked={!!addr.leaveAtDoor}
+                                    onCheckedChange={(v) => update({leaveAtDoor: v})}
+                                    label="Оставить у двери"
                                 />
-                                {errors.addressLine ? (
-                                    <div className="text-xs text-red-600 mt-1">{errors.addressLine}</div>
+                            </>
+                        ) : (
+                            <div className="justify-center items-center">
+                                {addr && addr.addressLine ? (
+                                    <div className="text-gray-700">
+                                        Выбран адрес: <span
+                                        className="font-medium">{addr.addressLine}{addr.street ? `, ${addr.street}` : ""}{addr.house ? `, д. ${addr.house}` : ""}</span>
+                                    </div>
                                 ) : null}
                             </div>
-
-                            <div>
-                                <label className="sr-only" htmlFor="street">
-                                    Улица
-                                </label>
-                                <input
-                                    id="street"
-                                    name="street"
-                                    type="text"
-                                    value={addr.street ?? ""}
-                                    onChange={(e) => update({street: e.target.value})}
-                                    onBlur={() => onBlurValidate("street")}
-                                    placeholder="Улица"
-                                    className={`input text-sm sm:text-base ${errors.street ? "border-red-300" : ""}`}
-                                    aria-invalid={!!errors.street}
-                                />
-                                {errors.street ? <div className="text-xs text-red-600 mt-1">{errors.street}</div> : null}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div>
-                                <label className="sr-only" htmlFor="house">
-                                    Номер дома
-                                </label>
-                                <input
-                                    id="house"
-                                    name="house"
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    type="text"
-                                    value={addr.house ?? ""}
-                                    onChange={(e) => update({house: e.target.value.replace(/[^\d]/g, "")})}
-                                    onBlur={() => onBlurValidate("house")}
-                                    placeholder="Номер дома"
-                                    className={`input text-sm sm:text-base ${errors.house ? "border-red-300" : ""}`}
-                                    aria-invalid={!!errors.house}
-                                />
-                                {errors.house ? <div className="text-xs text-red-600 mt-1">{errors.house}</div> : null}
-                            </div>
-
-                            <div>
-                                <label className="sr-only" htmlFor="flat">
-                                    Номер квартиры
-                                </label>
-                                <input
-                                    id="flat"
-                                    name="flat"
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    type="text"
-                                    value={addr.flat ?? ""}
-                                    onChange={(e) => update({flat: e.target.value.replace(/[^\d]/g, "")})}
-                                    onBlur={() => onBlurValidate("flat")}
-                                    placeholder="Номер квартиры"
-                                    className={`input text-sm sm:text-base ${errors.flat ? "border-red-300" : ""}`}
-                                    aria-invalid={!!errors.flat}
-                                />
-                                {errors.flat ? <div className="text-xs text-red-600 mt-1">{errors.flat}</div> : null}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div>
-                                <label className="sr-only" htmlFor="intercom">
-                                    Домофон
-                                </label>
-                                <input
-                                    id="intercom"
-                                    name="intercom"
-                                    type="text"
-                                    value={addr.intercom ?? ""}
-                                    onChange={(e) => update({intercom: e.target.value})}
-                                    onBlur={() => onBlurValidate("intercom")}
-                                    placeholder='Домофон (цифра или "нет")'
-                                    className={`input text-sm sm:text-base ${errors.intercom ? "border-red-300" : ""}`}
-                                    aria-invalid={!!errors.intercom}
-                                />
-                                {errors.intercom ? <div className="text-xs text-red-600 mt-1">{errors.intercom}</div> : null}
-                            </div>
-
-                            <div>
-                                <label className="sr-only" htmlFor="floor">
-                                    Этаж
-                                </label>
-                                <input
-                                    id="floor"
-                                    name="floor"
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    type="text"
-                                    value={addr.floor ?? ""}
-                                    onChange={(e) => update({floor: e.target.value.replace(/[^\d]/g, "")})}
-                                    onBlur={() => onBlurValidate("floor")}
-                                    placeholder="Этаж"
-                                    className={`input text-sm sm:text-base ${errors.floor ? "border-red-300" : ""}`}
-                                    aria-invalid={!!errors.floor}
-                                />
-                                {errors.floor ? <div className="text-xs text-red-600 mt-1">{errors.floor}</div> : null}
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="sr-only" htmlFor="comment">
-                                Комментарий
-                            </label>
-                            <input
-                                id="comment"
-                                name="comment"
-                                type="text"
-                                value={addr.comment ?? ""}
-                                onChange={(e) => update({comment: e.target.value})}
-                                placeholder="Комментарий для курьера"
-                                className="input text-sm sm:text-base min-h-30"
-                            />
-                        </div>
-
-                        <ToggleSwitch
-                            checked={!!addr.leaveAtDoor}
-                            onCheckedChange={(v) => update({leaveAtDoor: v})}
-                            label="Оставить у двери"
-                        />
+                        )}
 
                         <div className="h-24 md:h-28" aria-hidden/>
                     </div>
 
                     <div className="sticky bottom-0 bg-white p-2 sm:p-4 flex flex-col gap-3">
-                        <button
-                            type="submit"
-                            disabled={loadingSubmit}
-                            className={`big__button btn__circle w-full ${loadingSubmit ? "opacity-60 cursor-not-allowed" : ""}`}
-                        >
-                            Далее
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                type="submit"
+                                disabled={loadingSubmit || !showForm}
+                                className={`big__button btn__circle flex-1 ${loadingSubmit ? "opacity-60 cursor-not-allowed" : ""}`}
+                            >
+                                Далее
+                            </button>
+
+                        </div>
 
                         <BackButton onBack={() => setStep("cart")}/>
                     </div>
@@ -603,7 +661,7 @@ const DeliveryForm: React.FC<Props> = ({
                              onBack={() => setStep("address")}/>
             )}
 
-            { (loadingFetch || loadingAddresses) && (<Loader/>)}
+            {(loadingFetch || loadingAddresses) && (<Loader/>)}
         </div>
     );
 };
