@@ -83,27 +83,36 @@ async def create_normal_product(client):
     PRICES = [999, 1999, 2199, 499, 899, 1399, 2599, 3499, 5999]
     NAME_CATS = ["Выбор пользователей", "Острее киберугроз", "Только здесь", "Новинки", "Только в доставке", "Комбо и ланчи", "Баскеты", "Бургеры"]
     NAMES = ["Комбо \"Курица в квадрате\" оригинальное", "Острое комбо от Kaspersky «Против звонков с неизвестного»", "Шефбургер оригинальный", "Комбо с Биг Маэстро", "Веджи Чиз Ролл классический", "8 Острых Крылышек", "Большое комбо \"Курица в квадрате\" оригинальное"]
-
-    resp = await client.post("/api/files/",
-                             files={"file": open(random.choice(TEST_PHOTOS), "rb")})
-    url = resp.json()["url"]
-
-    category_data = CategoryCreateDTO(
-        name=random.choice(NAME_CATS),
-        photo=url
-    )
-
-    response1 = await client.post("/api/categories/", json=category_data.model_dump(mode="json"))
-    category = Category(**response1.json())
-
+    already_exists = []
     for name in NAMES:
+        resp = await client.post("/api/files/",
+                                 files={"file": open(random.choice(TEST_PHOTOS), "rb")})
+        url = resp.json()["url"]
+        category_data = None
+
+        while True:
+            cat = random.choice(NAME_CATS)
+            if cat in already_exists:
+                continue
+
+            category_data = CategoryCreateDTO(
+                name=cat,
+                photo=url
+            )
+            already_exists.append(cat)
+            break
+
+
+        response1 = await client.post("/api/categories/", json=category_data.model_dump(mode="json"))
+        category = Category(**response1.json())
+
         product = ProductCreateDTO(
             name=name,
             content=f"Пирожок с манго-маракуйей и крем-чизом - это сочетание хрустящего теста с начинкой из спелого манго, свежей кислинкой маракуйи и лёгким сливочным кремом. *Продукция содержит или может содержать ракообразных или их следы, а также другие аллергены. Кроме ресторанов-исключений, указанных на сайте – https://rostics.ru/promo/noshrimps",
             composition="Филе куриное оригинальное; Томаты свежие; Салат Айсберг; Булочка бриошь; Сырная котлета; Соус на основе растительных масел со вкусом \"Блю Чиз\"",
             price=random.choice(PRICES),
-            discount_price=random.randint(1, 200),
-            discount=random.randint(1, 200),
+            discount_price=random.choice(PRICES),
+            discount=random.randint(0, 10) or None,
             count=random.randint(1, 200),
             grams=random.randint(1, 200),
             protein=random.randint(1, 200),
