@@ -15,7 +15,6 @@ orders_api_router = APIRouter()
 @orders_api_router.post("/")
 @access_control(open=False)
 async def create(request: Request, order: OrderCreateDTO, uow: OrderUoWDeps):
-    print(request.state.user)
     return await new_order(order, uow, request.state.user)
 
 
