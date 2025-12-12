@@ -77,9 +77,8 @@ const DeliveryForm: React.FC<Props> = ({
 
     const [focusedIndex, setFocusedIndex] = useState<number>(-1);
     const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
-    const [showForm, setShowForm] = useState(false); // controls visibility of inputs
+    const [showForm, setShowForm] = useState(false);
 
-    // simpler alpha regex compatible with older runtimes
     const alphaRegex = /^[A-Za-zА-Яа-яЁё \-]+$/;
     const numericRegex = /^\d+$/;
 
@@ -123,7 +122,6 @@ const DeliveryForm: React.FC<Props> = ({
         return () => ctrl.abort();
     }, [fetchAddresses]);
 
-    // reflect external value if passed
     useEffect(() => {
         if (value) {
             setAddr(value);
@@ -131,17 +129,10 @@ const DeliveryForm: React.FC<Props> = ({
     }, [value]);
 
     useEffect(() => {
-        // reset focus state when addresses change
         setFocusedIndex(-1);
         optionRefs.current = [];
     }, [addresses]);
 
-    const genUuid = (): string => {
-        if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
-            return (crypto as any).randomUUID();
-        }
-        return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-    };
 
     const update = useCallback(
         (patch: Partial<DeliveryAddress>) => {

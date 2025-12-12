@@ -15,7 +15,6 @@ type PaymentFormProps = {
 const PaymentForm: React.FC<PaymentFormProps> = ({
                                                      addr,
                                                      onSubmit,
-                                                     submitLabel = "Оплатить",
                                                      onBack,
                                                  }) => {
 
@@ -31,9 +30,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <button
                     type="button"
                     onClick={handlePayment}
-                    className="btn__circle big__button"
+                    className="btn__circle big__button bg-violet-500"
+                    name="yoomoney"
                 >
-                    {submitLabel}
+                    Оплатить через ЮМани
                 </button>
 
                 {onBack && <BackButton onBack={onBack} />}

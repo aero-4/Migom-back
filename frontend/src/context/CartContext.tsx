@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
 import config from "../../config.ts";
 
 export type Product = {
@@ -22,14 +22,14 @@ type CartContextType = {
     removeItem: (id: Product["id"]) => void;
     setQty: (id: Product["id"], qty: number) => void;
     clear: () => void;
-    // теперь принимает payload (например { address_id, products })
     createOrder: (payload: Record<string, any>) => Promise<{ ok: boolean; data?: any; error?: string }>;
+    createPayment: (payload: Record<string, any>) => Promise<{ ok: boolean; data?: any; error?: string }>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 const STORAGE_KEY = "cart_v1";
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [items, setItems] = useState<CartItem[]>(() => {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -53,10 +53,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setItems((prev) => {
             const idx = prev.findIndex((p) => p.id === product.id);
             if (idx === -1) {
-                return [...prev, { ...product, qty }];
+                return [...prev, {...product, qty}];
             } else {
                 const copy = [...prev];
-                copy[idx] = { ...copy[idx], qty: copy[idx].qty + qty };
+                copy[idx] = {...copy[idx], qty: copy[idx].qty + qty};
                 return copy;
             }
         });
@@ -71,7 +71,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             removeItem(id);
             return;
         }
-        setItems((prev) => prev.map((p) => (p.id === id ? { ...p, qty } : p)));
+        setItems((prev) => prev.map((p) => (p.id === id ? {...p, qty} : p)));
     };
 
     const clear = () => setItems([]);
@@ -87,27 +87,55 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const res = await fetch(config.API_URL + "/api/orders/", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(payload),
                 credentials: "include"
             });
             if (!res.ok) {
                 const text = await res.text();
                 let parsed: any = text;
-                try { parsed = JSON.parse(text); } catch { /* не JSON */ }
+                try {
+                    parsed = JSON.parse(text);
+                } catch { /* не JSON */
+                }
                 const errMsg = (parsed && parsed.detail) ? parsed.detail : (text || `Status ${res.status}`);
-                return { ok: false, error: errMsg };
+                return {ok: false, error: errMsg};
             }
             const data = await res.json();
-            return { ok: true, data };
+            return {ok: true, data};
         } catch (err: any) {
-            return { ok: false, error: err?.message ?? "Network error" };
+            return {ok: false, error: err?.message ?? "Network error"};
         }
     };
 
+    const createPayment = async (payload: Record<string, any>) => {
+        try {
+            const res = await fetch(config.API_URL + "/api/payments/", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload),
+                credentials: "include"
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                let parsed: any = text;
+                try {
+                    parsed = JSON.parse(text);
+                } catch { /* не JSON */
+                }
+                const errMsg = (parsed && parsed.detail) ? parsed.detail : (text || `Status ${res.status}`);
+                return {ok: false, error: errMsg};
+            }
+            const data = await res.json();
+            return {ok: true, data};
+        } catch (err: any) {
+            return {ok: false, error: err?.message ?? "Network error"};
+        }
+    }
+
     return (
         <CartContext.Provider
-            value={{ items, totalItems, totalPrice, isOpen, open, close, toggle, addItem, removeItem, setQty, clear, createOrder }}
+            value={{items, totalItems, totalPrice, isOpen, open, close, toggle, addItem, removeItem, setQty, clear, createOrder, createPayment}}
         >
             {children}
         </CartContext.Provider>

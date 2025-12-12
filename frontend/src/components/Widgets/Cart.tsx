@@ -17,6 +17,7 @@ export const CartWidget: React.FC = () => {
         removeItem,
         clear,
         createOrder,
+        createPayment
     } = useCart();
     const {isAuthenticated} = useAuth();
     const [loading, setLoading] = useState(false);
@@ -69,16 +70,21 @@ export const CartWidget: React.FC = () => {
         }
 
         const payload = {
-            address_id: Number(addr.id), // обязательно число
+            address_id: Number(addr.id),
             products: items.map(it => ({ product_id: Number(it.id), quantity: Number(it.qty) }))
         };
-
         const result = await createOrder(payload);
 
         if (result.ok) {
             const orderId = result.data?.order?.id ?? result.data?.id ?? result.data?.orderId;
             if (orderId) {
-                // успех
+                const result2 = await createPayment({order_id: orderId, amount: totalPrice, method: "yoomoney"})
+
+                if (result.ok) {
+                    const url = result2.data?.url
+
+                    window.document.location.assign(url);
+                }
             } else {
                 console.error("No order id in response:", result.data);
             }
