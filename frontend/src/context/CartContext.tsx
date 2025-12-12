@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import config from "../../config.ts";
 
 export type Product = {
     id: string | number;
@@ -84,10 +85,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const createOrder = async (payload: Record<string, any>) => {
         try {
-            const res = await fetch("/api/orders", {
+            const res = await fetch(config.API_URL + "/api/orders/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
+                credentials: "include"
             });
             if (!res.ok) {
                 const text = await res.text();
