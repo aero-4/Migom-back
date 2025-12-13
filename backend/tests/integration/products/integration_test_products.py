@@ -34,16 +34,8 @@ TEST_SUPER_USER = UserCreateDTO(email="test@test.com", password="test12345", fir
 
 
 async def create_product(client, product=None):
-    TEST_PHOTOS = ["test (1).jpeg",
-                   "test (2).jpeg",
-                   "test (3).jpeg",
-                   "test (4).jpeg",
-                   "test (5).jpeg",
-                   "test (6).jpeg",
-                   "test (7).jpeg",
-                   "test (8).jpeg"]
     resp = await client.post("/api/files/",
-                             files={"file": open(random.choice(TEST_PHOTOS), "rb")}
+                             files={"file": open("examples/test (1).jpeg", "rb")}
                              )
     url = resp.json()["url"]
 
@@ -58,7 +50,7 @@ async def create_product(client, product=None):
         name=f"Бургер - Бургерный №{random.randint(1, 2000)} ",
         content=f"Бургеры в бургерной скале. Почувствуйте новые вкусы! №{random.randint(1, 200)}",
         composition="зеленый лист, соль, сахар, огурцы",
-        price=random.randint(1, 100),
+        price=1299,
         discount_price=random.randint(1, 100),
         discount=random.randint(1, 100),
         count=random.randint(1, 100),
@@ -259,14 +251,35 @@ async def test_success_get_all_by_name_filters(clear_db, user_factory):
         await user_factory(client, TEST_SUPER_USER)
 
         products = []
-        for i in range(10):
-            products.append(await create_product(client))
+        for i in range(2):
+            products.append(
+                await create_product(client)
+            )
 
-        search = SearchDataDTO(name="Бургер")
+        search = SearchDataDTO(name="бур")
         search_response = await client.post("/api/products/search", json=search.model_dump())
         search_result = [Product(**i) for i in search_response.json()]
 
         assert products == search_result
+
+        search2 = SearchDataDTO(name="ГЕР")
+        search_response2 = await client.post("/api/products/search", json=search2.model_dump())
+        search_result2 = [Product(**i) for i in search_response2.json()]
+
+        assert products == search_result2
+
+        search3 = SearchDataDTO(price=1299)
+        search_response3 = await client.post("/api/products/search", json=search3.model_dump())
+        search_result3 = [Product(**i) for i in search_response3.json()]
+
+        assert products == search_result3
+
+        search4 = SearchDataDTO(name="...бургерный")
+        search_response4 = await client.post("/api/products/search", json=search3.model_dump())
+        search_result4 = [Product(**i) for i in search_response4.json()]
+
+        assert products == search_result4
+
 
 
 @pytest.mark.asyncio(loop_scope="session")

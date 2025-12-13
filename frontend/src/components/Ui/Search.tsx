@@ -10,7 +10,6 @@ type ProductItem = { /* ...как было...*/ };
 
 const DEBOUNCE = 500;
 
-/* parseInputToDTO — оставляем без изменений */
 export const parseInputToDTO = (raw: string): SearchDataDTO => {
     const value = raw.trim();
     if (!value) return {};
@@ -331,9 +330,6 @@ const Search: React.FC = () => {
                 </div>
             )}
 
-            {loading && dropdownStyle && (
-                <Loader/>
-            )}
         </>
     );
 };

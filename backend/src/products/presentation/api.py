@@ -22,25 +22,23 @@ async def get(product_id: int, uow: ProductUoWDep):
 
 
 
-@access_control(superuser=True)
 @products_api_router.post("/search")
 async def search(search_data: SearchDataDTO, uow: ProductUoWDep):
     return await collect_products_by_filters(search_data, uow)
 
 
-@access_control(superuser=True)
 @products_api_router.post("/")
 async def add(product_data: ProductCreateDTO, uow: ProductUoWDep):
     return await create_product(product_data, uow)
 
 
-@access_control(superuser=True)
 @products_api_router.patch("/{product_id}")
+@access_control(superuser=True)
 async def patch(product_id: int, product_data: ProductUpdateDTO, uow: ProductUoWDep):
     return await update_product(product_id, product_data, uow)
 
 
-@access_control(superuser=True)
 @products_api_router.delete("/{product_id}")
+@access_control(superuser=True)
 async def delete(product_id: int, uow: ProductUoWDep):
     return await delete_product(product_id, uow)

@@ -106,7 +106,6 @@ body {
         flex-col
         bg-white
         rounded-2xl
-        min-w-0
         gap-3
         p-3
         md:p-5
@@ -115,7 +114,7 @@ body {
     }
 
     .badge__covered {
-        @apply absolute z-10 text-center px-3 text-[11px] md:text-[13px] bg-green-300 rounded-xl text-gray-700
+        @apply -mr-15 absolute z-10 text-center px-3 text-[11px] md:text-[13px] bg-green-300 rounded-xl text-gray-700
     }
 
     .img {
@@ -127,7 +126,7 @@ body {
     }
 
     .product__img {
-        @apply w-full min-w-25 min-h-25 aspect-square rounded-3xl object-cover transition-transform transform;
+        @apply w-full aspect-square rounded-3xl object-cover transition-transform transform;
     }
 
     .product__name {
