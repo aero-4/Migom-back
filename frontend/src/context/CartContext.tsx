@@ -5,6 +5,7 @@ export type Product = {
     id: string | number;
     name: string;
     price: number;
+    discount_price: number;
     image?: string;
 };
 
@@ -81,7 +82,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({children}
     const toggle = () => setIsOpen((s) => !s);
 
     const totalItems = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
-    const totalPrice = useMemo(() => items.reduce((s, i) => s + i.qty * i.price, 0), [items]);
+    const totalPrice = useMemo(() => items.reduce((s, i) => s + i.qty * i.discount_price || i.price, 0), [items]);
 
     const createOrder = async (payload: Record<string, any>) => {
         try {

@@ -88,9 +88,11 @@ const DeliveryForm: React.FC<Props> = ({
             const res = await fetch("/api/addresses/", {signal});
             if (!res.ok) {
                 setAddresses([]);
+                window.location.assign("/login")
                 return;
             }
             const list = await res.json();
+
             if (!Array.isArray(list)) {
                 setAddresses([]);
                 return;

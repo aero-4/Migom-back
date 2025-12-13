@@ -71,5 +71,6 @@ class PGPaymentRepository(IPaymentRepository):
             order_id=obj.order_id,
             user_id=obj.user_id,
             method=obj.method,
-            status=obj.status
+            status=obj.status,
+            url=obj.url
         )

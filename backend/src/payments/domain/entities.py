@@ -9,6 +9,7 @@ class Payment(CustomModel):
     user_id: int
     method: str
     status: str
+    url: str | None = None
 
 
 class PaymentCreate(CustomModel):

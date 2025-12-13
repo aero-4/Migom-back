@@ -84,12 +84,16 @@ async def create_normal_product(client):
     NAME_CATS = ["Выбор пользователей", "Острее киберугроз", "Только здесь", "Новинки", "Только в доставке", "Комбо и ланчи", "Баскеты", "Бургеры"]
     NAMES = ["Комбо \"Курица в квадрате\" оригинальное", "Острое комбо от Kaspersky «Против звонков с неизвестного»", "Шефбургер оригинальный", "Комбо с Биг Маэстро", "Веджи Чиз Ролл классический", "8 Острых Крылышек", "Большое комбо \"Курица в квадрате\" оригинальное"]
     already_exists = []
-    for name in NAMES:
-        resp = await client.post("/api/files/",
-                                 files={"file": open(random.choice(TEST_PHOTOS), "rb")})
-        url = resp.json()["url"]
-        category_data = None
 
+    for name in NAMES:
+        photo_path = random.choice(TEST_PHOTOS)
+
+        with open(photo_path, "rb") as f:
+            resp = await client.post("/api/files/",
+                                     files={"file": f})
+            url_photo = resp.json()["url"]
+
+        category_data = None
         while True:
             cat = random.choice(NAME_CATS)
             if cat in already_exists:
@@ -97,7 +101,7 @@ async def create_normal_product(client):
 
             category_data = CategoryCreateDTO(
                 name=cat,
-                photo=url
+                photo=url_photo
             )
             already_exists.append(cat)
             break
@@ -112,7 +116,7 @@ async def create_normal_product(client):
             composition="Филе куриное оригинальное; Томаты свежие; Салат Айсберг; Булочка бриошь; Сырная котлета; Соус на основе растительных масел со вкусом \"Блю Чиз\"",
             price=random.choice(PRICES),
             discount_price=random.choice(PRICES),
-            discount=random.randint(0, 10) or None,
+            discount=random.randint(1, 5),
             count=random.randint(1, 200),
             grams=random.randint(1, 200),
             protein=random.randint(1, 200),
@@ -120,7 +124,7 @@ async def create_normal_product(client):
             carbohydrates=random.randint(1, 200),
             kilocalorie=random.randint(1, 200),
             category_id=category.id,
-            photo=url,
+            photo=url_photo,
         )
 
         response2 = await client.post("/api/products/", json=product.model_dump())

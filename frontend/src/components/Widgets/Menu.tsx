@@ -20,7 +20,7 @@ export default function Menu({ onClose }: Props): JSX.Element {
 
     return (
         <div
-            className="absolute top-10 right-0 p-6 flex flex-col gap-1 rounded-md bg-white shadow transition-all border border-gray-200 border-1"
+            className="absolute z-50 top-10 right-0 p-6 flex flex-col gap-1 rounded-md bg-white shadow transition-all border border-gray-200 border-1"
             role="menu"
             aria-orientation="vertical"
         >

@@ -15,7 +15,7 @@ async def add_payment(user: User, payment_data: PaymentCreateDTO, uow: PaymentUo
     async with uow:
         payment_url: str = await provider.create(payment_data)
         payment_data.url = payment_url
-
         payment = await uow.payments.add(payment_data)
         await uow.commit()
+
     return payment
