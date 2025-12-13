@@ -26,7 +26,7 @@ export default function AddInCartBtn({product, className="", label=""}): JSX.Ele
     };
 
     return (
-        <div className={`${className} flex flex-row flex-wrap ml-auto bg-gray-200 rounded-full`}>
+        <div className={`${className} flex flex-row flex-wrap ml-auto bg-red-100/30 rounded-full`}>
             {count <= 0 ? (
                 <div>
                     <button
@@ -37,7 +37,7 @@ export default function AddInCartBtn({product, className="", label=""}): JSX.Ele
                         aria-label="Добавить"
                     >
                         <img src={plusPng} className={`w-3 lg:w-4`} alt="Добавить"/>
-                        {label && <span className="text-sm  my-3 px-3 text-black">{label}</span>}
+                        {label && <span className="text-sm my-3 px-3 text-black">{label}</span>}
                     </button>
                 </div>
             ) : (
@@ -53,7 +53,7 @@ export default function AddInCartBtn({product, className="", label=""}): JSX.Ele
                         {label && <span className="text-sm my-3 px-3 text-black">Убрать</span>}
                     </button>
 
-                    <span className="text-center text-xs ">{count}</span>
+                    <span className="text-center text-xs">{count}</span>
 
                     <button
                         name="plus"

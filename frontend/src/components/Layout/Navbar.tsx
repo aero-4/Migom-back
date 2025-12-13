@@ -123,13 +123,14 @@ const Navbar: React.FC = () => {
 
             {isMobileSearchOpen && (
                 <div
-                    className="fixed inset-0 z-60 bg-black/50 flex items-start justify-center p-7"
+                    className="fixed inset-0 z-60 bg-black/50 flex "
                     onClick={() => setMobileSearchOpen(false)}
                 >
                     <div
-                        className="shadow w-full max-w-3xl bg-white rounded-xl p-6 mt-12"
+                        className="flex flex-col gap-3 shadow w-full max-w-3xl bg-white rounded-xl p-12"
                         onClick={(e) => e.stopPropagation()}
                     >
+
                         <div className="flex justify-end">
                             <CloseButton close={() => setMobileSearchOpen(false)}/>
                         </div>

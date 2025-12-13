@@ -1,7 +1,6 @@
 import React, {JSX} from "react"
 import Categories from "../components/Widgets/Categories";
 import Products from "../components/Widgets/Products";
-import {CartWidget} from "../components/Widgets/Cart";
 
 export default function Home(): JSX.Element {
     return (
@@ -9,7 +8,6 @@ export default function Home(): JSX.Element {
             <h1 className="title">Каталог</h1>
 
             <Categories/>
-
 
             <h1 className="title">Популярное</h1>
 

@@ -3,6 +3,7 @@ import {Routes, Route} from 'react-router-dom';
 import Product from "./pages/Product.tsx";
 import Category from "./pages/Category.tsx";
 import Profile from "./pages/Profile.tsx";
+import SearchPage from "./pages/Search.tsx";
 
 const Home = lazy(() => import('./pages/Home.tsx'));
 const Login = lazy(() => import('./pages/Login.tsx'));
@@ -22,6 +23,7 @@ function App(): JSX.Element {
                     <Route path="category/:id" element={<Category/>}/>
                     <Route path="register" element={<Register/>}/>
                     <Route path="login" element={<Login/>}/>
+                    <Route path="search" element={<SearchPage/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Route>
             </Routes>

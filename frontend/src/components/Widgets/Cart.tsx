@@ -105,7 +105,7 @@ export const CartWidget: React.FC = () => {
 
                 {totalItems > 0 && (
                     <span
-                        className="absolute justify-center p-1 text-[10px] font-semibold leading-none text-white bg-red-500 rounded-full shadow"
+                        className="absolute justify-center p-1 px-1 text-sm -mt-2 ml-5 font-semibold leading-none text-white bg-red-500 rounded-full shadow"
                         aria-live="polite"
                     >
                         {totalItems}

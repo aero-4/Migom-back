@@ -41,11 +41,11 @@ body {
     }
 
     .add__button:hover {
-        @apply bg-red-500/90
+        @apply bg-red-400/90
     }
 
     .add__button:active {
-        @apply bg-red-600/30
+        @apply bg-red-600/40
     }
 
     .add__button--sm {
@@ -105,20 +105,21 @@ body {
         flex
         flex-col
         bg-white
-        rounded-xl
+        rounded-2xl
         min-w-0
         gap-3
         p-3
         md:p-5
         overflow-hidden
+        relative
     }
 
     .badge__covered {
-        @apply absolute z-1 text-center px-2 text-[11px] md:text-[13px] bg-lime-300 rounded-xl text-gray-600
+        @apply absolute z-10 text-center px-3 text-[11px] md:text-[13px] bg-green-300 rounded-xl text-gray-700
     }
 
     .img {
-        @apply w-full h-full my-auto aspect-square rounded-xl object-cover bg-gray-100 transition-transform transform;
+        @apply w-full h-full my-auto aspect-square rounded-xl object-cover transition-transform transform;
     }
 
     .cat__img {
@@ -126,13 +127,12 @@ body {
     }
 
     .product__img {
-        @apply w-full min-w-25 min-h-25 aspect-square rounded-3xl object-cover bg-gray-100 transition-transform transform;
+        @apply w-full min-w-25 min-h-25 aspect-square rounded-3xl object-cover transition-transform transform;
     }
 
     .product__name {
         @apply min-w-0 text-[14px] font-medium text-gray-700 truncate line-clamp-2 whitespace-normal
     }
-
 
     .meta__row {
         @apply flex items-center justify-between gap-2
@@ -143,7 +143,7 @@ body {
     }
 
     .cat__name {
-        @apply text-sm md:text-lg text-gray-900 text-center justify-center truncate p-2
+        @apply text-sm  text-gray-900 text-center justify-center truncate p-2
     }
 
     .form__label {
@@ -220,6 +220,6 @@ body {
     }
 
     .menu__button {
-        @apply flex flex-col items-center text-xs md:text-lg focus:outline-none hover:opacity-80 active:opacity-70 focus:outline-none
+        @apply flex flex-col items-center cursor-pointer text-xs md:text-lg focus:outline-none hover:opacity-80 active:opacity-70 focus:outline-none
     }
 }
