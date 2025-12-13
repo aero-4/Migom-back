@@ -1,6 +1,6 @@
 from typing import List, Any, Coroutine
 
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,16 +29,13 @@ class PGProductsRepository(IProductRepository):
         stmt = (
             select(ProductsOrm)
             .filter(
-                or_(ProductsOrm.name.like(f"%{search.name}%"),
-                    ProductsOrm.content.like(f"%{search.content}%"),
-                    ProductsOrm.category_id == search.category_id,
-                    ProductsOrm.price == search.price,
-                    ProductsOrm.discount == search.discount,
-                    ProductsOrm.grams == search.grams,
-                    ProductsOrm.protein == search.protein,
-                    ProductsOrm.fats == search.fats,
-                    ProductsOrm.carbohydrates == search.carbohydrates)
-            )
+                ProductsOrm.name.ilike(f"%{search.name}%"),
+                ProductsOrm.category_id == search.category_id,
+                ProductsOrm.price == search.price,
+                ProductsOrm.grams == search.grams,
+                ProductsOrm.protein == search.protein,
+                ProductsOrm.fats == search.fats,
+                ProductsOrm.carbohydrates == search.carbohydrates)
         )
         result = await self.session.execute(stmt)
         result: List[ProductsOrm] = result.scalars().all()
